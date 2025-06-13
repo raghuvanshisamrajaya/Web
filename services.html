@@ -3,233 +3,204 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Our Services</title>
+  <title>Services | Raghuvanshi Health Care</title>
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-    body { margin: 0; background: #f2f6fc; padding: 2rem; }
-    h1 { text-align: center; color: #2c3e50; margin-bottom: 1.5rem; }
-    .filter-container {
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f7f9;
+      padding: 1rem;
+    }
+    h1 {
+      text-align: center;
+      color: #00796b;
+    }
+    .controls {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-    .filter-container input, .filter-container select {
-      padding: 0.6rem 1rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      width: 220px;
-    }
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
-    .card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.3s ease;
-    }
-    .card:hover { transform: translateY(-6px); }
-    .card img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-    }
-    .card-body {
-      padding: 1.2rem;
-      flex-grow: 1;
-    }
-    .card h3 {
-      margin: 0 0 0.5rem;
-      color: #34495e;
-    }
-    .description {
-      color: #666;
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
-    }
-    .info {
-      font-size: 0.9rem;
-      margin-bottom: 0.4rem;
-      display: flex;
-      justify-content: space-between;
-      color: #444;
-    }
-    .actions {
-      display: flex;
       gap: 10px;
-      justify-content: center;
-      padding: 1rem;
+      margin-bottom: 1.5rem;
     }
-    .btn {
-      background: #3498db;
+    .controls input, .controls select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      width: 200px;
+    }
+    .services {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+    .service-card {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+      transition: 0.3s;
+    }
+    .service-card:hover {
+      transform: translateY(-5px);
+    }
+    .service-card img {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .service-card h3 {
+      color: #004d40;
+      margin-top: 0.5rem;
+    }
+    .service-card p {
+      font-size: 14px;
+      margin: 4px 0;
+    }
+    .rating {
+      color: #fbc02d;
+    }
+    .service-card button {
+      background-color: #25D366;
       color: white;
       border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
+      padding: 10px;
+      width: 100%;
+      margin-top: 8px;
+      border-radius: 6px;
       cursor: pointer;
-      font-weight: 500;
-      text-decoration: none;
-      text-align: center;
     }
-    .btn:hover { background: #2980b9; }
-    .btn.whatsapp {
-      background: #25d366;
-    }
-    .btn.whatsapp:hover {
-      background: #1ebd5a;
-    }
-    @media (max-width: 600px) {
-      body { padding: 1rem; }
+    .service-card button:hover {
+      background-color: #1ebe57;
     }
   </style>
 </head>
 <body>
-  <h1>Our Healthcare Services</h1>
 
-  <div class="filter-container">
-    <input type="text" id="searchInput" placeholder="Search by name or description..." />
-    <select id="ratingFilter">
-      <option value="">Minimum Rating</option>
-      <option value="5">5 ★</option>
-      <option value="4">4 ★</option>
-      <option value="3">3 ★</option>
-      <option value="2">2 ★</option>
-    </select>
-    <select id="categoryFilter">
-      <option value="">All Categories</option>
-    </select>
-    <select id="sortFilter">
-      <option value="">Sort by</option>
+  <h1>Our Services</h1>
+
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Search services..." />
+    <select id="sortSelect">
+      <option value="">Sort By</option>
       <option value="price-asc">Price: Low to High</option>
       <option value="price-desc">Price: High to Low</option>
       <option value="rating-desc">Rating: High to Low</option>
-      <option value="rating-asc">Rating: Low to High</option>
+    </select>
+    <select id="categorySelect">
+      <option value="">All Categories</option>
     </select>
   </div>
 
-  <div class="services-grid" id="servicesList"></div>
+  <div class="services" id="servicesList">Loading...</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
+  <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
-      authDomain: "store-471f1.firebaseapp.com",
-      projectId: "store-471f1",
-      storageBucket: "store-471f1.appspot.com",
-      messagingSenderId: "619523242611",
-      appId: "1:619523242611:web:fdfa53044c62f844574806"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+  </script>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  <script>
+    const servicesList = document.getElementById('servicesList');
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+    const categorySelect = document.getElementById('categorySelect');
 
-    const servicesList = document.getElementById("servicesList");
-    const searchInput = document.getElementById("searchInput");
-    const ratingFilter = document.getElementById("ratingFilter");
-    const categoryFilter = document.getElementById("categoryFilter");
-    const sortFilter = document.getElementById("sortFilter");
+    let services = [];
 
-    let allServices = [];
+    function fetchServices() {
+      db.collection("services").onSnapshot(async snapshot => {
+        services = [];
+        const categories = new Set();
 
-    function populateCategories() {
-      const categories = [...new Set(allServices.map(s => s.category).filter(Boolean))];
-      categoryFilter.innerHTML = '<option value="">All Categories</option>';
-      categories.forEach(cat => {
-        const opt = document.createElement("option");
-        opt.value = cat;
-        opt.textContent = cat;
-        categoryFilter.appendChild(opt);
+        for (const doc of snapshot.docs) {
+          const data = doc.data();
+          let imageUrl = data.imageUrl;
+
+          // If image URL is relative, get from Firebase Storage
+          if (imageUrl && !imageUrl.startsWith("http")) {
+            try {
+              imageUrl = await storage.ref("service-images/" + imageUrl).getDownloadURL();
+            } catch {
+              imageUrl = "https://via.placeholder.com/300x200?text=No+Image";
+            }
+          }
+
+          services.push({
+            id: doc.id,
+            name: data.name || "No name",
+            description: data.description || "No description",
+            category: data.category || "Uncategorized",
+            price: data.price || 0,
+            rating: data.rating || 0,
+            imageUrl
+          });
+
+          categories.add(data.category);
+        }
+
+        updateCategoryDropdown(categories);
+        renderServices();
       });
     }
 
-    function applyFiltersAndRender() {
-      const search = searchInput.value.toLowerCase();
-      const minRating = parseFloat(ratingFilter.value || 0);
-      const category = categoryFilter.value;
-      const sort = sortFilter.value;
+    function updateCategoryDropdown(categories) {
+      categorySelect.innerHTML = `<option value="">All Categories</option>` +
+        Array.from(categories).map(c => `<option value="${c}">${c}</option>`).join('');
+    }
 
-      let filtered = allServices.filter(service => {
-        const matchesText = service.title?.toLowerCase().includes(search) ||
-                            service.description?.toLowerCase().includes(search);
-        const matchesRating = parseFloat(service.rating || 0) >= minRating;
-        const matchesCategory = !category || service.category === category;
-        const hasSlots = (service.slots ?? 1) > 0;
-        return matchesText && matchesRating && matchesCategory && hasSlots;
+    function renderServices() {
+      const search = searchInput.value.toLowerCase();
+      const sort = sortSelect.value;
+      const category = categorySelect.value;
+
+      let filtered = services.filter(s => {
+        return (!category || s.category === category) &&
+               (s.name.toLowerCase().includes(search) || s.description.toLowerCase().includes(search));
       });
 
       if (sort === "price-asc") filtered.sort((a, b) => a.price - b.price);
       if (sort === "price-desc") filtered.sort((a, b) => b.price - a.price);
-      if (sort === "rating-desc") filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-      if (sort === "rating-asc") filtered.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+      if (sort === "rating-desc") filtered.sort((a, b) => b.rating - a.rating);
 
-      renderServices(filtered);
+      servicesList.innerHTML = filtered.length ? filtered.map(service => `
+        <div class="service-card">
+          <img src="${service.imageUrl}" alt="${service.name}">
+          <h3>${service.name}</h3>
+          <p>${service.description}</p>
+          <p><strong>₹${service.price}</strong></p>
+          <p class="rating">⭐ ${service.rating.toFixed(1)} / 5</p>
+          <button onclick="bookWhatsApp('${service.name}')">Book on WhatsApp</button>
+        </div>
+      `).join('') : `<p>No services found.</p>`;
     }
 
-    function renderServices(services) {
-      servicesList.innerHTML = "";
-
-      if (services.length === 0) {
-        servicesList.innerHTML = "<p>No matching services found.</p>";
-        return;
-      }
-
-      services.forEach(s => {
-        const imageUrl = (s.image && s.image.startsWith("http")) ? s.image : 'https://via.placeholder.com/400x200?text=No+Image';
-
-        const card = document.createElement("div");
-        card.className = "card";
-
-        card.innerHTML = `
-          <img src="${imageUrl}" alt="${s.title}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x200?text=Image+Unavailable';" />
-          <div class="card-body">
-            <h3>${s.title}</h3>
-            <p class="description">${s.description}</p>
-            <div class="info">
-              <span>₹${s.price}</span>
-              <span>⭐ ${s.rating ?? 'N/A'}</span>
-            </div>
-            <div class="info">
-              <span>Slots: ${s.slots}</span>
-              <span>Category: ${s.category || 'General'}</span>
-            </div>
-          </div>
-          <div class="actions">
-            <a class="btn" href="/booking.html?id=${s.id}">Book Now</a>
-            <a class="btn whatsapp" href="https://wa.me/91XXXXXXXXXX?text=I want to book: ${encodeURIComponent(s.title)}" target="_blank">WhatsApp</a>
-          </div>
-        `;
-        servicesList.appendChild(card);
-      });
+    function bookWhatsApp(serviceName) {
+      const phone = "91XXXXXXXXXX"; // Replace with your WhatsApp number
+      const message = `Hello! I would like to book the service: ${serviceName}`;
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
     }
 
-    function listenToServices() {
-      const colRef = collection(db, "services");
-      onSnapshot(colRef, snapshot => {
-        allServices = [];
-        snapshot.forEach(doc => {
-          allServices.push({ id: doc.id, ...doc.data() });
-        });
-        populateCategories();
-        applyFiltersAndRender();
-      });
-    }
+    // Listeners
+    searchInput.addEventListener("input", renderServices);
+    sortSelect.addEventListener("change", renderServices);
+    categorySelect.addEventListener("change", renderServices);
 
-    [searchInput, ratingFilter, categoryFilter, sortFilter].forEach(e => {
-      e.addEventListener("input", applyFiltersAndRender);
-      e.addEventListener("change", applyFiltersAndRender);
-    });
-
-    listenToServices();
+    fetchServices();
   </script>
+
 </body>
 </html>
