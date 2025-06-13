@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login / Signup</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #e9f0f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .auth-container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+      padding: 2rem;
+      max-width: 400px;
+      width: 100%;
+      animation: slideIn 0.5s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #1976d2;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      background: #1976d2;
+      color: white;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-top: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #0d47a1;
+    }
+
+    .toggle-link {
+      text-align: center;
+      margin-top: 1rem;
+      color: #1976d2;
+      cursor: pointer;
+    }
+
+    .msg {
+      text-align: center;
+      margin-top: 1rem;
+      color: #d32f2f;
+    }
+  </style>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div class="auth-container">
+  <h2 id="formTitle">Login</h2>
+  <form id="authForm">
+    <input type="text" id="name" placeholder="Full Name" style="display:none;" />
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <input type="text" id="phone" placeholder="Phone Number" style="display:none;" />
+    <button type="submit">Login</button>
+    <div class="msg" id="msg"></div>
+  </form>
+  <div class="toggle-link" onclick="toggleForm()">Don't have an account? Sign up</div>
+</div>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
+    authDomain: "store-471f1.firebaseapp.com",
+    projectId: "store-471f1",
+    storageBucket: "store-471f1.appspot.com",
+    messagingSenderId: "619523242611",
+    appId: "1:619523242611:web:fdfa53044c62f844574806",
+    measurementId: "G-16C8MYT70G"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  const form = document.getElementById("authForm");
+  const msg = document.getElementById("msg");
+  let isSignup = false;
+
+  function toggleForm() {
+    isSignup = !isSignup;
+    document.getElementById("formTitle").innerText = isSignup ? "Sign Up" : "Login";
+    form.querySelector("button").innerText = isSignup ? "Sign Up" : "Login";
+    form.name.style.display = isSignup ? "block" : "none";
+    form.phone.style.display = isSignup ? "block" : "none";
+    document.querySelector(".toggle-link").innerText = isSignup
+      ? "Already have an account? Login"
+      : "Don't have an account? Sign up";
+    msg.innerText = "";
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msg.innerText = "Loading...";
+
+    const email = form.email.value.trim();
+    const password = form.password.value.trim();
+    const name = form.name.value.trim();
+    const phone = form.phone.value.trim();
+
+    try {
+      if (isSignup) {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        await db.collection("users").doc(user.uid).set({
+          name,
+          email,
+          phone,
+          role: "user", // default
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        msg.style.color = "green";
+        msg.innerText = "✅ Signup successful!";
+      } else {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        const doc = await db.collection("users").doc(user.uid).get();
+        if (doc.exists) {
+          const role = doc.data().role || "user";
+          msg.style.color = "green";
+          msg.innerText = "✅ Login successful! Redirecting...";
+
+          setTimeout(() => {
+            if (role === "admin") {
+              window.location.href = "/admin-dashboard.html";
+            } else if (role === "doctor") {
+              window.location.href = "/doctor-dashboard.html";
+            } else if (role === "merchant") {
+              window.location.href = "/merchant-dashboard.html";
+            } else {
+              window.location.href = "/user-dashboard.html";
+            }
+          }, 1000);
+        } else {
+          msg.style.color = "red";
+          msg.innerText = "❌ User data not found.";
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      msg.style.color = "red";
+      msg.innerText = err.message;
+    }
+  });
+</script>
+
+</body>
+</html>
