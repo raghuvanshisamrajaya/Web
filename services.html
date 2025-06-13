@@ -1,190 +1,235 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Services - Raghuvanshi Health Care</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Our Services</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f0f8ff;
-      color: #333;
+    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body { margin: 0; background: #f2f6fc; padding: 2rem; }
+    h1 { text-align: center; color: #2c3e50; margin-bottom: 1.5rem; }
+    .filter-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
     }
-    header {
-      background: #1976d2;
-      color: white;
-      padding: 1rem 2rem;
-      text-align: center;
-      font-size: 1.5rem;
-    }
-    .controls {
-      text-align: center;
-      margin: 1rem;
-    }
-    .controls input,
-    .controls select {
-      padding: 0.5rem 1rem;
+    .filter-container input, .filter-container select {
+      padding: 0.6rem 1rem;
       font-size: 1rem;
-      margin: 0.5rem;
       border: 1px solid #ccc;
       border-radius: 8px;
+      width: 220px;
     }
-    .container {
+    .services-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      padding: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
     }
     .card {
-      background: #fff;
-      padding: 1.5rem;
+      background: white;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
     }
-    .card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    }
+    .card:hover { transform: translateY(-6px); }
     .card img {
       width: 100%;
-      height: 180px;
+      height: 200px;
       object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 1rem;
+    }
+    .card-body {
+      padding: 1.2rem;
+      flex-grow: 1;
     }
     .card h3 {
       margin: 0 0 0.5rem;
-      color: #1976d2;
+      color: #34495e;
     }
-    .card p {
+    .description {
+      color: #666;
       font-size: 0.95rem;
-      line-height: 1.5;
+      margin-bottom: 1rem;
     }
-    .rating {
-      color: #ffa000;
-      margin: 0.3rem 0;
+    .info {
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+      display: flex;
+      justify-content: space-between;
+      color: #444;
     }
-    .card .btn {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
-      background: #1976d2;
+    .actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .btn {
+      background: #3498db;
       color: white;
       border: none;
+      padding: 0.5rem 1rem;
       border-radius: 8px;
       cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s;
+      font-weight: 500;
+      text-decoration: none;
+      text-align: center;
     }
-    .card .btn:hover {
-      background: #0d47a1;
+    .btn:hover { background: #2980b9; }
+    .btn.whatsapp {
+      background: #25d366;
+    }
+    .btn.whatsapp:hover {
+      background: #1ebd5a;
+    }
+    @media (max-width: 600px) {
+      body { padding: 1rem; }
     }
   </style>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-  <header>Our Services</header>
-  <div class="controls">
-    <input type="text" id="searchInput" placeholder="Search services...">
+  <h1>Our Healthcare Services</h1>
+
+  <div class="filter-container">
+    <input type="text" id="searchInput" placeholder="Search by name or description..." />
+    <select id="ratingFilter">
+      <option value="">Minimum Rating</option>
+      <option value="5">5 ★</option>
+      <option value="4">4 ★</option>
+      <option value="3">3 ★</option>
+      <option value="2">2 ★</option>
+    </select>
     <select id="categoryFilter">
       <option value="">All Categories</option>
     </select>
-    <select id="sortBy">
-      <option value="latest">Sort: Latest</option>
-      <option value="low">Price: Low to High</option>
-      <option value="high">Price: High to Low</option>
+    <select id="sortFilter">
+      <option value="">Sort by</option>
+      <option value="price-asc">Price: Low to High</option>
+      <option value="price-desc">Price: High to Low</option>
+      <option value="rating-desc">Rating: High to Low</option>
+      <option value="rating-asc">Rating: Low to High</option>
     </select>
   </div>
-  <div class="container" id="servicesContainer">
-    <p>Loading services...</p>
-  </div>  <script>
+
+  <div class="services-grid" id="servicesList"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
       authDomain: "store-471f1.firebaseapp.com",
       projectId: "store-471f1",
       storageBucket: "store-471f1.appspot.com",
       messagingSenderId: "619523242611",
-      appId: "1:619523242611:web:fdfa53044c62f844574806",
-      measurementId: "G-16C8MYT70G"
+      appId: "1:619523242611:web:fdfa53044c62f844574806"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    const container = document.getElementById("servicesContainer");
+    const servicesList = document.getElementById("servicesList");
     const searchInput = document.getElementById("searchInput");
+    const ratingFilter = document.getElementById("ratingFilter");
     const categoryFilter = document.getElementById("categoryFilter");
-    const sortBy = document.getElementById("sortBy");
+    const sortFilter = document.getElementById("sortFilter");
 
-    let servicesData = [];
+    let allServices = [];
 
-    function renderServices(data) {
-      container.innerHTML = "";
-      if (!data.length) {
-        container.innerHTML = "<p>No matching services found.</p>";
-        return;
-      }
-
-      data.forEach(service => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <img src="${service.image || 'https://via.placeholder.com/300x180?text=Service+Image'}" alt="Service">
-          <h3>${service.name}</h3>
-          <p><strong>Category:</strong> ${service.category || 'General'}</p>
-          <p>${service.desc}</p>
-          <p><strong>Price:</strong> ₹${service.price}</p>
-          <div class="rating">⭐ ${service.rating || '4.5'} / 5</div>
-          <p><strong>Slots Left:</strong> ${service.slots || 5}</p>
-          <button class="btn" onclick="location.href='/booking.html?service=${encodeURIComponent(service.name)}'">Book Now</button>
-        `;
-        container.appendChild(card);
+    function populateCategories() {
+      const categories = [...new Set(allServices.map(s => s.category).filter(Boolean))];
+      categoryFilter.innerHTML = '<option value="">All Categories</option>';
+      categories.forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        categoryFilter.appendChild(opt);
       });
     }
 
-    function updateDisplay() {
-      const query = searchInput.value.toLowerCase();
+    function applyFiltersAndRender() {
+      const search = searchInput.value.toLowerCase();
+      const minRating = parseFloat(ratingFilter.value || 0);
       const category = categoryFilter.value;
-      let filtered = servicesData.filter(service =>
-        (service.name.toLowerCase().includes(query) ||
-         service.desc.toLowerCase().includes(query)) &&
-        (!category || service.category === category)
-      );
+      const sort = sortFilter.value;
 
-      if (sortBy.value === 'low') {
-        filtered.sort((a, b) => a.price - b.price);
-      } else if (sortBy.value === 'high') {
-        filtered.sort((a, b) => b.price - a.price);
-      } else {
-        filtered.sort((a, b) => b.timestamp - a.timestamp);
-      }
+      let filtered = allServices.filter(service => {
+        const matchesText = service.title?.toLowerCase().includes(search) ||
+                            service.description?.toLowerCase().includes(search);
+        const matchesRating = parseFloat(service.rating || 0) >= minRating;
+        const matchesCategory = !category || service.category === category;
+        const hasSlots = (service.slots ?? 1) > 0;
+        return matchesText && matchesRating && matchesCategory && hasSlots;
+      });
+
+      if (sort === "price-asc") filtered.sort((a, b) => a.price - b.price);
+      if (sort === "price-desc") filtered.sort((a, b) => b.price - a.price);
+      if (sort === "rating-desc") filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      if (sort === "rating-asc") filtered.sort((a, b) => (a.rating || 0) - (b.rating || 0));
 
       renderServices(filtered);
     }
 
-    db.collection("services").orderBy("timestamp", "desc").get()
-      .then(snapshot => {
-        servicesData = snapshot.docs.map(doc => doc.data());
+    function renderServices(services) {
+      servicesList.innerHTML = "";
 
-        // Populate category dropdown
-        const categories = [...new Set(servicesData.map(s => s.category).filter(Boolean))];
-        categories.forEach(cat => {
-          const opt = document.createElement("option");
-          opt.value = cat;
-          opt.textContent = cat;
-          categoryFilter.appendChild(opt);
-        });
+      if (services.length === 0) {
+        servicesList.innerHTML = "<p>No matching services found.</p>";
+        return;
+      }
 
-        updateDisplay();
-      })
-      .catch(error => {
-        container.innerHTML = `<p>Error loading services: ${error.message}</p>`;
+      services.forEach(s => {
+        const imageUrl = (s.image && s.image.startsWith("http")) ? s.image : 'https://via.placeholder.com/400x200?text=No+Image';
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+          <img src="${imageUrl}" alt="${s.title}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x200?text=Image+Unavailable';" />
+          <div class="card-body">
+            <h3>${s.title}</h3>
+            <p class="description">${s.description}</p>
+            <div class="info">
+              <span>₹${s.price}</span>
+              <span>⭐ ${s.rating ?? 'N/A'}</span>
+            </div>
+            <div class="info">
+              <span>Slots: ${s.slots}</span>
+              <span>Category: ${s.category || 'General'}</span>
+            </div>
+          </div>
+          <div class="actions">
+            <a class="btn" href="/booking.html?id=${s.id}">Book Now</a>
+            <a class="btn whatsapp" href="https://wa.me/91XXXXXXXXXX?text=I want to book: ${encodeURIComponent(s.title)}" target="_blank">WhatsApp</a>
+          </div>
+        `;
+        servicesList.appendChild(card);
       });
+    }
 
-    searchInput.addEventListener("input", updateDisplay);
-    categoryFilter.addEventListener("change", updateDisplay);
-    sortBy.addEventListener("change", updateDisplay);
-  </script></body>
+    function listenToServices() {
+      const colRef = collection(db, "services");
+      onSnapshot(colRef, snapshot => {
+        allServices = [];
+        snapshot.forEach(doc => {
+          allServices.push({ id: doc.id, ...doc.data() });
+        });
+        populateCategories();
+        applyFiltersAndRender();
+      });
+    }
+
+    [searchInput, ratingFilter, categoryFilter, sortFilter].forEach(e => {
+      e.addEventListener("input", applyFiltersAndRender);
+      e.addEventListener("change", applyFiltersAndRender);
+    });
+
+    listenToServices();
+  </script>
+</body>
 </html>
