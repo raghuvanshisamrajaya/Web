@@ -31,7 +31,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
       margin-bottom: 30px;
     }
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       padding: 12px;
       margin-top: 10px;
@@ -86,13 +86,11 @@
     .delete-btn {
       background-color: #dc2626;
     }
-
     @media (max-width: 768px) {
       .card img {
         height: 150px;
       }
     }
-
     @media (max-width: 500px) {
       h1 {
         font-size: 22px;
@@ -103,7 +101,6 @@
 <body>
   <div class="container">
     <h1>Admin Panel - Services</h1>
-
     <form id="serviceForm">
       <input type="text" id="title" placeholder="Service Title" required />
       <textarea id="description" placeholder="Service Description" required></textarea>
@@ -111,6 +108,13 @@
       <input type="url" id="imageUrl" placeholder="Image URL" required />
       <input type="number" id="rating" placeholder="Rating (0-5)" min="0" max="5" step="0.1" required />
       <input type="number" id="slots" placeholder="Available Slots" min="1" required />
+      <input type="text" id="duration" placeholder="Duration (e.g. 30 mins)" />
+      <select id="gender">
+        <option value="">Gender Preference</option>
+        <option value="Any">Any</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
       <button type="submit">Save Service</button>
     </form>
 
@@ -123,6 +127,8 @@
         <p id="previewPrice"></p>
         <p id="previewRating"></p>
         <p id="previewSlots"></p>
+        <p id="previewDuration"></p>
+        <p id="previewGender"></p>
       </div>
     </div>
 
@@ -162,6 +168,8 @@
     const previewPrice = document.getElementById("previewPrice");
     const previewRating = document.getElementById("previewRating");
     const previewSlots = document.getElementById("previewSlots");
+    const previewDuration = document.getElementById("previewDuration");
+    const previewGender = document.getElementById("previewGender");
     const servicesContainer = document.getElementById("servicesContainer");
 
     const inputs = {
@@ -170,7 +178,9 @@
       price: document.getElementById("price"),
       imageUrl: document.getElementById("imageUrl"),
       rating: document.getElementById("rating"),
-      slots: document.getElementById("slots")
+      slots: document.getElementById("slots"),
+      duration: document.getElementById("duration"),
+      gender: document.getElementById("gender")
     };
 
     const checkAdmin = async (uid) => {
@@ -187,6 +197,8 @@
       previewPrice.textContent = `₹${inputs.price.value}`;
       previewRating.textContent = `⭐ ${inputs.rating.value}/5`;
       previewSlots.textContent = `Slots: ${inputs.slots.value}`;
+      previewDuration.textContent = `Duration: ${inputs.duration.value}`;
+      previewGender.textContent = `Gender: ${inputs.gender.value}`;
     };
 
     Object.values(inputs).forEach(el => el.addEventListener("input", updatePreview));
@@ -207,6 +219,8 @@
           <p>₹${data.price}</p>
           <p>⭐ ${data.rating}/5</p>
           <p>Slots: ${data.slots}</p>
+          <p>Duration: ${data.duration || '-'}</p>
+          <p>Gender: ${data.gender || '-'}</p>
           <div class="card-actions">
             <button class="edit-btn" data-id="${docSnap.id}">Edit</button>
             <button class="delete-btn" data-id="${docSnap.id}">Delete</button>
@@ -221,7 +235,7 @@
           const docRef = doc(db, "services", id);
           const snap = await getDoc(docRef);
           const data = snap.data();
-          Object.entries(inputs).forEach(([key, el]) => el.value = data[key]);
+          Object.entries(inputs).forEach(([key, el]) => el.value = data[key] || "");
           updatePreview();
           editId = id;
         }
@@ -254,6 +268,8 @@
           imageUrl: inputs.imageUrl.value,
           rating: parseFloat(inputs.rating.value),
           slots: parseInt(inputs.slots.value),
+          duration: inputs.duration.value,
+          gender: inputs.gender.value,
           createdAt: serverTimestamp()
         };
 
