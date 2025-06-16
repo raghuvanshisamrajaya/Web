@@ -1,157 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Add Service - Raghuvanshi Health Care</title>
+  <title>Add Service - Admin Only</title>
   <style>
-    * { box-sizing: border-box; }
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f4f8;
+      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 2rem;
+      padding: 20px;
+      background: #f4f6f8;
     }
-
     .container {
-      max-width: 1200px;
-      margin: auto;
       display: grid;
       grid-template-columns: 1fr;
       gap: 2rem;
+      max-width: 1000px;
+      margin: auto;
     }
-
-    @media(min-width: 768px) {
+    @media (min-width: 768px) {
       .container {
         grid-template-columns: 1fr 1fr;
       }
     }
-
-    .form-container, .preview {
+    .card, form {
       background: white;
-      padding: 2rem;
       border-radius: 15px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
-
-    h2 {
-      text-align: center;
-      color: #1976d2;
-    }
-
-    form input, form textarea {
+    input, textarea, button {
+      display: block;
       width: 100%;
-      padding: 0.75rem;
-      margin: 0.5rem 0;
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 10px;
-      font-size: 1rem;
     }
-
-    .tag-input {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      padding: 0.5rem 0;
-    }
-
-    .tag {
-      background: #1976d2;
-      color: white;
-      padding: 0.3rem 0.7rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-    }
-
     button {
       background: #1976d2;
       color: white;
-      padding: 0.8rem;
-      width: 100%;
-      border: none;
-      border-radius: 10px;
       cursor: pointer;
-      font-size: 1rem;
+      transition: 0.3s;
     }
-
     button:hover {
       background: #125ea8;
     }
-
-    .card {
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    .tag {
+      display: inline-block;
+      background: #1976d2;
+      color: white;
+      padding: 5px 10px;
+      margin: 5px 5px 0 0;
+      border-radius: 20px;
+      font-size: 0.8rem;
     }
-
-    .card img {
+    .preview-img {
       width: 100%;
       height: 200px;
       object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 10px;
     }
-
-    .card-body {
-      padding: 1rem;
-    }
-
-    .card-body h3 {
-      margin: 0 0 0.5rem;
-      color: #333;
-    }
-
-    .card-body p {
-      margin: 0.4rem 0;
-      color: #555;
-    }
-
     .msg {
-      text-align: center;
-      margin-top: 1rem;
       font-weight: bold;
+      color: green;
+      text-align: center;
+      margin-top: 10px;
     }
   </style>
 
-  <!-- Firebase Libraries -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 </head>
 <body>
-
   <div class="container">
-    <!-- Form -->
-    <div class="form-container">
-      <h2>Add New Service</h2>
-      <form id="serviceForm">
-        <input type="text" id="name" placeholder="Service Name" required />
-        <textarea id="desc" placeholder="Description" required></textarea>
-        <input type="text" id="category" placeholder="Category" required />
-        <input type="number" id="price" placeholder="Price ₹" required />
-        <input type="number" id="rating" placeholder="Rating (1-5)" min="1" max="5" step="0.1" />
-        <input type="number" id="slots" placeholder="Available Slots" required />
-        <input type="file" id="image" accept="image/*" required />
-        <input type="text" id="tagInput" placeholder="Enter tags and press comma (,)" />
-        <div class="tag-input" id="tagContainer"></div>
-        <button type="submit">Add Service</button>
-        <div class="msg" id="msg"></div>
-      </form>
-    </div>
+    <!-- Form Section -->
+    <form id="serviceForm">
+      <h2>Add New Service (Admin Only)</h2>
+      <input type="text" id="name" placeholder="Service Name" required />
+      <textarea id="desc" placeholder="Service Description" required></textarea>
+      <input type="text" id="category" placeholder="Category" required />
+      <input type="number" id="price" placeholder="Price ₹" required />
+      <input type="number" id="rating" placeholder="Rating (optional)" />
+      <input type="number" id="slots" placeholder="Slots" required />
+      <input type="text" id="tagInput" placeholder="Type tag & press comma" />
+      <div id="tagsContainer"></div>
+      <input type="file" id="image" accept="image/*" required />
+      <button type="submit">Submit</button>
+      <div class="msg" id="msg"></div>
+    </form>
 
-    <!-- Preview -->
-    <div class="preview">
-      <h2>Live Preview</h2>
-      <div class="card">
-        <img id="previewImg" src="https://via.placeholder.com/400x200?text=Preview" />
-        <div class="card-body">
-          <h3 id="previewName">Service Name</h3>
-          <p id="previewDesc">Service Description</p>
-          <p><b>Category:</b> <span id="previewCategory">--</span></p>
-          <p><b>Price:</b> ₹<span id="previewPrice">0</span> | ⭐ <span id="previewRating">0</span></p>
-          <p><b>Slots:</b> <span id="previewSlots">0</span></p>
-          <div class="tag-input" id="previewTags"></div>
-        </div>
-      </div>
+    <!-- Live Preview -->
+    <div class="card">
+      <img src="https://via.placeholder.com/400x200?text=Preview" id="previewImg" class="preview-img" />
+      <h3 id="previewName">Service Name</h3>
+      <p id="previewDesc">Service Description</p>
+      <p><strong>Category:</strong> <span id="previewCategory">--</span></p>
+      <p><strong>Price:</strong> ₹<span id="previewPrice">0</span> | ⭐ <span id="previewRating">0</span></p>
+      <p><strong>Slots:</strong> <span id="previewSlots">0</span></p>
+      <div id="previewTags"></div>
     </div>
   </div>
 
@@ -170,54 +122,55 @@
     const db = firebase.firestore();
     const storage = firebase.storage();
 
-    const form = document.getElementById('serviceForm');
-    const msg = document.getElementById('msg');
-    const preview = {
-      name: document.getElementById('previewName'),
-      desc: document.getElementById('previewDesc'),
-      cat: document.getElementById('previewCategory'),
-      price: document.getElementById('previewPrice'),
-      rating: document.getElementById('previewRating'),
-      slots: document.getElementById('previewSlots'),
-      img: document.getElementById('previewImg'),
-      tags: document.getElementById('previewTags')
-    };
-
+    // Tag handling
     const tags = [];
     const tagInput = document.getElementById("tagInput");
-    const tagContainer = document.getElementById("tagContainer");
+    const tagsContainer = document.getElementById("tagsContainer");
+    const previewTags = document.getElementById("previewTags");
 
     tagInput.addEventListener("keydown", e => {
       if (e.key === "," && tagInput.value.trim()) {
         e.preventDefault();
-        const val = tagInput.value.trim().replace(",", "");
-        if (!tags.includes(val)) {
-          tags.push(val);
+        const newTag = tagInput.value.trim().replace(",", "");
+        if (!tags.includes(newTag)) {
+          tags.push(newTag);
+          renderTags();
+          renderPreviewTags();
         }
-        renderTags();
         tagInput.value = "";
-        renderPreviewTags();
       }
     });
 
     function renderTags() {
-      tagContainer.innerHTML = tags.map(tag => `<span class="tag">${tag}</span>`).join("");
+      tagsContainer.innerHTML = tags.map(tag => `<span class="tag">${tag}</span>`).join("");
     }
 
     function renderPreviewTags() {
-      preview.tags.innerHTML = tags.map(tag => `<span class="tag">${tag}</span>`).join("");
+      previewTags.innerHTML = tags.map(tag => `<span class="tag">${tag}</span>`).join("");
     }
 
-    // Live preview updates
+    // Live preview
+    const preview = {
+      name: document.getElementById("previewName"),
+      desc: document.getElementById("previewDesc"),
+      category: document.getElementById("previewCategory"),
+      price: document.getElementById("previewPrice"),
+      rating: document.getElementById("previewRating"),
+      slots: document.getElementById("previewSlots"),
+      img: document.getElementById("previewImg")
+    };
+
+    const updatePreview = () => {
+      preview.name.innerText = document.getElementById("name").value || "Service Name";
+      preview.desc.innerText = document.getElementById("desc").value || "Service Description";
+      preview.category.innerText = document.getElementById("category").value || "--";
+      preview.price.innerText = document.getElementById("price").value || "0";
+      preview.rating.innerText = document.getElementById("rating").value || "0";
+      preview.slots.innerText = document.getElementById("slots").value || "0";
+    };
+
     ["name", "desc", "category", "price", "rating", "slots"].forEach(id => {
-      document.getElementById(id).addEventListener("input", () => {
-        preview.name.innerText = form.name.value || "Service Name";
-        preview.desc.innerText = form.desc.value || "Service Description";
-        preview.cat.innerText = form.category.value || "--";
-        preview.price.innerText = form.price.value || "0";
-        preview.rating.innerText = form.rating.value || "0";
-        preview.slots.innerText = form.slots.value || "0";
-      });
+      document.getElementById(id).addEventListener("input", updatePreview);
     });
 
     document.getElementById("image").addEventListener("change", e => {
@@ -227,48 +180,49 @@
       }
     });
 
-    form.addEventListener("submit", async (e) => {
+    // Form submission
+    document.getElementById("serviceForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      msg.innerText = "Uploading...";
+      const msg = document.getElementById("msg");
+      msg.innerText = "Checking admin...";
 
-      firebase.auth().onAuthStateChanged(async (user) => {
-        if (!user) return msg.innerText = "⚠️ Please log in.";
+      auth.onAuthStateChanged(async (user) => {
+        if (!user) return msg.innerText = "❌ Please log in.";
+
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        const role = userDoc.exists ? userDoc.data().role : null;
+
+        if (role !== "admin") return msg.innerText = "❌ Only admins can add services.";
+
+        msg.innerText = "Uploading service...";
 
         try {
-          const userDoc = await db.collection("users").doc(user.uid).get();
-          const userData = userDoc.data();
-
-          if (!userDoc.exists || userData.role !== "admin") {
-            msg.innerText = "⛔ Only admins can add services.";
-            return;
-          }
-
           const file = document.getElementById("image").files[0];
           const storageRef = storage.ref("service_images/" + Date.now() + "_" + file.name);
-          const uploadTaskSnapshot = await storageRef.put(file);
-          const downloadURL = await uploadTaskSnapshot.ref.getDownloadURL();
+          const snapshot = await storageRef.put(file);
+          const imageUrl = await snapshot.ref.getDownloadURL();
 
-          const data = {
-            name: form.name.value.trim(),
-            desc: form.desc.value.trim(),
-            category: form.category.value.trim(),
-            price: parseFloat(form.price.value),
-            rating: parseFloat(form.rating.value || 0),
-            slots: parseInt(form.slots.value),
-            image: downloadURL,
+          await db.collection("services").add({
+            name: document.getElementById("name").value,
+            desc: document.getElementById("desc").value,
+            category: document.getElementById("category").value,
+            price: parseFloat(document.getElementById("price").value),
+            rating: parseFloat(document.getElementById("rating").value || 0),
+            slots: parseInt(document.getElementById("slots").value),
             tags,
+            image: imageUrl,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
-          };
+          });
 
-          await db.collection("services").add(data);
           msg.innerText = "✅ Service added successfully!";
-          form.reset();
+          document.getElementById("serviceForm").reset();
           preview.img.src = "https://via.placeholder.com/400x200?text=Preview";
           tags.length = 0;
           renderTags();
           renderPreviewTags();
-        } catch (err) {
-          console.error("Upload error:", err);
+          updatePreview();
+        } catch (error) {
+          console.error(error);
           msg.innerText = "❌ Failed to upload service.";
         }
       });
