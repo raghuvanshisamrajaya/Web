@@ -191,7 +191,9 @@
       if (e.key === "," && tagInput.value.trim()) {
         e.preventDefault();
         const val = tagInput.value.trim().replace(",", "");
-        tags.push(val);
+        if (!tags.includes(val)) {
+          tags.push(val);
+        }
         renderTags();
         tagInput.value = "";
         renderPreviewTags();
@@ -229,42 +231,47 @@
       e.preventDefault();
       msg.innerText = "Uploading...";
 
-      const user = auth.currentUser;
-      if (!user) return msg.innerText = "⚠️ Please log in.";
-      const userDoc = await db.collection("users").doc(user.uid).get();
-      if (!userDoc.exists || userDoc.data().role !== "admin") {
-        return msg.innerText = "⛔ Only admins can add services.";
-      }
+      firebase.auth().onAuthStateChanged(async (user) => {
+        if (!user) return msg.innerText = "⚠️ Please log in.";
 
-      const file = document.getElementById("image").files[0];
-      const storageRef = storage.ref("service_images/" + Date.now() + "_" + file.name);
-      try {
-        const uploadTask = await storageRef.put(file);
-        const downloadURL = await uploadTask.ref.getDownloadURL();
+        try {
+          const userDoc = await db.collection("users").doc(user.uid).get();
+          const userData = userDoc.data();
 
-        const data = {
-          name: form.name.value.trim(),
-          desc: form.desc.value.trim(),
-          category: form.category.value.trim(),
-          price: parseFloat(form.price.value),
-          rating: parseFloat(form.rating.value || 0),
-          slots: parseInt(form.slots.value),
-          image: downloadURL,
-          tags,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        };
+          if (!userDoc.exists || userData.role !== "admin") {
+            msg.innerText = "⛔ Only admins can add services.";
+            return;
+          }
 
-        await db.collection("services").add(data);
-        msg.innerText = "✅ Service added successfully!";
-        form.reset();
-        preview.img.src = "https://via.placeholder.com/400x200?text=Preview";
-        tags.length = 0;
-        renderTags();
-        renderPreviewTags();
-      } catch (err) {
-        console.error(err);
-        msg.innerText = "❌ Failed to upload service.";
-      }
+          const file = document.getElementById("image").files[0];
+          const storageRef = storage.ref("service_images/" + Date.now() + "_" + file.name);
+          const uploadTaskSnapshot = await storageRef.put(file);
+          const downloadURL = await uploadTaskSnapshot.ref.getDownloadURL();
+
+          const data = {
+            name: form.name.value.trim(),
+            desc: form.desc.value.trim(),
+            category: form.category.value.trim(),
+            price: parseFloat(form.price.value),
+            rating: parseFloat(form.rating.value || 0),
+            slots: parseInt(form.slots.value),
+            image: downloadURL,
+            tags,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          };
+
+          await db.collection("services").add(data);
+          msg.innerText = "✅ Service added successfully!";
+          form.reset();
+          preview.img.src = "https://via.placeholder.com/400x200?text=Preview";
+          tags.length = 0;
+          renderTags();
+          renderPreviewTags();
+        } catch (err) {
+          console.error("Upload error:", err);
+          msg.innerText = "❌ Failed to upload service.";
+        }
+      });
     });
   </script>
 </body>
