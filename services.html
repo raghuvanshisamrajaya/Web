@@ -1,128 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Our Services</title>
+  <title>Services - Raghuvanshi Health Care</title>
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-    body { margin: 0; background: #f2f6fc; padding: 2rem; }
-    h1 { text-align: center; color: #2c3e50; margin-bottom: 1.5rem; }
-    .filter-container {
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      color: #1f2937;
+    }
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.2rem;
+      margin-bottom: 25px;
+      color: #111827;
+      animation: fadeIn 1s ease-in-out;
+    }
+    .filters {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 1rem;
-      margin-bottom: 2rem;
+      gap: 12px;
+      margin-bottom: 20px;
+      animation: fadeIn 1.2s ease-in-out;
     }
-    .filter-container input, .filter-container select {
-      padding: 0.6rem 1rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      width: 220px;
+    .filters input, .filters select {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      background: white;
+      transition: 0.3s;
+      min-width: 180px;
     }
-    .services-grid {
+    .filters input:focus, .filters select:focus {
+      border-color: #3b82f6;
+      outline: none;
+    }
+    .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
     }
     .card {
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-radius: 18px;
       overflow: hidden;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeInUp 0.4s ease-in-out;
       display: flex;
       flex-direction: column;
-      transition: transform 0.3s ease;
     }
-    .card:hover { transform: translateY(-6px); }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+    }
     .card img {
       width: 100%;
-      height: 200px;
+      height: 190px;
       object-fit: cover;
     }
-    .card-body {
-      padding: 1.2rem;
-      flex-grow: 1;
+    .card-content {
+      padding: 16px;
+      flex: 1;
     }
     .card h3 {
-      margin: 0 0 0.5rem;
-      color: #34495e;
+      margin: 0 0 6px;
+      font-size: 20px;
+      color: #111827;
     }
-    .description {
-      color: #666;
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
+    .card p {
+      margin: 4px 0;
+      font-size: 14px;
+      color: #374151;
     }
-    .info {
-      font-size: 0.9rem;
-      margin-bottom: 0.4rem;
+    .tags {
       display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .tag {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: #e5e7eb;
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+      color: #374151;
+    }
+    .tag svg {
+      width: 14px;
+      height: 14px;
+      stroke: #4b5563;
+    }
+    .card-footer {
+      display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
-      color: #444;
-    }
-    .actions {
-      display: flex;
       gap: 10px;
-      justify-content: center;
-      padding: 1rem;
+      padding: 14px 16px;
+      border-top: 1px solid #eee;
+      background: #f9fafb;
+    }
+    .btn, .whatsapp-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease, transform 0.2s;
+      text-decoration: none;
     }
     .btn {
-      background: #3498db;
+      background-color: #3b82f6;
       color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 500;
-      text-decoration: none;
-      text-align: center;
     }
-    .btn:hover { background: #2980b9; }
-    .btn.whatsapp {
-      background: #25d366;
+    .btn:hover {
+      background-color: #2563eb;
+      transform: scale(1.03);
     }
-    .btn.whatsapp:hover {
-      background: #1ebd5a;
+    .whatsapp-btn {
+      background-color: #25d366;
+      color: white;
     }
-    @media (max-width: 600px) {
-      body { padding: 1rem; }
+    .whatsapp-btn svg {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+}
+    .whatsapp-btn:hover {
+      background-color: #1ebe57;
+      transform: scale(1.03);
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 500px) {
+      .card-footer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    
+    .card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.tag {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+.tag:hover {
+  background: #bae6fd;
+}
+
+/* Floating WhatsApp Button */
+#floatingWhatsApp {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #25D366;
+  color: white;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+#floatingWhatsApp:hover {
+  transform: scale(1.1);
+}
+#floatingWhatsApp svg {
+  width: 28px;
+  height: 28px;
+}
   </style>
 </head>
 <body>
-  <h1>Our Healthcare Services</h1>
-
-  <div class="filter-container">
-    <input type="text" id="searchInput" placeholder="Search by name or description..." />
-    <select id="ratingFilter">
-      <option value="">Minimum Rating</option>
-      <option value="5">5 ★</option>
-      <option value="4">4 ★</option>
-      <option value="3">3 ★</option>
-      <option value="2">2 ★</option>
-    </select>
-    <select id="categoryFilter">
-      <option value="">All Categories</option>
-    </select>
-    <select id="sortFilter">
-      <option value="">Sort by</option>
-      <option value="price-asc">Price: Low to High</option>
-      <option value="price-desc">Price: High to Low</option>
-      <option value="rating-desc">Rating: High to Low</option>
-      <option value="rating-asc">Rating: Low to High</option>
-    </select>
+  <div class="container">
+    <h1>Available Services</h1>
+    <div class="filters">
+      <input type="text" id="searchInput" placeholder="Search by title or description">
+      <select id="categoryFilter">
+        <option value="">All Categories</option>
+      </select>
+      <select id="ratingFilter">
+        <option value="">All Ratings</option>
+        <option value="4">⭐ 4 & above</option>
+        <option value="3">⭐ 3 & above</option>
+        <option value="2">⭐ 2 & above</option>
+        <option value="1">⭐ 1 & above</option>
+      </select>
+    </div>
+    <div class="grid" id="servicesGrid"></div>
   </div>
-
-  <div class="services-grid" id="servicesList"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
+      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6c62CNUhhwLc",
       authDomain: "store-471f1.firebaseapp.com",
       projectId: "store-471f1",
       storageBucket: "store-471f1.appspot.com",
@@ -133,103 +246,94 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const servicesList = document.getElementById("servicesList");
+    const servicesGrid = document.getElementById("servicesGrid");
     const searchInput = document.getElementById("searchInput");
-    const ratingFilter = document.getElementById("ratingFilter");
     const categoryFilter = document.getElementById("categoryFilter");
-    const sortFilter = document.getElementById("sortFilter");
+    const ratingFilter = document.getElementById("ratingFilter");
 
     let allServices = [];
 
-    function populateCategories() {
-      const categories = [...new Set(allServices.map(s => s.category).filter(Boolean))];
-      categoryFilter.innerHTML = '<option value="">All Categories</option>';
-      categories.forEach(cat => {
-        const opt = document.createElement("option");
-        opt.value = cat;
-        opt.textContent = cat;
-        categoryFilter.appendChild(opt);
-      });
-    }
+    const icons = {
+      star: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`,
+      clock: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`,
+      user: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-3-3.87"/><path d="M4 21v-2a4 4 0 0 1 3-3.87"/><circle cx="12" cy="7" r="4"/></svg>`,
+      tag: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.59 13.41L12 4.83V2h2.83l8.59 8.59a2 2 0 0 1 0 2.82l-6 6a2 2 0 0 1-2.82 0z"/></svg>`
+    };
 
-    function applyFiltersAndRender() {
-      const search = searchInput.value.toLowerCase();
-      const minRating = parseFloat(ratingFilter.value || 0);
-      const category = categoryFilter.value;
-      const sort = sortFilter.value;
-
-      let filtered = allServices.filter(service => {
-        const matchesText = service.title?.toLowerCase().includes(search) ||
-                            service.description?.toLowerCase().includes(search);
-        const matchesRating = parseFloat(service.rating || 0) >= minRating;
-        const matchesCategory = !category || service.category === category;
-        const hasSlots = (service.slots ?? 1) > 0;
-        return matchesText && matchesRating && matchesCategory && hasSlots;
-      });
-
-      if (sort === "price-asc") filtered.sort((a, b) => a.price - b.price);
-      if (sort === "price-desc") filtered.sort((a, b) => b.price - a.price);
-      if (sort === "rating-desc") filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-      if (sort === "rating-asc") filtered.sort((a, b) => (a.rating || 0) - (b.rating || 0));
-
-      renderServices(filtered);
-    }
-
-    function renderServices(services) {
-      servicesList.innerHTML = "";
-
-      if (services.length === 0) {
-        servicesList.innerHTML = "<p>No matching services found.</p>";
-        return;
-      }
-
-      services.forEach(s => {
-        const imageUrl = (s.image && s.image.startsWith("http")) ? s.image : 'https://via.placeholder.com/400x200?text=No+Image';
-
+    const renderServices = (services) => {
+      servicesGrid.innerHTML = "";
+      services.forEach(service => {
         const card = document.createElement("div");
         card.className = "card";
-
         card.innerHTML = `
-          <img src="${imageUrl}" alt="${s.title}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x200?text=Image+Unavailable';" />
-          <div class="card-body">
-            <h3>${s.title}</h3>
-            <p class="description">${s.description}</p>
-            <div class="info">
-              <span>₹${s.price}</span>
-              <span>⭐ ${s.rating ?? 'N/A'}</span>
-            </div>
-            <div class="info">
-              <span>Slots: ${s.slots}</span>
-              <span>Category: ${s.category || 'General'}</span>
+          <img src="${service.imageUrl}" />
+          <div class="card-content">
+            <h3>${service.title}</h3>
+            <p>${service.description}</p>
+            <p><strong>₹${service.price}</strong></p>
+            <div class="tags">
+              <span class="tag">${icons.star} ${service.rating}/5</span>
+              <span class="tag">${icons.clock} ${service.duration} mins</span>
+              <span class="tag">${icons.user} ${service.gender}</span>
+              <span class="tag">${icons.tag} ${service.category}</span>
+              <span class="tag">Slots: ${service.slots}</span>
             </div>
           </div>
-          <div class="actions">
-            <a class="btn" href="/booking.html?id=${s.id}">Book Now</a>
-            <a class="btn whatsapp" href="https://wa.me/91XXXXXXXXXX?text=I want to book: ${encodeURIComponent(s.title)}" target="_blank">WhatsApp</a>
+          <div class="card-footer">
+            <a class="btn" href="#booking">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="white" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Book Now
+            </a>
+            <a class="whatsapp-btn" href="https://wa.me/?text=Hi, I want to book '${service.title}'" target="_blank">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 32 32" width="16" height="16">
+    <path d="M16 .5C7.4.5.5 7.4.5 16c0 2.8.7 5.5 2.1 7.9L.5 31.5l7.8-2.1c2.3 1.3 4.9 2.1 7.7 2.1 8.6 0 15.5-6.9 15.5-15.5S24.6.5 16 .5zm0 28.3c-2.3 0-4.6-.6-6.6-1.8l-.5-.3-4.6 1.2 1.2-4.5-.3-.6c-1.2-2-1.8-4.3-1.8-6.6 0-7.4 6-13.5 13.5-13.5S29.5 8.6 29.5 16 23.4 28.8 16 28.8z"/>
+    <path d="M24.3 19.7l-3.5-1c-.5-.2-1.1 0-1.4.4l-.9 1.2c-3.4-1.7-5.4-4.2-6.5-6.6l1.1-.8c.4-.3.5-.9.4-1.4l-1-3.6c-.2-.6-.8-1-1.4-1H9.2c-.8 0-1.4.6-1.4 1.4 0 8.4 6.9 15.3 15.3 15.3.8 0 1.4-.6 1.4-1.4v-2.1c.1-.7-.4-1.3-1.2-1.4z"/>
+  </svg>
+  WhatsApp
+</a>
           </div>
         `;
-        servicesList.appendChild(card);
+        servicesGrid.appendChild(card);
       });
-    }
+    };
 
-    function listenToServices() {
-      const colRef = collection(db, "services");
-      onSnapshot(colRef, snapshot => {
-        allServices = [];
-        snapshot.forEach(doc => {
-          allServices.push({ id: doc.id, ...doc.data() });
-        });
-        populateCategories();
-        applyFiltersAndRender();
+    const applyFilters = () => {
+      const searchTerm = searchInput.value.toLowerCase();
+      const selectedCategory = categoryFilter.value;
+      const minRating = parseFloat(ratingFilter.value) || 0;
+
+      const filtered = allServices.filter(s =>
+        (s.title.toLowerCase().includes(searchTerm) || s.description.toLowerCase().includes(searchTerm)) &&
+        (selectedCategory === "" || s.category === selectedCategory) &&
+        s.rating >= minRating
+      );
+
+      renderServices(filtered);
+    };
+
+    const fetchServices = async () => {
+      const snapshot = await getDocs(collection(db, "services"));
+      const categoriesSet = new Set();
+
+      allServices = snapshot.docs.map(doc => {
+        const data = doc.data();
+        if (data.category) categoriesSet.add(data.category);
+        return { ...data, id: doc.id };
       });
-    }
 
-    [searchInput, ratingFilter, categoryFilter, sortFilter].forEach(e => {
-      e.addEventListener("input", applyFiltersAndRender);
-      e.addEventListener("change", applyFiltersAndRender);
-    });
+      categoryFilter.innerHTML = `<option value="">All Categories</option>`;
+      [...categoriesSet].forEach(cat => {
+        categoryFilter.innerHTML += `<option value="${cat}">${cat}</option>`;
+      });
 
-    listenToServices();
+      applyFilters();
+    };
+
+    searchInput.addEventListener("input", applyFilters);
+    categoryFilter.addEventListener("change", applyFilters);
+    ratingFilter.addEventListener("change", applyFilters);
+
+    fetchServices();
   </script>
 </body>
 </html>
