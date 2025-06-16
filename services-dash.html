@@ -1,232 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Add Service - Admin Only</title>
+  <title>Add Service - Raghuvanshi Health Care</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
       padding: 20px;
-      background: #f4f6f8;
     }
     .container {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-      max-width: 1000px;
+      max-width: 900px;
       margin: auto;
+      display: grid;
+      gap: 2rem;
+      grid-template-columns: 1fr;
     }
     @media (min-width: 768px) {
       .container {
         grid-template-columns: 1fr 1fr;
       }
     }
-    .card, form {
+    .form-container, .preview {
       background: white;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    input, textarea, button {
-      display: block;
+    input, textarea {
       width: 100%;
-      margin-bottom: 15px;
-      padding: 10px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
       border-radius: 10px;
+      border: 1px solid #ccc;
     }
     button {
-      background: #1976d2;
+      background-color: #1976d2;
       color: white;
+      padding: 1rem;
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
       cursor: pointer;
-      transition: 0.3s;
     }
     button:hover {
-      background: #125ea8;
+      background-color: #125ea8;
     }
-    .tag {
-      display: inline-block;
-      background: #1976d2;
-      color: white;
-      padding: 5px 10px;
-      margin: 5px 5px 0 0;
-      border-radius: 20px;
-      font-size: 0.8rem;
+    .msg {
+      text-align: center;
+      margin-top: 1rem;
+      font-weight: bold;
     }
-    .preview-img {
+    .preview img {
       width: 100%;
       height: 200px;
       object-fit: cover;
       border-radius: 10px;
-      margin-bottom: 10px;
-    }
-    .msg {
-      font-weight: bold;
-      color: green;
-      text-align: center;
-      margin-top: 10px;
+      margin-bottom: 1rem;
     }
   </style>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <!-- Firebase Libraries -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
 </head>
 <body>
-  <div class="container">
-    <!-- Form Section -->
+
+<div class="container">
+  <!-- Form -->
+  <div class="form-container">
+    <h2>Add New Service</h2>
     <form id="serviceForm">
-      <h2>Add New Service (Admin Only)</h2>
-      <input type="text" id="name" placeholder="Service Name" required />
-      <textarea id="desc" placeholder="Service Description" required></textarea>
-      <input type="text" id="category" placeholder="Category" required />
-      <input type="number" id="price" placeholder="Price ₹" required />
-      <input type="number" id="rating" placeholder="Rating (optional)" />
-      <input type="number" id="slots" placeholder="Slots" required />
-      <input type="text" id="tagInput" placeholder="Type tag & press comma" />
-      <div id="tagsContainer"></div>
-      <input type="file" id="image" accept="image/*" required />
+      <input type="text" id="name" placeholder="Service Name" required>
+      <textarea id="desc" placeholder="Description" required></textarea>
+      <input type="text" id="category" placeholder="Category" required>
+      <input type="number" id="price" placeholder="Price ₹" required>
+      <input type="number" id="rating" placeholder="Rating (1-5)" min="0" max="5">
+      <input type="number" id="slots" placeholder="Slots Available" required>
+      <input type="file" id="image" accept="image/*" required>
       <button type="submit">Submit</button>
       <div class="msg" id="msg"></div>
     </form>
-
-    <!-- Live Preview -->
-    <div class="card">
-      <img src="https://via.placeholder.com/400x200?text=Preview" id="previewImg" class="preview-img" />
-      <h3 id="previewName">Service Name</h3>
-      <p id="previewDesc">Service Description</p>
-      <p><strong>Category:</strong> <span id="previewCategory">--</span></p>
-      <p><strong>Price:</strong> ₹<span id="previewPrice">0</span> | ⭐ <span id="previewRating">0</span></p>
-      <p><strong>Slots:</strong> <span id="previewSlots">0</span></p>
-      <div id="previewTags"></div>
-    </div>
   </div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
-      authDomain: "store-471f1.firebaseapp.com",
-      projectId: "store-471f1",
-      storageBucket: "store-471f1.appspot.com",
-      messagingSenderId: "619523242611",
-      appId: "1:619523242611:web:fdfa53044c62f844574806"
-    };
+  <!-- Live Preview -->
+  <div class="preview">
+    <h3>Live Preview</h3>
+    <img id="previewImg" src="https://via.placeholder.com/400x200?text=Preview" />
+    <p><strong>Name:</strong> <span id="prevName">--</span></p>
+    <p><strong>Description:</strong> <span id="prevDesc">--</span></p>
+    <p><strong>Category:</strong> <span id="prevCategory">--</span></p>
+    <p><strong>Price:</strong> ₹<span id="prevPrice">0</span></p>
+    <p><strong>Rating:</strong> <span id="prevRating">0</span></p>
+    <p><strong>Slots:</strong> <span id="prevSlots">0</span></p>
+  </div>
+</div>
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
+    authDomain: "store-471f1.firebaseapp.com",
+    projectId: "store-471f1",
+    storageBucket: "store-471f1.appspot.com",
+    messagingSenderId: "619523242611",
+    appId: "1:619523242611:web:fdfa53044c62f844574806"
+  };
 
-    // Tag handling
-    const tags = [];
-    const tagInput = document.getElementById("tagInput");
-    const tagsContainer = document.getElementById("tagsContainer");
-    const previewTags = document.getElementById("previewTags");
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
 
-    tagInput.addEventListener("keydown", e => {
-      if (e.key === "," && tagInput.value.trim()) {
-        e.preventDefault();
-        const newTag = tagInput.value.trim().replace(",", "");
-        if (!tags.includes(newTag)) {
-          tags.push(newTag);
-          renderTags();
-          renderPreviewTags();
-        }
-        tagInput.value = "";
-      }
-    });
+  // Live Preview
+  const preview = {
+    name: document.getElementById("prevName"),
+    desc: document.getElementById("prevDesc"),
+    cat: document.getElementById("prevCategory"),
+    price: document.getElementById("prevPrice"),
+    rating: document.getElementById("prevRating"),
+    slots: document.getElementById("prevSlots"),
+    img: document.getElementById("previewImg"),
+  };
 
-    function renderTags() {
-      tagsContainer.innerHTML = tags.map(tag => `<span class="tag">${tag}</span>`).join("");
+  const updatePreview = () => {
+    preview.name.textContent = document.getElementById("name").value;
+    preview.desc.textContent = document.getElementById("desc").value;
+    preview.cat.textContent = document.getElementById("category").value;
+    preview.price.textContent = document.getElementById("price").value;
+    preview.rating.textContent = document.getElementById("rating").value || "0";
+    preview.slots.textContent = document.getElementById("slots").value;
+  };
+
+  ["name", "desc", "category", "price", "rating", "slots"].forEach(id => {
+    document.getElementById(id).addEventListener("input", updatePreview);
+  });
+
+  document.getElementById("image").addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (file) {
+      preview.img.src = URL.createObjectURL(file);
+    }
+  });
+
+  // Handle Form Submit
+  document.getElementById("serviceForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById("msg");
+    msg.innerText = "Checking admin permissions...";
+
+    const user = auth.currentUser;
+    if (!user) {
+      msg.innerText = "❌ You are not logged in!";
+      return;
     }
 
-    function renderPreviewTags() {
-      previewTags.innerHTML = tags.map(tag => `<span class="tag">${tag}</span>`).join("");
-    }
-
-    // Live preview
-    const preview = {
-      name: document.getElementById("previewName"),
-      desc: document.getElementById("previewDesc"),
-      category: document.getElementById("previewCategory"),
-      price: document.getElementById("previewPrice"),
-      rating: document.getElementById("previewRating"),
-      slots: document.getElementById("previewSlots"),
-      img: document.getElementById("previewImg")
-    };
-
-    const updatePreview = () => {
-      preview.name.innerText = document.getElementById("name").value || "Service Name";
-      preview.desc.innerText = document.getElementById("desc").value || "Service Description";
-      preview.category.innerText = document.getElementById("category").value || "--";
-      preview.price.innerText = document.getElementById("price").value || "0";
-      preview.rating.innerText = document.getElementById("rating").value || "0";
-      preview.slots.innerText = document.getElementById("slots").value || "0";
-    };
-
-    ["name", "desc", "category", "price", "rating", "slots"].forEach(id => {
-      document.getElementById(id).addEventListener("input", updatePreview);
-    });
-
-    document.getElementById("image").addEventListener("change", e => {
-      const file = e.target.files[0];
-      if (file) {
-        preview.img.src = URL.createObjectURL(file);
+    try {
+      const userDoc = await db.collection("users").doc(user.uid).get();
+      const role = userDoc.exists ? userDoc.data().role : null;
+      console.log("User role:", role);
+      if (role !== "admin") {
+        msg.innerText = "⛔ Only admins can add services.";
+        return;
       }
-    });
 
-    // Form submission
-    document.getElementById("serviceForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const msg = document.getElementById("msg");
-      msg.innerText = "Checking admin...";
+      msg.innerText = "Uploading image...";
+      const file = document.getElementById("image").files[0];
+      const storageRef = storage.ref(`service_images/${Date.now()}_${file.name}`);
+      const snapshot = await storageRef.put(file);
+      const imageUrl = await snapshot.ref.getDownloadURL();
 
-      auth.onAuthStateChanged(async (user) => {
-        if (!user) return msg.innerText = "❌ Please log in.";
+      const serviceData = {
+        name: document.getElementById("name").value.trim(),
+        desc: document.getElementById("desc").value.trim(),
+        category: document.getElementById("category").value.trim(),
+        price: parseFloat(document.getElementById("price").value),
+        rating: parseFloat(document.getElementById("rating").value || "0"),
+        slots: parseInt(document.getElementById("slots").value),
+        image: imageUrl,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
 
-        const userDoc = await db.collection("users").doc(user.uid).get();
-        const role = userDoc.exists ? userDoc.data().role : null;
+      await db.collection("services").add(serviceData);
+      msg.innerText = "✅ Service added successfully!";
+      document.getElementById("serviceForm").reset();
+      preview.img.src = "https://via.placeholder.com/400x200?text=Preview";
+      updatePreview();
+    } catch (error) {
+      console.error("Error adding service:", error);
+      msg.innerText = "❌ Failed to add service. See console.";
+    }
+  });
 
-        if (role !== "admin") return msg.innerText = "❌ Only admins can add services.";
+  // Auto login for test (remove this in production)
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      console.log("Logged in:", user.email);
+    } else {
+      msg.innerText = "🔐 Please log in first.";
+    }
+  });
+</script>
 
-        msg.innerText = "Uploading service...";
-
-        try {
-          const file = document.getElementById("image").files[0];
-          const storageRef = storage.ref("service_images/" + Date.now() + "_" + file.name);
-          const snapshot = await storageRef.put(file);
-          const imageUrl = await snapshot.ref.getDownloadURL();
-
-          await db.collection("services").add({
-            name: document.getElementById("name").value,
-            desc: document.getElementById("desc").value,
-            category: document.getElementById("category").value,
-            price: parseFloat(document.getElementById("price").value),
-            rating: parseFloat(document.getElementById("rating").value || 0),
-            slots: parseInt(document.getElementById("slots").value),
-            tags,
-            image: imageUrl,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-          });
-
-          msg.innerText = "✅ Service added successfully!";
-          document.getElementById("serviceForm").reset();
-          preview.img.src = "https://via.placeholder.com/400x200?text=Preview";
-          tags.length = 0;
-          renderTags();
-          renderPreviewTags();
-          updatePreview();
-        } catch (error) {
-          console.error(error);
-          msg.innerText = "❌ Failed to upload service.";
-        }
-      });
-    });
-  </script>
 </body>
 </html>
