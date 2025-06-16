@@ -8,11 +8,10 @@
     * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f1f5f9;
+      background: #f3f6f9;
       margin: 0;
       padding: 1rem;
     }
-
     .container {
       display: flex;
       flex-direction: column;
@@ -20,36 +19,34 @@
       max-width: 1200px;
       margin: auto;
     }
-
     @media(min-width: 768px) {
       .container {
         flex-direction: row;
+        justify-content: space-between;
       }
     }
-
     .form-container, .preview {
       flex: 1;
       background: white;
       padding: 2rem;
-      border-radius: 15px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
     }
-
     h2 {
       text-align: center;
       color: #1976d2;
-      margin-top: 0;
     }
-
     form input, form textarea, form select {
       width: 100%;
       padding: 0.8rem;
       margin: 0.5rem 0;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid #ccc;
       font-size: 1rem;
     }
-
+    form input[type="file"] {
+      border: none;
+    }
     button {
       width: 100%;
       background: #1976d2;
@@ -57,77 +54,37 @@
       padding: 0.8rem;
       border: none;
       font-size: 1rem;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
-
-    button:hover {
-      background: #0d47a1;
-    }
-
-    .msg {
-      text-align: center;
-      margin-top: 1rem;
-    }
-
+    .msg { text-align: center; margin-top: 1rem; font-weight: bold; }
     .card {
-      border-radius: 15px;
+      border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
       background: white;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
       transition: transform 0.3s ease;
     }
-
-    .card:hover {
-      transform: scale(1.01);
-    }
-
+    .card:hover { transform: scale(1.01); }
     .card img {
       width: 100%;
       height: 200px;
       object-fit: cover;
     }
-
-    .card-body {
-      padding: 1rem;
-    }
-
-    .card-body h3 {
-      margin: 0 0 0.5rem;
-      color: #222;
-    }
-
-    .card-body p {
-      margin: 0.5rem 0;
-      color: #555;
-    }
-
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-    }
-
+    .card-body { padding: 1rem; }
+    .card-body h3 { margin: 0; color: #333; }
+    .card-body p { margin: 0.5rem 0; color: #555; }
+    .tags { margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
     .tag {
       background: #1976d2;
       color: white;
-      padding: 0.3rem 0.7rem;
-      border-radius: 20px;
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
       font-size: 0.75rem;
-    }
-
-    .img-preview {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      margin-bottom: 1rem;
     }
   </style>
 
-  <!-- Firebase -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
@@ -144,15 +101,14 @@
       <input type="text" id="category" placeholder="Category" required />
       <input type="number" id="price" placeholder="Price ₹" required />
       <input type="number" id="slots" placeholder="Available Slots" required />
-      <input type="number" id="rating" placeholder="Rating (1-5)" min="1" max="5" step="0.1" required />
-      <input type="text" id="duration" placeholder="Duration (e.g., 30 mins)" />
+      <input type="number" id="rating" placeholder="Rating (1-5)" min="0" max="5" step="0.1"/>
+      <input type="text" id="duration" placeholder="Duration (e.g. 30 mins)" />
       <select id="gender">
-        <option value="">Gender Specific (optional)</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
+        <option value="">Any Gender</option>
+        <option value="Male">Male Provider</option>
+        <option value="Female">Female Provider</option>
       </select>
-      <input type="file" id="imageFile" accept="image/*" required />
-      <img id="previewImg" class="img-preview" src="https://via.placeholder.com/400x200?text=Preview" />
+      <input type="file" id="imageInput" accept="image/*" />
       <button type="submit">Add Service</button>
       <div class="msg" id="msg"></div>
     </form>
@@ -161,12 +117,17 @@
   <div class="preview">
     <h2>Live Preview</h2>
     <div class="card">
-      <img id="cardImg" src="https://via.placeholder.com/400x200?text=Preview" />
+      <img id="previewImg" src="https://via.placeholder.com/400x200?text=Preview" alt="Preview Image" />
       <div class="card-body">
-        <h3 id="cardName">Service Name</h3>
-        <p id="cardDesc">Service description...</p>
-        <div class="tags" id="tagBox"></div>
-        <p><strong>₹<span id="cardPrice">0</span></strong> | 🧍 Slots: <span id="cardSlots">0</span></p>
+        <h3 id="previewName">Service Name</h3>
+        <p id="previewDesc">Service description will appear here...</p>
+        <div class="tags">
+          <span class="tag" id="tagCategory">Category</span>
+          <span class="tag" id="tagRating">⭐ 0</span>
+          <span class="tag" id="tagGender">Any</span>
+          <span class="tag" id="tagDuration">Duration</span>
+        </div>
+        <p>₹<span id="previewPrice">0</span> | 🧍 Slots: <span id="previewSlots">0</span></p>
       </div>
     </div>
   </div>
@@ -179,7 +140,8 @@
     projectId: "store-471f1",
     storageBucket: "store-471f1.appspot.com",
     messagingSenderId: "619523242611",
-    appId: "1:619523242611:web:fdfa53044c62f844574806"
+    appId: "1:619523242611:web:fdfa53044c62f844574806",
+    measurementId: "G-16C8MYT70G"
   };
 
   firebase.initializeApp(firebaseConfig);
@@ -189,34 +151,28 @@
 
   const form = document.getElementById("serviceForm");
   const msg = document.getElementById("msg");
-  const previewImg = document.getElementById("previewImg");
-  const cardImg = document.getElementById("cardImg");
 
   const updatePreview = () => {
-    document.getElementById("cardName").innerText = form.name.value || "Service Name";
-    document.getElementById("cardDesc").innerText = form.desc.value || "Service description...";
-    document.getElementById("cardPrice").innerText = form.price.value || "0";
-    document.getElementById("cardSlots").innerText = form.slots.value || "0";
-
-    const tagBox = document.getElementById("tagBox");
-    tagBox.innerHTML = '';
-    if (form.category.value) tagBox.innerHTML += `<span class="tag">${form.category.value}</span>`;
-    if (form.rating.value) tagBox.innerHTML += `<span class="tag">⭐ ${form.rating.value}</span>`;
-    if (form.duration.value) tagBox.innerHTML += `<span class="tag">${form.duration.value}</span>`;
-    if (form.gender.value) tagBox.innerHTML += `<span class="tag">${form.gender.value}</span>`;
+    document.getElementById("previewName").innerText = form.name.value || "Service Name";
+    document.getElementById("previewDesc").innerText = form.desc.value || "Service description will appear here...";
+    document.getElementById("tagCategory").innerText = form.category.value || "Category";
+    document.getElementById("tagRating").innerText = "⭐ " + (form.rating.value || "0");
+    document.getElementById("tagGender").innerText = form.gender.value || "Any";
+    document.getElementById("tagDuration").innerText = form.duration.value || "Duration";
+    document.getElementById("previewPrice").innerText = form.price.value || "0";
+    document.getElementById("previewSlots").innerText = form.slots.value || "0";
   };
 
   ["name", "desc", "category", "price", "slots", "rating", "duration", "gender"].forEach(id => {
     document.getElementById(id).addEventListener("input", updatePreview);
   });
 
-  document.getElementById("imageFile").addEventListener("change", e => {
+  document.getElementById("imageInput").addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = e => {
-        previewImg.src = e.target.result;
-        cardImg.src = e.target.result;
+      reader.onload = () => {
+        document.getElementById("previewImg").src = reader.result;
       };
       reader.readAsDataURL(file);
     }
@@ -224,7 +180,7 @@
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    msg.innerText = "Uploading...";
+    msg.innerText = "Processing...";
 
     const user = auth.currentUser;
     if (!user) {
@@ -238,16 +194,15 @@
       return;
     }
 
-    const file = document.getElementById("imageFile").files[0];
-    if (!file) {
-      msg.innerText = "❗ Please select an image.";
-      return;
-    }
+    const imageFile = document.getElementById("imageInput").files[0];
+    let imageURL = "";
 
     try {
-      const storageRef = storage.ref(`services/${Date.now()}_${file.name}`);
-      await storageRef.put(file);
-      const imageUrl = await storageRef.getDownloadURL();
+      if (imageFile) {
+        const storageRef = storage.ref(`services/${Date.now()}_${imageFile.name}`);
+        await storageRef.put(imageFile);
+        imageURL = await storageRef.getDownloadURL();
+      }
 
       const data = {
         name: form.name.value.trim(),
@@ -255,24 +210,23 @@
         category: form.category.value.trim(),
         price: parseFloat(form.price.value),
         slots: parseInt(form.slots.value),
-        rating: parseFloat(form.rating.value),
+        rating: parseFloat(form.rating.value) || 0,
         duration: form.duration.value.trim(),
-        gender: form.gender.value,
-        image: imageUrl,
+        gender: form.gender.value.trim(),
+        image: imageURL,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       };
 
       await db.collection("services").add(data);
       msg.innerText = "✅ Service added successfully!";
       form.reset();
-      previewImg.src = cardImg.src = "https://via.placeholder.com/400x200?text=Preview";
-      document.getElementById("tagBox").innerHTML = "";
+      document.getElementById("previewImg").src = "https://via.placeholder.com/400x200?text=Preview";
+      updatePreview();
     } catch (err) {
       console.error(err);
       msg.innerText = "❌ Error adding service.";
     }
   });
 </script>
-
 </body>
 </html>
