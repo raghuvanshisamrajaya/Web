@@ -1,90 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Service Creator</title>
+  <title>Add Service - Raghuvanshi Health Care</title>
   <style>
     * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f3f6f9;
+      background: #f0f4f8;
       margin: 0;
-      padding: 1rem;
+      padding: 2rem;
     }
+
     .container {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
       max-width: 1200px;
       margin: auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
     }
+
     @media(min-width: 768px) {
       .container {
-        flex-direction: row;
-        justify-content: space-between;
+        grid-template-columns: 1fr 1fr;
       }
     }
+
     .form-container, .preview {
-      flex: 1;
       background: white;
       padding: 2rem;
-      border-radius: 20px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     }
+
     h2 {
       text-align: center;
       color: #1976d2;
     }
-    form input, form textarea, form select {
+
+    form input, form textarea {
       width: 100%;
-      padding: 0.8rem;
+      padding: 0.75rem;
       margin: 0.5rem 0;
-      border-radius: 12px;
       border: 1px solid #ccc;
+      border-radius: 10px;
       font-size: 1rem;
     }
-    form input[type="file"] {
-      border: none;
+
+    .tag-input {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.5rem 0;
     }
+
+    .tag {
+      background: #1976d2;
+      color: white;
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+
     button {
-      width: 100%;
       background: #1976d2;
       color: white;
       padding: 0.8rem;
+      width: 100%;
       border: none;
-      font-size: 1rem;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
+      font-size: 1rem;
     }
-    .msg { text-align: center; margin-top: 1rem; font-weight: bold; }
+
+    button:hover {
+      background: #125ea8;
+    }
+
     .card {
-      border-radius: 20px;
+      border-radius: 15px;
       overflow: hidden;
-      background: white;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-      transition: transform 0.3s ease;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     }
-    .card:hover { transform: scale(1.01); }
+
     .card img {
       width: 100%;
       height: 200px;
       object-fit: cover;
     }
-    .card-body { padding: 1rem; }
-    .card-body h3 { margin: 0; color: #333; }
-    .card-body p { margin: 0.5rem 0; color: #555; }
-    .tags { margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
-    .tag {
-      background: #1976d2;
-      color: white;
-      padding: 0.3rem 0.6rem;
-      border-radius: 6px;
-      font-size: 0.75rem;
+
+    .card-body {
+      padding: 1rem;
+    }
+
+    .card-body h3 {
+      margin: 0 0 0.5rem;
+      color: #333;
+    }
+
+    .card-body p {
+      margin: 0.4rem 0;
+      color: #555;
+    }
+
+    .msg {
+      text-align: center;
+      margin-top: 1rem;
+      font-weight: bold;
     }
   </style>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase Libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
@@ -92,141 +119,153 @@
 </head>
 <body>
 
-<div class="container">
-  <div class="form-container">
-    <h2>Add New Service</h2>
-    <form id="serviceForm">
-      <input type="text" id="name" placeholder="Service Name" required />
-      <textarea id="desc" placeholder="Description" required></textarea>
-      <input type="text" id="category" placeholder="Category" required />
-      <input type="number" id="price" placeholder="Price ₹" required />
-      <input type="number" id="slots" placeholder="Available Slots" required />
-      <input type="number" id="rating" placeholder="Rating (1-5)" min="0" max="5" step="0.1"/>
-      <input type="text" id="duration" placeholder="Duration (e.g. 30 mins)" />
-      <select id="gender">
-        <option value="">Any Gender</option>
-        <option value="Male">Male Provider</option>
-        <option value="Female">Female Provider</option>
-      </select>
-      <input type="file" id="imageInput" accept="image/*" />
-      <button type="submit">Add Service</button>
-      <div class="msg" id="msg"></div>
-    </form>
-  </div>
+  <div class="container">
+    <!-- Form -->
+    <div class="form-container">
+      <h2>Add New Service</h2>
+      <form id="serviceForm">
+        <input type="text" id="name" placeholder="Service Name" required />
+        <textarea id="desc" placeholder="Description" required></textarea>
+        <input type="text" id="category" placeholder="Category" required />
+        <input type="number" id="price" placeholder="Price ₹" required />
+        <input type="number" id="rating" placeholder="Rating (1-5)" min="1" max="5" step="0.1" />
+        <input type="number" id="slots" placeholder="Available Slots" required />
+        <input type="file" id="image" accept="image/*" required />
+        <input type="text" id="tagInput" placeholder="Enter tags and press comma (,)" />
+        <div class="tag-input" id="tagContainer"></div>
+        <button type="submit">Add Service</button>
+        <div class="msg" id="msg"></div>
+      </form>
+    </div>
 
-  <div class="preview">
-    <h2>Live Preview</h2>
-    <div class="card">
-      <img id="previewImg" src="https://via.placeholder.com/400x200?text=Preview" alt="Preview Image" />
-      <div class="card-body">
-        <h3 id="previewName">Service Name</h3>
-        <p id="previewDesc">Service description will appear here...</p>
-        <div class="tags">
-          <span class="tag" id="tagCategory">Category</span>
-          <span class="tag" id="tagRating">⭐ 0</span>
-          <span class="tag" id="tagGender">Any</span>
-          <span class="tag" id="tagDuration">Duration</span>
+    <!-- Preview -->
+    <div class="preview">
+      <h2>Live Preview</h2>
+      <div class="card">
+        <img id="previewImg" src="https://via.placeholder.com/400x200?text=Preview" />
+        <div class="card-body">
+          <h3 id="previewName">Service Name</h3>
+          <p id="previewDesc">Service Description</p>
+          <p><b>Category:</b> <span id="previewCategory">--</span></p>
+          <p><b>Price:</b> ₹<span id="previewPrice">0</span> | ⭐ <span id="previewRating">0</span></p>
+          <p><b>Slots:</b> <span id="previewSlots">0</span></p>
+          <div class="tag-input" id="previewTags"></div>
         </div>
-        <p>₹<span id="previewPrice">0</span> | 🧍 Slots: <span id="previewSlots">0</span></p>
       </div>
     </div>
   </div>
-</div>
 
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
-    authDomain: "store-471f1.firebaseapp.com",
-    projectId: "store-471f1",
-    storageBucket: "store-471f1.appspot.com",
-    messagingSenderId: "619523242611",
-    appId: "1:619523242611:web:fdfa53044c62f844574806",
-    measurementId: "G-16C8MYT70G"
-  };
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
+      authDomain: "store-471f1.firebaseapp.com",
+      projectId: "store-471f1",
+      storageBucket: "store-471f1.appspot.com",
+      messagingSenderId: "619523242611",
+      appId: "1:619523242611:web:fdfa53044c62f844574806"
+    };
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-  const storage = firebase.storage();
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
 
-  const form = document.getElementById("serviceForm");
-  const msg = document.getElementById("msg");
+    const form = document.getElementById('serviceForm');
+    const msg = document.getElementById('msg');
+    const preview = {
+      name: document.getElementById('previewName'),
+      desc: document.getElementById('previewDesc'),
+      cat: document.getElementById('previewCategory'),
+      price: document.getElementById('previewPrice'),
+      rating: document.getElementById('previewRating'),
+      slots: document.getElementById('previewSlots'),
+      img: document.getElementById('previewImg'),
+      tags: document.getElementById('previewTags')
+    };
 
-  const updatePreview = () => {
-    document.getElementById("previewName").innerText = form.name.value || "Service Name";
-    document.getElementById("previewDesc").innerText = form.desc.value || "Service description will appear here...";
-    document.getElementById("tagCategory").innerText = form.category.value || "Category";
-    document.getElementById("tagRating").innerText = "⭐ " + (form.rating.value || "0");
-    document.getElementById("tagGender").innerText = form.gender.value || "Any";
-    document.getElementById("tagDuration").innerText = form.duration.value || "Duration";
-    document.getElementById("previewPrice").innerText = form.price.value || "0";
-    document.getElementById("previewSlots").innerText = form.slots.value || "0";
-  };
+    const tags = [];
+    const tagInput = document.getElementById("tagInput");
+    const tagContainer = document.getElementById("tagContainer");
 
-  ["name", "desc", "category", "price", "slots", "rating", "duration", "gender"].forEach(id => {
-    document.getElementById(id).addEventListener("input", updatePreview);
-  });
+    tagInput.addEventListener("keydown", e => {
+      if (e.key === "," && tagInput.value.trim()) {
+        e.preventDefault();
+        const val = tagInput.value.trim().replace(",", "");
+        tags.push(val);
+        renderTags();
+        tagInput.value = "";
+        renderPreviewTags();
+      }
+    });
 
-  document.getElementById("imageInput").addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        document.getElementById("previewImg").src = reader.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    msg.innerText = "Processing...";
-
-    const user = auth.currentUser;
-    if (!user) {
-      msg.innerText = "⚠️ Please log in.";
-      return;
+    function renderTags() {
+      tagContainer.innerHTML = tags.map(tag => `<span class="tag">${tag}</span>`).join("");
     }
 
-    const userDoc = await db.collection("users").doc(user.uid).get();
-    if (!userDoc.exists || userDoc.data().role !== "admin") {
-      msg.innerText = "⛔ Only admins can add services.";
-      return;
+    function renderPreviewTags() {
+      preview.tags.innerHTML = tags.map(tag => `<span class="tag">${tag}</span>`).join("");
     }
 
-    const imageFile = document.getElementById("imageInput").files[0];
-    let imageURL = "";
+    // Live preview updates
+    ["name", "desc", "category", "price", "rating", "slots"].forEach(id => {
+      document.getElementById(id).addEventListener("input", () => {
+        preview.name.innerText = form.name.value || "Service Name";
+        preview.desc.innerText = form.desc.value || "Service Description";
+        preview.cat.innerText = form.category.value || "--";
+        preview.price.innerText = form.price.value || "0";
+        preview.rating.innerText = form.rating.value || "0";
+        preview.slots.innerText = form.slots.value || "0";
+      });
+    });
 
-    try {
-      if (imageFile) {
-        const storageRef = storage.ref(`services/${Date.now()}_${imageFile.name}`);
-        await storageRef.put(imageFile);
-        imageURL = await storageRef.getDownloadURL();
+    document.getElementById("image").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (file) {
+        preview.img.src = URL.createObjectURL(file);
+      }
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msg.innerText = "Uploading...";
+
+      const user = auth.currentUser;
+      if (!user) return msg.innerText = "⚠️ Please log in.";
+      const userDoc = await db.collection("users").doc(user.uid).get();
+      if (!userDoc.exists || userDoc.data().role !== "admin") {
+        return msg.innerText = "⛔ Only admins can add services.";
       }
 
-      const data = {
-        name: form.name.value.trim(),
-        desc: form.desc.value.trim(),
-        category: form.category.value.trim(),
-        price: parseFloat(form.price.value),
-        slots: parseInt(form.slots.value),
-        rating: parseFloat(form.rating.value) || 0,
-        duration: form.duration.value.trim(),
-        gender: form.gender.value.trim(),
-        image: imageURL,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      };
+      const file = document.getElementById("image").files[0];
+      const storageRef = storage.ref("service_images/" + Date.now() + "_" + file.name);
+      try {
+        const uploadTask = await storageRef.put(file);
+        const downloadURL = await uploadTask.ref.getDownloadURL();
 
-      await db.collection("services").add(data);
-      msg.innerText = "✅ Service added successfully!";
-      form.reset();
-      document.getElementById("previewImg").src = "https://via.placeholder.com/400x200?text=Preview";
-      updatePreview();
-    } catch (err) {
-      console.error(err);
-      msg.innerText = "❌ Error adding service.";
-    }
-  });
-</script>
+        const data = {
+          name: form.name.value.trim(),
+          desc: form.desc.value.trim(),
+          category: form.category.value.trim(),
+          price: parseFloat(form.price.value),
+          rating: parseFloat(form.rating.value || 0),
+          slots: parseInt(form.slots.value),
+          image: downloadURL,
+          tags,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        await db.collection("services").add(data);
+        msg.innerText = "✅ Service added successfully!";
+        form.reset();
+        preview.img.src = "https://via.placeholder.com/400x200?text=Preview";
+        tags.length = 0;
+        renderTags();
+        renderPreviewTags();
+      } catch (err) {
+        console.error(err);
+        msg.innerText = "❌ Failed to upload service.";
+      }
+    });
+  </script>
 </body>
 </html>
