@@ -7,62 +7,77 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f4;
-      padding: 20px;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 2rem;
     }
     .container {
-      max-width: 900px;
+      max-width: 1200px;
       margin: auto;
       display: grid;
-      gap: 2rem;
       grid-template-columns: 1fr;
+      gap: 2rem;
     }
-    @media (min-width: 768px) {
-      .container {
-        grid-template-columns: 1fr 1fr;
-      }
+    @media(min-width: 768px) {
+      .container { grid-template-columns: 1fr 1fr; }
     }
     .form-container, .preview {
       background: white;
       padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     }
-    input, textarea {
+    h2 { text-align: center; color: #1976d2; }
+    form input, form textarea {
       width: 100%;
-      padding: 0.8rem;
-      margin-bottom: 1rem;
-      border-radius: 10px;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
       border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+    .tag-input {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.5rem 0;
+    }
+    .tag {
+      background: #1976d2;
+      color: white;
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
     }
     button {
-      background-color: #1976d2;
+      background: #1976d2;
       color: white;
-      padding: 1rem;
+      padding: 0.8rem;
       width: 100%;
       border: none;
       border-radius: 10px;
-      font-size: 1rem;
       cursor: pointer;
+      font-size: 1rem;
     }
-    button:hover {
-      background-color: #125ea8;
+    .card {
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     }
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    .card-body { padding: 1rem; }
     .msg {
       text-align: center;
       margin-top: 1rem;
       font-weight: bold;
     }
-    .preview img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 1rem;
-    }
   </style>
 
-  <!-- Firebase Libraries -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
@@ -71,32 +86,36 @@
 <body>
 
 <div class="container">
-  <!-- Form -->
   <div class="form-container">
     <h2>Add New Service</h2>
     <form id="serviceForm">
-      <input type="text" id="name" placeholder="Service Name" required>
+      <input type="text" id="name" placeholder="Service Name" required />
       <textarea id="desc" placeholder="Description" required></textarea>
-      <input type="text" id="category" placeholder="Category" required>
-      <input type="number" id="price" placeholder="Price ₹" required>
-      <input type="number" id="rating" placeholder="Rating (1-5)" min="0" max="5">
-      <input type="number" id="slots" placeholder="Slots Available" required>
-      <input type="file" id="image" accept="image/*" required>
-      <button type="submit">Submit</button>
+      <input type="text" id="category" placeholder="Category" required />
+      <input type="number" id="price" placeholder="Price ₹" required />
+      <input type="number" id="rating" placeholder="Rating (1-5)" min="1" max="5" step="0.1" />
+      <input type="number" id="slots" placeholder="Available Slots" required />
+      <input type="file" id="image" accept="image/*" required />
+      <input type="text" id="tagInput" placeholder="Enter tags and press comma (,)" />
+      <div class="tag-input" id="tagContainer"></div>
+      <button type="submit">Add Service</button>
       <div class="msg" id="msg"></div>
     </form>
   </div>
 
-  <!-- Live Preview -->
   <div class="preview">
-    <h3>Live Preview</h3>
-    <img id="previewImg" src="https://via.placeholder.com/400x200?text=Preview" />
-    <p><strong>Name:</strong> <span id="prevName">--</span></p>
-    <p><strong>Description:</strong> <span id="prevDesc">--</span></p>
-    <p><strong>Category:</strong> <span id="prevCategory">--</span></p>
-    <p><strong>Price:</strong> ₹<span id="prevPrice">0</span></p>
-    <p><strong>Rating:</strong> <span id="prevRating">0</span></p>
-    <p><strong>Slots:</strong> <span id="prevSlots">0</span></p>
+    <h2>Live Preview</h2>
+    <div class="card">
+      <img id="previewImg" src="https://via.placeholder.com/400x200?text=Preview" />
+      <div class="card-body">
+        <h3 id="previewName">Service Name</h3>
+        <p id="previewDesc">Service Description</p>
+        <p><b>Category:</b> <span id="previewCategory">--</span></p>
+        <p><b>Price:</b> ₹<span id="previewPrice">0</span> | ⭐ <span id="previewRating">0</span></p>
+        <p><b>Slots:</b> <span id="previewSlots">0</span></p>
+        <div class="tag-input" id="previewTags"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -115,28 +134,52 @@
   const db = firebase.firestore();
   const storage = firebase.storage();
 
-  // Live Preview
+  const form = document.getElementById('serviceForm');
+  const msg = document.getElementById('msg');
+
   const preview = {
-    name: document.getElementById("prevName"),
-    desc: document.getElementById("prevDesc"),
-    cat: document.getElementById("prevCategory"),
-    price: document.getElementById("prevPrice"),
-    rating: document.getElementById("prevRating"),
-    slots: document.getElementById("prevSlots"),
-    img: document.getElementById("previewImg"),
+    name: document.getElementById('previewName'),
+    desc: document.getElementById('previewDesc'),
+    cat: document.getElementById('previewCategory'),
+    price: document.getElementById('previewPrice'),
+    rating: document.getElementById('previewRating'),
+    slots: document.getElementById('previewSlots'),
+    img: document.getElementById('previewImg'),
+    tags: document.getElementById('previewTags')
   };
 
-  const updatePreview = () => {
-    preview.name.textContent = document.getElementById("name").value;
-    preview.desc.textContent = document.getElementById("desc").value;
-    preview.cat.textContent = document.getElementById("category").value;
-    preview.price.textContent = document.getElementById("price").value;
-    preview.rating.textContent = document.getElementById("rating").value || "0";
-    preview.slots.textContent = document.getElementById("slots").value;
-  };
+  const tags = [];
+  const tagInput = document.getElementById("tagInput");
+  const tagContainer = document.getElementById("tagContainer");
+
+  tagInput.addEventListener("keydown", e => {
+    if (e.key === "," && tagInput.value.trim()) {
+      e.preventDefault();
+      const val = tagInput.value.trim().replace(",", "");
+      tags.push(val);
+      renderTags();
+      renderPreviewTags();
+      tagInput.value = "";
+    }
+  });
+
+  function renderTags() {
+    tagContainer.innerHTML = tags.map(tag => `<span class="tag">${tag}</span>`).join("");
+  }
+
+  function renderPreviewTags() {
+    preview.tags.innerHTML = tags.map(tag => `<span class="tag">${tag}</span>`).join("");
+  }
 
   ["name", "desc", "category", "price", "rating", "slots"].forEach(id => {
-    document.getElementById(id).addEventListener("input", updatePreview);
+    document.getElementById(id).addEventListener("input", () => {
+      preview.name.innerText = form.name.value || "Service Name";
+      preview.desc.innerText = form.desc.value || "Service Description";
+      preview.cat.innerText = form.category.value || "--";
+      preview.price.innerText = form.price.value || "0";
+      preview.rating.innerText = form.rating.value || "0";
+      preview.slots.innerText = form.slots.value || "0";
+    });
   });
 
   document.getElementById("image").addEventListener("change", e => {
@@ -146,64 +189,55 @@
     }
   });
 
-  // Handle Form Submit
-  document.getElementById("serviceForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const msg = document.getElementById("msg");
-    msg.innerText = "Checking admin permissions...";
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) return msg.innerText = "⚠️ Please log in first.";
 
-    const user = auth.currentUser;
-    if (!user) {
-      msg.innerText = "❌ You are not logged in!";
+    const userDoc = await db.collection("users").doc(user.uid).get();
+    const role = userDoc.exists ? userDoc.data().role : null;
+
+    if (role !== "admin") {
+      msg.innerText = "⛔ Only admins can add services.";
+      form.querySelector("button").disabled = true;
       return;
     }
 
-    try {
-      const userDoc = await db.collection("users").doc(user.uid).get();
-      const role = userDoc.exists ? userDoc.data().role : null;
-      console.log("User role:", role);
-      if (role !== "admin") {
-        msg.innerText = "⛔ Only admins can add services.";
-        return;
-      }
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msg.innerText = "Uploading...";
 
-      msg.innerText = "Uploading image...";
       const file = document.getElementById("image").files[0];
-      const storageRef = storage.ref(`service_images/${Date.now()}_${file.name}`);
-      const snapshot = await storageRef.put(file);
-      const imageUrl = await snapshot.ref.getDownloadURL();
+      const storageRef = storage.ref("service_images/" + Date.now() + "_" + file.name);
 
-      const serviceData = {
-        name: document.getElementById("name").value.trim(),
-        desc: document.getElementById("desc").value.trim(),
-        category: document.getElementById("category").value.trim(),
-        price: parseFloat(document.getElementById("price").value),
-        rating: parseFloat(document.getElementById("rating").value || "0"),
-        slots: parseInt(document.getElementById("slots").value),
-        image: imageUrl,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
+      try {
+        const snapshot = await storageRef.put(file);
+        const downloadURL = await snapshot.ref.getDownloadURL();
 
-      await db.collection("services").add(serviceData);
-      msg.innerText = "✅ Service added successfully!";
-      document.getElementById("serviceForm").reset();
-      preview.img.src = "https://via.placeholder.com/400x200?text=Preview";
-      updatePreview();
-    } catch (error) {
-      console.error("Error adding service:", error);
-      msg.innerText = "❌ Failed to add service. See console.";
-    }
-  });
+        const data = {
+          name: form.name.value.trim(),
+          desc: form.desc.value.trim(),
+          category: form.category.value.trim(),
+          price: parseFloat(form.price.value),
+          rating: parseFloat(form.rating.value || 0),
+          slots: parseInt(form.slots.value),
+          image: downloadURL,
+          tags,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        };
 
-  // Auto login for test (remove this in production)
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      console.log("Logged in:", user.email);
-    } else {
-      msg.innerText = "🔐 Please log in first.";
-    }
+        await db.collection("services").add(data);
+
+        msg.innerText = "✅ Service added successfully!";
+        form.reset();
+        preview.img.src = "https://via.placeholder.com/400x200?text=Preview";
+        tags.length = 0;
+        renderTags();
+        renderPreviewTags();
+      } catch (err) {
+        console.error(err);
+        msg.innerText = "❌ Failed to add service.";
+      }
+    });
   });
 </script>
-
 </body>
 </html>
