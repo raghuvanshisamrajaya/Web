@@ -115,6 +115,7 @@
         <option value="Male">Male</option>
         <option value="Female">Female</option>
       </select>
+      <input type="text" id="category" placeholder="Category (e.g. Therapy)" required />
       <button type="submit">Save Service</button>
     </form>
 
@@ -129,6 +130,7 @@
         <p id="previewSlots"></p>
         <p id="previewDuration"></p>
         <p id="previewGender"></p>
+        <p id="previewCategory"></p>
       </div>
     </div>
 
@@ -170,6 +172,7 @@
     const previewSlots = document.getElementById("previewSlots");
     const previewDuration = document.getElementById("previewDuration");
     const previewGender = document.getElementById("previewGender");
+    const previewCategory = document.getElementById("previewCategory");
     const servicesContainer = document.getElementById("servicesContainer");
 
     const inputs = {
@@ -180,7 +183,8 @@
       rating: document.getElementById("rating"),
       slots: document.getElementById("slots"),
       duration: document.getElementById("duration"),
-      gender: document.getElementById("gender")
+      gender: document.getElementById("gender"),
+      category: document.getElementById("category")
     };
 
     const checkAdmin = async (uid) => {
@@ -199,6 +203,7 @@
       previewSlots.textContent = `Slots: ${inputs.slots.value}`;
       previewDuration.textContent = `Duration: ${inputs.duration.value}`;
       previewGender.textContent = `Gender: ${inputs.gender.value}`;
+      previewCategory.textContent = `Category: ${inputs.category.value}`;
     };
 
     Object.values(inputs).forEach(el => el.addEventListener("input", updatePreview));
@@ -221,6 +226,7 @@
           <p>Slots: ${data.slots}</p>
           <p>Duration: ${data.duration || '-'}</p>
           <p>Gender: ${data.gender || '-'}</p>
+          <p>Category: ${data.category || '-'}</p>
           <div class="card-actions">
             <button class="edit-btn" data-id="${docSnap.id}">Edit</button>
             <button class="delete-btn" data-id="${docSnap.id}">Delete</button>
@@ -270,6 +276,7 @@
           slots: parseInt(inputs.slots.value),
           duration: inputs.duration.value,
           gender: inputs.gender.value,
+          category: inputs.category.value,
           createdAt: serverTimestamp()
         };
 
