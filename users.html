@@ -1,94 +1,68 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin - User Management</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      margin: 0;
       font-family: 'Inter', sans-serif;
-      background: #f9fafb;
-      color: #111827;
+      background-color: #f9fafb;
+      margin: 0;
+      padding: 0;
     }
     header {
-      background: #1d4ed8;
+      background-color: #1d4ed8;
       color: white;
-      padding: 1rem 2rem;
-      font-size: 1.75rem;
+      padding: 1rem;
+      font-size: 1.5rem;
       font-weight: 600;
+      text-align: center;
     }
     .container {
-      max-width: 1200px;
+      max-width: 1000px;
       margin: auto;
       padding: 2rem;
-    }
-    .actions {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    input, select {
-      padding: 0.5rem;
-      font-size: 1rem;
-      border-radius: 0.5rem;
-      border: 1px solid #ccc;
-    }
-    button {
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button:hover {
-      background: #1e40af;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      background: white;
-      border-radius: 0.75rem;
-      overflow: hidden;
+      margin-top: 1rem;
     }
     th, td {
-      padding: 1rem;
-      text-align: left;
+      padding: 0.75rem;
       border-bottom: 1px solid #e5e7eb;
+      text-align: left;
     }
     th {
-      background: #f3f4f6;
+      background-color: #f3f4f6;
       font-weight: 600;
     }
     tr:last-child td {
       border-bottom: none;
     }
-    .flex {
-      display: flex;
-      gap: 0.5rem;
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      font-weight: 600;
     }
-    .danger {
-      background: #ef4444;
-    }
-    .danger:hover {
-      background: #b91c1c;
+    .btn-update { background-color: #3b82f6; color: white; }
+    .btn-delete { background-color: #ef4444; color: white; }
+    .btn-restrict { background-color: #f59e0b; color: white; }
+    .btn-create { margin-bottom: 1rem; background-color: #10b981; color: white; }
+    input, select {
+      padding: 0.5rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
     }
   </style>
 </head>
 <body>
-  <header>
-    👥 Admin User Manager
-  </header>
+  <header>Admin - User Management</header>
   <div class="container">
-    <div class="actions">
-      <input type="text" id="search" placeholder="Search by email..." />
-      <button onclick="createUserPopup()">+ Create New User</button>
-    </div>
+    <button class="btn btn-create" onclick="createUserPrompt()">+ Create New User</button>
     <table>
       <thead>
         <tr>
@@ -105,7 +79,7 @@
     </table>
   </div>  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, updateDoc, deleteDoc, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, doc, getDoc, onSnapshot, updateDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -121,27 +95,27 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth();
-
     const userTable = document.getElementById("userTable");
-    const searchInput = document.getElementById("search");
-    let allUsers = [];
+
+    let users = [];
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) return window.location.href = "/login.html";
-      const docSnap = await getDocs(collection(db, "users"));
-      const currentUser = docSnap.docs.find(doc => doc.id === user.uid);
-      if (!currentUser || currentUser.data().role !== "admin") {
+
+      const adminDoc = await getDoc(doc(db, "users", user.uid));
+      if (!adminDoc.exists() || adminDoc.data().role !== "admin") {
         alert("Access denied. Admins only.");
         return window.location.href = "/";
       }
+
       loadUsers();
     });
 
     function loadUsers() {
-      const usersRef = collection(db, "users");
-      onSnapshot(usersRef, (snapshot) => {
-        allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderUsers(allUsers);
+      const ref = collection(db, "users");
+      onSnapshot(ref, (snapshot) => {
+        users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderUsers(users);
       });
     }
 
@@ -150,11 +124,11 @@
       users.forEach(user => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${user.email || '-'}</td>
-          <td>${user.displayName || '-'}</td>
-          <td>${user.phone || '-'}</td>
-          <td>${user.role || 'user'}</td>
-          <td>${user.status || 'active'}</td>
+          <td>${user.email || "-"}</td>
+          <td>${user.name || "-"}</td>
+          <td>${user.phone || "-"}</td>
+          <td>${user.role || "user"}</td>
+          <td>${user.status || "active"}</td>
           <td>
             <select id="role-${user.id}">
               <option value="admin">admin</option>
@@ -163,16 +137,16 @@
               <option value="user">user</option>
             </select>
           </td>
-          <td class="flex">
-            <button onclick="updateRole('${user.id}')">Update</button>
-            <button class="danger" onclick="deleteUser('${user.id}')">Delete</button>
-            <button onclick="toggleStatus('${user.id}', '${user.status || 'active'}')">
-              ${user.status === 'restricted' ? 'Unrestrict' : 'Restrict'}
+          <td>
+            <button class="btn btn-update" onclick="updateRole('${user.id}')">Update</button>
+            <button class="btn btn-delete" onclick="deleteUser('${user.id}')">Delete</button>
+            <button class="btn btn-restrict" onclick="toggleStatus('${user.id}', '${user.status || "active"}')">
+              ${user.status === "restricted" ? "Unrestrict" : "Restrict"}
             </button>
           </td>
         `;
         userTable.appendChild(row);
-        document.getElementById(`role-${user.id}`).value = user.role || 'user';
+        document.getElementById(`role-${user.id}`).value = user.role || "user";
       });
     }
 
@@ -189,33 +163,27 @@
       }
     };
 
-    window.toggleStatus = async (id, currentStatus) => {
-      const newStatus = currentStatus === 'restricted' ? 'active' : 'restricted';
+    window.toggleStatus = async (id, current) => {
+      const newStatus = current === "restricted" ? "active" : "restricted";
       await updateDoc(doc(db, "users", id), { status: newStatus });
       alert(`User is now ${newStatus}`);
     };
 
-    window.createUserPopup = async () => {
-      const email = prompt("User Email:");
-      const name = prompt("Display Name:");
-      const phone = prompt("Phone Number:");
+    window.createUserPrompt = async () => {
+      const email = prompt("Email:");
+      const name = prompt("Name:");
+      const phone = prompt("Phone:");
       const role = prompt("Role (admin/doctor/merchant/user):", "user");
-      if (!email || !name || !role || !phone) return alert("Invalid input");
-      const id = crypto.randomUUID();
-      await setDoc(doc(db, "users", id), {
+      if (!email || !name || !phone || !role) return alert("All fields required");
+      const newId = crypto.randomUUID();
+      await setDoc(doc(db, "users", newId), {
         email,
-        displayName: name,
+        name,
         phone,
         role,
         status: "active"
       });
       alert("User created");
     };
-
-    searchInput.addEventListener("input", () => {
-      const query = searchInput.value.toLowerCase();
-      const filtered = allUsers.filter(u => (u.email || '').toLowerCase().includes(query));
-      renderUsers(filtered);
-    });
   </script></body>
 </html>
