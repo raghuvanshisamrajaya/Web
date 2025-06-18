@@ -5,15 +5,717 @@
   <title>Raghuvanshi Healthcare</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="shortcut icon" href="/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="Raghuvanshi " />
-<link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Raghuvanshi " />
+    <link rel="manifest" href="/site.webmanifest" />
+<styles>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f4f6f9;
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background: linear-gradient(90deg, #0052cc, #2d89ef);
+        color: white;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+    }
+
+    .logo img {
+        max-height: 80px;
+        width: auto;
+        transition: max-height 0.3s ease;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 25px;
+    }
+
+    .nav-links a {
+        color: white;
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: 500;
+        position: relative;
+        transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+        color: #ffdd57;
+    }
+
+    .nav-links a::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -5px;
+        left: 0;
+        background-color: #ffdd57;
+        transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+        width: 100%;
+    }
+
+    .hamburger {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+    }
+
+    .hamburger div {
+        width: 30px;
+        height: 4px;
+        background-color: white;
+        margin: 4px 0;
+        border-radius: 2px;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+    .hamburger.open div:nth-child(1) {
+        transform: rotate(45deg) translateY(10px);
+    }
+
+    .hamburger.open div:nth-child(2) {
+        opacity: 0;
+    }
+
+    .hamburger.open div:nth-child(3) {
+        transform: rotate(-45deg) translateY(-10px);
+    }
+
+    .mobile-menu {
+        display: none;
+        flex-direction: column;
+        background-color: #0052cc;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        right: 0;
+        padding: 20px;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-top: 2px solid #ffdd57;
+    }
+
+    .mobile-menu.open {
+        display: flex;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .mobile-menu a {
+        color: white;
+        text-decoration: none;
+        margin-bottom: 15px;
+        font-size: 18px;
+        font-weight: 500;
+        position: relative;
+        transition: color 0.3s ease;
+    }
+
+    .mobile-menu a:hover {
+        color: #ffdd57;
+    }
+
+    .mobile-menu a::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -5px;
+        left: 0;
+        background-color: #ffdd57;
+        transition: width 0.3s ease;
+    }
+
+    .mobile-menu a:hover::after {
+        width: 100%;
+    }
+
+    .nav-links svg, .mobile-menu svg {
+        margin-right: 8px;
+        fill: #ffdd57;
+        width: 18px;
+        height: 18px;
+        vertical-align: middle;
+    }
+
+    @media (max-width: 768px) {
+        .nav-links {
+            display: none;
+        }
+
+        .hamburger {
+            display: flex;
+        }
+
+        .logo img {
+            max-height: 50px;
+        }
+    }
+
+    @media (min-width: 769px) {
+        .mobile-menu {
+            display: none !important;
+        }
+    } 
+
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+}
+
+.locations-container {
+  background-color: #2c3e50;
+  padding: 40px 20px;
+  color: #ecf0f1;
+  text-align: center;
+  border-top: 5px solid #34495e;
+}
+
+.locations-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.locations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  justify-content: center;
+}
+
+.locations-grid div {
+  background-color: #34495e;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 16px;
+  text-transform: capitalize;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/*slider cards */
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #f3f4f6;
+    }
+    .slide-title {
+      text-align: center;
+      font-size: 2.25rem;
+      font-weight: bold;
+      margin: 2rem 0 1rem;
+      color: #1f2937;
+    }
+    .slider-container {
+      display: flex;
+      overflow-x: auto;
+      padding: 2rem 1rem;
+      gap: 1.5rem;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .slider-container::-webkit-scrollbar {
+      display: none;
+    }
+    .slide-card {
+      flex: 0 0 auto;
+      min-width: 320px;
+      background: white;
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .slide-card-header {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      padding: 1.5rem;
+      color: white;
+      font-size: 1.25rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    .slide-price {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #4f46e5;
+      margin: 1rem 0;
+      text-align: center;
+    }
+    .slide-features {
+      list-style: none;
+      padding: 0 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .slide-features li {
+      margin-bottom: 0.75rem;
+      color: #374151;
+      display: flex;
+      align-items: center;
+    }
+    .slide-features li::before {
+      content: '✓';
+      color: #10b981;
+      margin-right: 0.5rem;
+      font-weight: bold;
+    }
+    .slide-card button {
+      margin: 0 1.5rem 1.5rem;
+      padding: 0.75rem;
+      background: #4f46e5;
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .slide-card button:hover {
+      background: #4338ca;
+    }
+    
+        .map-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 20px;
+      background: linear-gradient(135deg, #ffffff, #f1f1f1);
+      gap: 50px;
+    }
+
+    @media (min-width: 768px) {
+      .map-section {
+        flex-direction: row;
+        padding: 100px 60px;
+      }
+    }
+
+    .map-text {
+      max-width: 550px;
+      text-align: center;
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    @media (min-width: 768px) {
+      .map-text {
+        text-align: left;
+      }
+    }
+
+    .map-text h2 {
+      font-size: 2.7rem;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+    }
+
+    .map-text p {
+      font-size: 1.1rem;
+      color: #444;
+      line-height: 1.6;
+    }
+
+    .map-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      animation: scaleIn 1.2s ease forwards;
+    }
+
+    .map-wrapper img {
+      width: 100%;
+      display: block;
+    }
+
+    .marker {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: #ff7e00;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .marker:hover {
+      transform: scale(1.3);
+    }
+
+    .marker::after {
+      content: attr(data-city);
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      opacity: 0;
+      pointer-events: none;
+      white-space: nowrap;
+      transition: 0.3s ease;
+    }
+
+    .marker:hover::after {
+      opacity: 1;
+    }
+
+    /* Sample city coordinates */
+    .delhi { top: 28%; left: 47%; }
+    .mumbai { top: 60%; left: 30%; }
+    .kolkata { top: 38%; left: 73%; }
+    .bangalore { top: 78%; left: 40%; }
+    .hyderabad { top: 65%; left: 50%; }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  
+  
+  
+    
+    }
+
+    .read-more-btn:hover {
+      background-color: #e64a19;
+    }
+
+    @media (max-width: 768px) {
+      .swiper {
+        padding: 20px 20px;
+      }
+
+      .swiper-slide {
+        height: 80px;
+      }
+
+      .swiper-button-next,
+      .swiper-button-prev {
+        width: 30px;
+        height: 30px;
+      }
+    }
+
+
+    .stats-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      padding: 60px 20px;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .stat-card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      text-align: center;
+      padding: 40px 20px;
+      width: 260px;
+      max-width: 100%;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: slideUp 1s ease forwards;
+      opacity: 0;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.2s; }
+    .stat-card:nth-child(2) { animation-delay: 0.4s; }
+    .stat-card:nth-child(3) { animation-delay: 0.6s; }
+    .stat-card:nth-child(4) { animation-delay: 0.8s; }
+
+    .stat-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      background-color: #f05a28;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin: 0 auto 20px auto;
+    }
+
+    .stat-icon svg {
+      width: 28px;
+      height: 28px;
+      fill: white;
+    }
+
+    .stat-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .stat-subtitle {
+      font-size: 16px;
+      color: #777;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .stat-card {
+        width: 100%;
+        max-width: 320px;
+      }
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0 }
+      100% { opacity: 1 }
+    }
+
+    @keyframes slideUp {
+      0% {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+
+.healthcare-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.healthcare-container:hover {
+  transform: scale(1.01);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.12);
+}
+
+.healthcare-image img {
+  width: 300px;
+  height: auto;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.healthcare-image img:hover {
+  transform: scale(1.05);
+}
+
+.healthcare-content {
+  max-width: 600px;
+  padding: 20px;
+  text-align: center;
+}
+
+.healthcare-content h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 20px;
+}
+
+.healthcare-content .highlight {
+  color: #0db8a0;
+}
+
+.healthcare-content p {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 25px;
+}
+
+.book-button {
+  padding: 12px 28px;
+  background-color: #ff6b28;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.book-button:hover {
+  background-color: #e65c1a;
+  transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .healthcare-container {
+    flex-direction: column;
+    padding: 20px 15px;
+  }
+
+  .healthcare-image img {
+    width: 200px;
+    margin-bottom: 20px;
+  }
+
+  .healthcare-content h2 {
+    font-size: 22px;
+  }
+
+  .healthcare-content p {
+    font-size: 15px;
+  }
+}
+
+
+.services-section {
+  text-align: center;
+  padding: 50px 20px;
+  background: #f0fafa;
+}
+
+.services-section h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.services-section p {
+  color: #555;
+  font-size: 16px;
+  margin-bottom: 30px;
+}
+
+.services-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.service-card {
+  background: #ffffff;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  flex-wrap: wrap;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+}
+
+.service-text {
+  flex: 1;
+  min-width: 200px;
+}
+
+.service-text h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.action-btn {
+  color: #ff6b28;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 10px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.action-btn:hover {
+  color: #e65c1a;
+}
+
+.service-img img {
+  width: 120px;
+  height: auto;
+  border-radius: 8px;
+  margin-left: 20px;
+  transition: transform 0.3s ease;
+}
+
+.service-card:hover .service-img img {
+  transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .service-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .service-img img {
+    margin: 15px 0 0 0;
+  }
+}
+
+
+</styles>
   </head>
-</head>
 <body>
-<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="styles.css">
     <header>
         <div class="logo">
             <img src="images/logo.jpg" alt="Raghuvanshi Healthcare">
@@ -178,364 +880,4 @@
   <div class="slider-container">
     <div class="slide-card">
       <div class="slide-card-header">Starter Plan</div>
-      <p class="slide-price">₹499/mo</p>
-      <ul class="slide-features">
-        <li>Basic consultations</li>
-        <li>Email support</li>
-        <li>1 user account</li>
-      </ul>
-      <button>Choose Starter</button>
-    </div>
-    <div class="slide-card">
-      <div class="slide-card-header">Standard Plan</div>
-      <p class="slide-price">₹999/mo</p>
-      <ul class="slide-features">
-        <li>Standard services</li>
-        <li>Priority email support</li>
-        <li>Up to 3 users</li>
-      </ul>
-      <button>Choose Standard</button>
-    </div>
-    <div class="slide-card">
-      <div class="slide-card-header">Advanced Plan</div>
-      <p class="slide-price">₹1,999/mo</p>
-      <ul class="slide-features">
-        <li>Advanced diagnostics</li>
-        <li>Phone support</li>
-        <li>Up to 5 users</li>
-      </ul>
-      <button>Choose Advanced</button>
-    </div>
-    <div class="slide-card">
-      <div class="slide-card-header">Premium Plan</div>
-      <p class="slide-price">₹2,999/mo</p>
-      <ul class="slide-features">
-        <li>All advanced features</li>
-        <li>Dedicated consultant</li>
-        <li>Unlimited users</li>
-      </ul>
-      <button>Choose Premium</button>
-    </div>
-    <div class="slide-card">
-      <div class="slide-card-header">Elite Plan</div>
-      <p class="slide-price">₹4,999/mo</p>
-      <ul class="slide-features">
-        <li>Premium + exclusive services</li>
-        <li>Personal health manager</li>
-        <li>Enterprise support</li>
-      </ul>
-      <button>Choose Elite</button>
-    </div>
-  </div>
-  
-<!-- Our Partners Section -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-
-<style>
-  .partners-section {
-    padding: 60px 20px;
-    background: linear-gradient(to bottom, #f9fafb, #ffffff);
-    height: 400px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .partners-section h2 {
-    font-size: 2.4rem;
-    color: #111827;
-    margin-bottom: 40px;
-    font-weight: 700;
-    position: relative;
-    display: inline-block;
-    animation: fadeInDown 0.8s ease-out;
-  }
-
-  .partners-section h2::after {
-    content: '';
-    width: 70px;
-    height: 4px;
-    background: #06b6d4;
-    display: block;
-    margin: 12px auto 0;
-    border-radius: 3px;
-    animation: expandBar 1s ease-out;
-  }
-
-  .swiper {
-    padding-bottom: 40px;
-    transition: transform 0.5s ease-in-out;
-  }
-
-  .swiper-slide {
-    display: flex;
-    justify-content: center;
-    transition: transform 0.3s ease;
-  }
-
-  .partner-card {
-    background: #ffffff;
-    border-radius: 18px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-    padding: 25px;
-    width: 190px;
-    height: 190px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.35s ease;
-    transform: scale(1);
-    cursor: pointer;
-    opacity: 0;
-    animation: fadeUp 0.8s ease forwards;
-  }
-
-  .swiper-slide:nth-child(1) .partner-card { animation-delay: 0.1s; }
-  .swiper-slide:nth-child(2) .partner-card { animation-delay: 0.2s; }
-  .swiper-slide:nth-child(3) .partner-card { animation-delay: 0.3s; }
-  .swiper-slide:nth-child(4) .partner-card { animation-delay: 0.4s; }
-
-  .partner-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
-  }
-
-  .partner-card img {
-    width: 70px;
-    height: 70px;
-    object-fit: cover;
-    margin-bottom: 14px;
-    border-radius: 50%; /* Circular image */
-    filter: grayscale(40%);
-    transition: filter 0.3s ease, transform 0.3s ease;
-  }
-
-  .partner-card:hover img {
-    filter: none;
-    transform: scale(1.1);
-  }
-
-  .partner-card span {
-    font-weight: 600;
-    font-size: 1rem;
-    color: #111827;
-    transition: color 0.3s ease;
-  }
-
-  @media (max-width: 768px) {
-    .partner-card {
-      width: 140px;
-      height: 140px;
-      padding: 15px;
-    }
-
-    .partner-card img {
-      width: 55px;
-      height: 55px;
-    }
-
-    .partner-card span {
-      font-size: 0.9rem;
-    }
-  }
-
-  /* Animations */
-  @keyframes fadeInDown {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes fadeUp {
-    0% {
-      opacity: 0;
-      transform: translateY(40px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes expandBar {
-    from {
-      width: 0;
-    }
-    to {
-      width: 70px;
-    }
-  }
-</style>
-
-<section class="partners-section">
-  <h2>Our Partners</h2>
-
-  <div class="swiper mySwiper">
-    <div class="swiper-wrapper">
-      <!-- Partner 1 -->
-      <div class="swiper-slide">
-        <div class="partner-card">
-          <img src="https://via.placeholder.com/80x80?text=Logo1" alt="Partner 1"/>
-          <span>Partner One</span>
-        </div>
-      </div>
-
-      <!-- Partner 2 -->
-      <div class="swiper-slide">
-        <div class="partner-card">
-          <img src="https://via.placeholder.com/80x80?text=Logo2" alt="Partner 2"/>
-          <span>Partner Two</span>
-        </div>
-      </div>
-
-      <!-- Partner 3 -->
-      <div class="swiper-slide">
-        <div class="partner-card">
-          <img src="https://via.placeholder.com/80x80?text=Logo3" alt="Partner 3"/>
-          <span>Partner Three</span>
-        </div>
-      </div>
-
-      <!-- Partner 4 -->
-      <div class="swiper-slide">
-        <div class="partner-card">
-          <img src="https://via.placeholder.com/80x80?text=Logo4" alt="Partner 4"/>
-          <span>Partner Four</span>
-        </div>
-      </div>
-
-      <!-- Add more partners as needed -->
-    </div>
-  </div>
-</section>
-
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script>
-  const swiper = new Swiper('.mySwiper', {
-    slidesPerView: 1.3,
-    spaceBetween: 20,
-    loop: true,
-    speed: 700,
-    autoplay: {
-      delay: 2500,
-      disableOnInteraction: false,
-    },
-    grabCursor: true,
-    centeredSlides: false,
-    breakpoints: {
-      480: {
-        slidesPerView: 2.2,
-      },
-      768: {
-        slidesPerView: 3.2,
-      },
-      1024: {
-        slidesPerView: 4.2,
-      }
-    }
-  });
-</script>
-
-
-
-
-    <section class="map-section">
-    <div class="map-wrapper">
-      <img src="images/map-image.jpg" alt="India Map Coverage">
-
-      <!-- Interactive markers -->
-      <div class="marker delhi" data-city="Delhi"></div>
-      <div class="marker mumbai" data-city="Mumbai"></div>
-      <div class="marker kolkata" data-city="Kolkata"></div>
-      <div class="marker bangalore" data-city="Bangalore"></div>
-      <div class="marker hyderabad" data-city="Hyderabad"></div>
-    </div>
-
-    <div class="map-text">
-      <h2>We Are Operational in 40+ Cities</h2>
-      <p>
-        Raghuvanshi Healthcare is present in over 40 cities across India. Our network is expanding to bring essential, compassionate care to your doorstep. Each marker below represents a city we're proudly serving.
-      </p>
-    </div>
-  </section>
-
-<div class="locations-container">
-  <h2 class="locations-title">Services Available In</h2>
-  <div class="locations-grid">
-    <div>Bangalore</div>
-    <div>Mumbai</div>
-    <div>Delhi</div>
-    <div>Kolkata</div>
-    <div>Chennai</div>
-    <div>Jaipur</div>
-    <div>Pune</div>
-    <div>Hyderabad</div>
-    <div>Ahmedabad</div>
-  </div>
-</div>  
-
-    <footer style="background: #004e89; color: #fff; padding: 3rem 2rem; font-family: 'Inter', sans-serif;">
-  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2rem; max-width: 1200px; margin: auto;">
-    <!-- Company Info -->
-    <div style="flex: 1; min-width: 250px;">
-      <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Raghuvanshi Healthcare</h3>
-      <p>Empowering lives with reliable medical equipment and services. We're committed to your health and care.</p>
-    </div>
-
-    <!-- Navigation Links -->
-    <div style="flex: 1; min-width: 200px;">
-      <h4 style="margin-bottom: 1rem;">Company</h4>
-      <ul style="list-style: none; padding: 0; line-height: 2;">
-        <a href="about.html" style="color: #fff; text-decoration: none;">About Us</a>   
-        <li><a href="privacy.html" style="color: #fff; text-decoration: none;">Privacy Policy</a></li>
-        <li><a href="terms.html" style="color: #fff; text-decoration: none;">Terms & Conditions</a></li>
-        <li><a href="cookies.html" style="color: #fff; text-decoration: none;">Cookies Policy</a></li>
-        <li><a href="contact.html" style="color: #fff; text-decoration: none;">Contact Us</a></li>
-      </ul>
-    </div>
-
-    <!-- Contact Info -->
-    <div style="flex: 1; min-width: 220px;">
-      <h4 style="margin-bottom: 1rem;">Contact Us</h4>
-      <p>Email: raghuvanshisamrajaya@gmail.com</p>
-      <p>Phone: +91-6367225694</p>
-      <p>Phone: +91-8824187767</p>
-    </div>
-
-    <!-- Social Media -->
-    <div style="flex: 1; min-width: 200px;">
-      <h4 style="margin-bottom: 1rem;">Follow Us</h4>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <a href="https://www.instagram.com/raghuvanshihealthcare?igsh=czh0cHJieTQzcWQ3" target="_blank" style="color: #fff;" title="Instagram">
-          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/instagram.svg" alt="Instagram" width="24" />
-        </a>
-        <a href="#facebook" target="_blank" style="color: #fff;" title="Facebook">
-          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/facebook.svg" alt="Facebook" width="24" />
-        </a>
-        <a href="https://twitter.com" target="_blank" style="color: #fff;" title="Twitter">
-          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/twitter.svg" alt="Twitter" width="24" />
-        </a>
-        <a href="https://youtube.com/@raghuvanshiihealthcare?si=Z4izxX0Pg-mvwjKQ" target="_blank" style="color: #fff;" title="YouTube">
-          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/youtube.svg" alt="YouTube" width="24" />
-        </a>
-        <a href="" target="_blank" style="color: #fff;" title="LinkedIn">
-          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/linkedin.svg" alt="LinkedIn" width="24" />
-        </a>
-        <a href="https://t.me/raghuvanshihealthcare" target="_blank" style="color: #fff;" title="Telegram">
-          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/telegram.svg" alt="Telegram" width="24" />
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <div style="text-align: center; margin-top: 2rem; font-size: 0.9rem; color: #ccc;">
-    &copy; 2025 Raghuvanshi Healthcare . All rights reserved.
-  </div>
-</footer>
-</html>
+      <p class="slide-price">₹499
