@@ -1,13 +1,13 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Booking Dashboard - Raghuvanshi Health Care</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+
   <style>
     .card-hover:hover {
       transform: translateY(-5px);
@@ -18,63 +18,74 @@
     }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-800 min-h-screen">
-  <div class="p-4 max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6">Booking Dashboard</h1><!-- Summary Cards -->
-<div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-  <div id="totalBookings" class="bg-white rounded-2xl p-4 shadow-md transition card-hover">
-    <h2 class="text-lg font-semibold">Total</h2>
-    <p class="text-2xl font-bold" id="total-count">0</p>
-  </div>
-  <div id="pendingBookings" class="bg-yellow-100 rounded-2xl p-4 shadow-md transition card-hover">
-    <h2 class="text-lg font-semibold">Pending</h2>
-    <p class="text-2xl font-bold" id="pending-count">0</p>
-  </div>
-  <div id="confirmedBookings" class="bg-green-100 rounded-2xl p-4 shadow-md transition card-hover">
-    <h2 class="text-lg font-semibold">Confirmed</h2>
-    <p class="text-2xl font-bold" id="confirmed-count">0</p>
-  </div>
-  <div id="rejectedBookings" class="bg-red-100 rounded-2xl p-4 shadow-md transition card-hover">
-    <h2 class="text-lg font-semibold">Rejected</h2>
-    <p class="text-2xl font-bold" id="rejected-count">0</p>
-  </div>
-  <div id="completedBookings" class="bg-blue-100 rounded-2xl p-4 shadow-md transition card-hover">
-    <h2 class="text-lg font-semibold">Completed</h2>
-    <p class="text-2xl font-bold" id="completed-count">0</p>
-  </div>
-</div>
+<body class="bg-gray-100 min-h-screen text-gray-800">
+  <div class="max-w-7xl mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-6">Booking Dashboard</h1>
 
-<!-- Booking Table -->
-<div class="bg-white rounded-2xl shadow-md p-4 overflow-x-auto">
-  <table class="w-full table-auto">
-    <thead>
-      <tr class="bg-gray-200">
-        <th class="px-4 py-2">Name</th>
-        <th class="px-4 py-2">Email</th>
-        <th class="px-4 py-2">Phone</th>
-        <th class="px-4 py-2">Service</th>
-        <th class="px-4 py-2">Date</th>
-        <th class="px-4 py-2">Time</th>
-        <th class="px-4 py-2">Status</th>
-        <th class="px-4 py-2">Doctor</th>
-        <th class="px-4 py-2">Actions</th>
-      </tr>
-    </thead>
-    <tbody id="bookingTable" class="text-center"></tbody>
-  </table>
-</div>
+    <!-- Top Counters -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+      <div class="bg-white p-4 rounded-2xl shadow-md card-hover transition">
+        <h2 class="text-lg font-semibold">Total</h2>
+        <p class="text-2xl font-bold" id="total-count">0</p>
+      </div>
+      <div class="bg-yellow-100 p-4 rounded-2xl shadow-md card-hover transition">
+        <h2 class="text-lg font-semibold">Pending</h2>
+        <p class="text-2xl font-bold" id="pending-count">0</p>
+      </div>
+      <div class="bg-green-100 p-4 rounded-2xl shadow-md card-hover transition">
+        <h2 class="text-lg font-semibold">Confirmed</h2>
+        <p class="text-2xl font-bold" id="confirmed-count">0</p>
+      </div>
+      <div class="bg-red-100 p-4 rounded-2xl shadow-md card-hover transition">
+        <h2 class="text-lg font-semibold">Rejected</h2>
+        <p class="text-2xl font-bold" id="rejected-count">0</p>
+      </div>
+      <div class="bg-blue-100 p-4 rounded-2xl shadow-md card-hover transition">
+        <h2 class="text-lg font-semibold">Completed</h2>
+        <p class="text-2xl font-bold" id="completed-count">0</p>
+      </div>
+    </div>
 
-  </div>  <script>
+    <!-- Search Bar -->
+    <div class="mb-4">
+      <input type="text" id="searchInput" placeholder="Search by name, email, phone, service, invoice..." class="w-full md:w-1/2 px-4 py-2 border rounded-md" />
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-2xl shadow-md p-4 overflow-x-auto">
+      <table class="w-full table-auto">
+        <thead>
+          <tr class="bg-gray-200 text-sm">
+            <th class="px-4 py-2">Name</th>
+            <th class="px-4 py-2">Email</th>
+            <th class="px-4 py-2">Phone</th>
+            <th class="px-4 py-2">Service</th>
+            <th class="px-4 py-2">Date</th>
+            <th class="px-4 py-2">Time</th>
+            <th class="px-4 py-2">Invoice #</th>
+            <th class="px-4 py-2">Status</th>
+            <th class="px-4 py-2">Doctor</th>
+            <th class="px-4 py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="bookingTable" class="text-center text-sm"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Your Firebase Config
     const firebaseConfig = {
-  apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
-  authDomain: "store-471f1.firebaseapp.com",
-  projectId: "store-471f1",
-  storageBucket: "store-471f1.appspot.com",
-  messagingSenderId: "619523242611",
-  appId: "1:619523242611:web:fdfa53044c62f844574806",
-  measurementId: "G-16C8MYT70G"
-};
-    const app = firebase.initializeApp(firebaseConfig);
+      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
+      authDomain: "store-471f1.firebaseapp.com",
+      projectId: "store-471f1",
+      storageBucket: "store-471f1.appspot.com",
+      messagingSenderId: "619523242611",
+      appId: "1:619523242611:web:fdfa53044c62f844574806",
+      measurementId: "G-16C8MYT70G"
+    };
+
+    firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
     const counts = {
@@ -86,31 +97,37 @@
     };
 
     const updateCounters = () => {
-      document.getElementById('total-count').textContent = counts.total;
-      document.getElementById('pending-count').textContent = counts.pending;
-      document.getElementById('confirmed-count').textContent = counts.confirmed;
-      document.getElementById('rejected-count').textContent = counts.rejected;
-      document.getElementById('completed-count').textContent = counts.completed;
+      document.getElementById("total-count").textContent = counts.total;
+      document.getElementById("pending-count").textContent = counts.pending;
+      document.getElementById("confirmed-count").textContent = counts.confirmed;
+      document.getElementById("rejected-count").textContent = counts.rejected;
+      document.getElementById("completed-count").textContent = counts.completed;
     };
 
     const loadDoctors = async () => {
-      const querySnapshot = await db.collection("users").where("role", "==", "doctor").get();
-      return querySnapshot.docs.map(doc => doc.data().email);
+      const snapshot = await db.collection("users").where("role", "==", "doctor").get();
+      return snapshot.docs.map(doc => doc.data().email);
     };
 
     const renderTable = async () => {
       const doctors = await loadDoctors();
       db.collection("bookings").onSnapshot(snapshot => {
-        const table = document.getElementById('bookingTable');
-        table.innerHTML = '';
+        const table = document.getElementById("bookingTable");
+        const searchVal = document.getElementById("searchInput").value.toLowerCase();
+        table.innerHTML = "";
+
         counts.total = counts.pending = counts.confirmed = counts.rejected = counts.completed = 0;
 
         snapshot.forEach(doc => {
           const data = doc.data();
-          counts.total++;
-          counts[data.status]++;
+          const match = [data.userName, data.email, data.phone, data.serviceName, data.invoiceNumber]
+            .some(field => field && field.toLowerCase().includes(searchVal));
+          if (!match) return;
 
-          const row = document.createElement('tr');
+          counts.total++;
+          if (counts[data.status] !== undefined) counts[data.status]++;
+
+          const row = document.createElement("tr");
           row.innerHTML = `
             <td class="px-4 py-2">${data.userName}</td>
             <td class="px-4 py-2">${data.email}</td>
@@ -118,12 +135,13 @@
             <td class="px-4 py-2">${data.serviceName}</td>
             <td class="px-4 py-2">${data.date}</td>
             <td class="px-4 py-2">${data.time}</td>
+            <td class="px-4 py-2">${data.invoiceNumber || "-"}</td>
             <td class="px-4 py-2 capitalize">${data.status}</td>
-            <td class="px-4 py-2">${data.assignedDoctorEmail || '-'}</td>
+            <td class="px-4 py-2">${data.assignedDoctorEmail || "-"}</td>
             <td class="px-4 py-2">
-              <select class="mb-1 text-sm" onchange="assignDoctor('${doc.id}', this.value)">
+              <select onchange="assignDoctor('${doc.id}', this.value)" class="mb-1 text-xs">
                 <option value="">Assign Doctor</option>
-                ${doctors.map(email => `<option value="${email}">${email}</option>`).join('')}
+                ${doctors.map(email => `<option value="${email}">${email}</option>`).join("")}
               </select><br/>
               <button onclick="updateStatus('${doc.id}', 'confirmed')" class="bg-green-500 text-white text-xs px-2 py-1 rounded">Confirm</button>
               <button onclick="updateStatus('${doc.id}', 'rejected')" class="bg-red-500 text-white text-xs px-2 py-1 rounded">Reject</button>
@@ -132,6 +150,7 @@
           `;
           table.appendChild(row);
         });
+
         updateCounters();
       });
     };
@@ -145,6 +164,8 @@
       db.collection("bookings").doc(id).update({ assignedDoctorEmail: email });
     };
 
+    document.getElementById("searchInput").addEventListener("input", renderTable);
     renderTable();
-  </script></body>
+  </script>
+</body>
 </html>
