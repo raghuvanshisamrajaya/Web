@@ -1,126 +1,94 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard - Raghuvanshi Healthcare</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f5f5f5;
-    }
-    .sidebar {
-      height: 100vh;
-      width: 240px;
-      background: #0d47a1;
-      color: white;
-      padding: 20px;
-      position: fixed;
-      transition: all 0.3s ease;
-    }
-    .sidebar h2 {
-      margin-bottom: 30px;
-      text-align: center;
-      font-size: 22px;
-      color: #fff;
-      animation: fadeIn 1s ease;
-    }
-    .sidebar a {
-      display: block;
-      color: #bbdefb;
-      text-decoration: none;
-      margin: 15px 0;
-      padding: 10px;
-      border-radius: 8px;
-      transition: background 0.3s ease, transform 0.2s;
-    }
-    .sidebar a:hover {
-      background-color: #1565c0;
-      transform: translateX(5px);
-    }
-    .main {
-      margin-left: 260px;
-      padding: 40px;
-      transition: margin 0.3s ease;
-    }
-    .card {
-      background: #fff;
-      padding: 25px;
-      margin-bottom: 20px;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      animation: fadeInUp 0.8s ease;
-    }
-    .card h3 {
-      margin-bottom: 10px;
-      font-size: 20px;
-      color: #0d47a1;
-    }
-    .card p {
-      color: #555;
-      font-size: 18px;
-      font-weight: 600;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @media (max-width: 768px) {
-      .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-      }
-      .main {
-        margin-left: 0;
-        padding: 20px;
-      }
-    }
-  </style>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
 </head>
-<body>
-  <div class="sidebar">
-    <h2>Admin Panel</h2>
-    <a href="dashboard.html" onclick="loadSection('dashboard')">📊 Dashboard</a>
-    <a href="services-dash.html" onclick="loadSection('services')">🛠️ Manage Services</a>
-    <a href="#" onclick="loadSection('products')">🛒 Manage Products</a>
-    <a href="users.html" onclick="loadSection('users')">👤 Manage Users</a>
-    <a href="analytics.html" onclick="loadSection('analytics')">📈 Analytics</a>
-  </div>  <div class="main" id="mainContent">
-    <h1>Welcome to Admin Dashboard</h1>
-    <div class="grid">
-      <div class="card">
-        <h3>Total Services</h3>
-        <p id="totalServices">Loading...</p>
-      </div>
-      <div class="card">
-        <h3>Total Products</h3>
-        <p id="totalProducts">Loading...</p>
-      </div>
-      <div class="card">
-        <h3>Total Users</h3>
-        <p id="totalUsers">Loading...</p>
-      </div>
-      <div class="card">
-        <h3>Bookings Today</h3>
-        <p id="todaysBookings">Loading...</p>
-      </div>
+<body class="bg-gray-100 text-gray-800">
+  <!-- Layout -->
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 bg-blue-900 text-white transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-in-out md:relative shadow-xl">
+      <div class="p-6 text-2xl font-bold">Admin Panel</div>
+      <nav class="flex flex-col gap-2 px-4">
+       <a href="#" class="px-4 py-2 rounded hover:bg-blue-800 transition">Dashboard</a>
+        <a href="#" class="px-4 py-2 rounded hover:bg-blue-800 transition">Bookings </a>
+        <a href="#" class="px-4 py-2 rounded hover:bg-blue-800 transition">Services Manager</a>
+        <a href="#" class="px-4 py-2 rounded hover:bg-blue-800 transition">Products Manager</a>
+        <a href="#" class="px-4 py-2 rounded hover:bg-blue-800 transition">Users Manager </a>
+        <a href="#" class="px-4 py-2 rounded hover:bg-blue-800 transition">Anaylatics</a>
+        <button id="logoutBtn" class="px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition text-left">Logout</button>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden w-full">
+      <header class="bg-white shadow flex items-center justify-between px-4 py-4 md:px-6">
+        <button id="menuBtn" class="md:hidden text-blue-900">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <h1 class="text-xl font-bold text-blue-900">Dashboard</h1>
+        <div class="flex items-center gap-4">
+          <span class="text-sm hidden sm:block">Admin</span>
+          <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">A</div>
+        </div>
+      </header>
+
+      <main class="p-4 md:p-6 overflow-y-auto">
+        <h2 class="text-2xl font-semibold mb-6">Welcome back, Admin 👋</h2>
+
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="bg-white rounded-xl shadow-md p-4">
+            <h3 class="text-sm text-gray-500">Total Users</h3>
+            <p id="totalUsers" class="text-2xl font-bold text-blue-700 mt-2">0</p>
+          </div>
+          <div class="bg-white rounded-xl shadow-md p-4">
+            <h3 class="text-sm text-gray-500">Total Products</h3>
+            <p id="totalProducts" class="text-2xl font-bold text-purple-700 mt-2">0</p>
+          </div>
+          <div class="bg-white rounded-xl shadow-md p-4">
+            <h3 class="text-sm text-gray-500">Total Services</h3>
+            <p id="totalServices" class="text-2xl font-bold text-green-700 mt-2">0</p>
+          </div>
+          <div class="bg-white rounded-xl shadow-md p-4">
+            <h3 class="text-sm text-gray-500">Total Bookings</h3>
+            <p id="totalBookings" class="text-2xl font-bold text-pink-700 mt-2">0</p>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white p-6 rounded-xl shadow-md">
+            <h3 class="text-lg font-semibold mb-4">📈 Bookings Over Time</h3>
+            <canvas id="lineChart" height="300"></canvas>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-md">
+            <h3 class="text-lg font-semibold mb-4">🧪 Service Distribution</h3>
+            <canvas id="pieChart" height="300"></canvas>
+          </div>
+        </div>
+      </main>
     </div>
-  </div>  <script>
+  </div>
+
+  <!-- Firebase Integration -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
       authDomain: "store-471f1.firebaseapp.com",
@@ -131,37 +99,89 @@
       measurementId: "G-16C8MYT70G"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore();
 
-    async function updateDashboard() {
-      try {
-        const servicesSnap = await db.collection("services").get();
-        document.getElementById("totalServices").innerText = servicesSnap.size;
+    // Sidebar toggle
+    document.getElementById("menuBtn").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.toggle("-translate-x-full");
+    });
 
-        const productsSnap = await db.collection("products").get();
-        document.getElementById("totalProducts").innerText = productsSnap.size;
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
+    });
 
-        const usersSnap = await db.collection("users").get();
-        document.getElementById("totalUsers").innerText = usersSnap.size;
+    // Admin check and data fetch
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return window.location.href = "index.html";
 
-        const today = new Date().toISOString().split("T")[0];
-        let bookingsToday = 0;
-        const bookingsSnap = await db.collection("bookings").get();
-        bookingsSnap.forEach(doc => {
-          const data = doc.data();
-          if (data.date && data.date.startsWith(today)) bookingsToday++;
-        });
-        document.getElementById("todaysBookings").innerText = bookingsToday;
-      } catch (e) {
-        console.error("Error loading dashboard:", e);
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists() || userSnap.data().role !== "admin") {
+        alert("Access Denied: Admins Only");
+        return window.location.href = "index.html";
       }
-    }
 
-    function loadSection(section) {
-      document.getElementById('mainContent').innerHTML = `<h2>Loading ${section}...</h2>`;
-    }
+      // Fetch totals
+      const [usersSnap, productsSnap, servicesSnap, bookingsSnap] = await Promise.all([
+        getDocs(collection(db, "users")),
+        getDocs(collection(db, "products")),
+        getDocs(collection(db, "services")),
+        getDocs(collection(db, "bookings")),
+      ]);
 
-    updateDashboard();
-  </script></body>
+      document.getElementById("totalUsers").textContent = usersSnap.size;
+      document.getElementById("totalProducts").textContent = productsSnap.size;
+      document.getElementById("totalServices").textContent = servicesSnap.size;
+      document.getElementById("totalBookings").textContent = bookingsSnap.size;
+
+      // Bookings chart by date
+      const bookingMap = {};
+      bookingsSnap.forEach(doc => {
+        const data = doc.data();
+        const date = new Date(data.date).toLocaleDateString("en-GB");
+        bookingMap[date] = (bookingMap[date] || 0) + 1;
+      });
+
+      const labels = Object.keys(bookingMap);
+      const bookingCounts = Object.values(bookingMap);
+
+      new Chart(document.getElementById("lineChart"), {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Bookings",
+            data: bookingCounts,
+            backgroundColor: "rgba(59,130,246,0.2)",
+            borderColor: "#3b82f6",
+            tension: 0.3,
+            fill: true
+          }]
+        }
+      });
+
+      // Service category distribution
+      const serviceMap = {};
+      servicesSnap.forEach(doc => {
+        const cat = doc.data().category || "Uncategorized";
+        serviceMap[cat] = (serviceMap[cat] || 0) + 1;
+      });
+
+      new Chart(document.getElementById("pieChart"), {
+        type: "pie",
+        data: {
+          labels: Object.keys(serviceMap),
+          datasets: [{
+            data: Object.values(serviceMap),
+            backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#6366f1"]
+          }]
+        }
+      });
+    });
+  </script>
+</body>
 </html>
