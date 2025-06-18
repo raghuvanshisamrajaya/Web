@@ -1,9 +1,11 @@
-.        /* General Reset */
+        /* General Reset */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }body {
+        }
+        
+        body {
         font-family: 'Roboto', sans-serif;
         background-color: #f4f6f9;
     }
@@ -401,49 +403,9 @@ body {
       to { opacity: 1; transform: scale(1); }
     }
   
-
-  /* Animations */
-  @keyframes fadeInDown {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes fadeUp {
-    0% {
-      opacity: 0;
-      transform: translateY(40px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes expandBar {
-    from {
-      width: 0;
-    }
-    to {
-      width: 70px;
-    }
-
-
-    .read-more-btn {
-      margin-top: 10px;
-      background-color: #ff5722;
-      color: white;
-      font-weight: 600;
-      padding: 10px 20px;
-      border-radius: 8px;
-      text-decoration: none;
-      display: inline-block;
-      transition: background 0.3s ease;
+  
+  
+    
     }
 
     .read-more-btn:hover {
@@ -735,3 +697,5 @@ body {
     margin: 15px 0 0 0;
   }
 }
+
+
