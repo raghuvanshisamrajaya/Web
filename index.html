@@ -9,9 +9,10 @@
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="Raghuvanshi " />
-    <link rel="manifest" href="/site.webmanifest" />
-<styles>
-        /* General Reset */
+   <link rel="manifest" href="/site.webmanifest" />
+  <styles>
+
+            /* General Reset */
         * {
             margin: 0;
             padding: 0;
@@ -712,10 +713,11 @@ body {
 }
 
 
-</styles>
+    
+  </styles>
   </head>
 <body>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="index.css">
     <header>
         <div class="logo">
             <img src="images/logo.jpg" alt="Raghuvanshi Healthcare">
@@ -880,4 +882,364 @@ body {
   <div class="slider-container">
     <div class="slide-card">
       <div class="slide-card-header">Starter Plan</div>
-      <p class="slide-price">₹499
+      <p class="slide-price">₹499/mo</p>
+      <ul class="slide-features">
+        <li>Basic consultations</li>
+        <li>Email support</li>
+        <li>1 user account</li>
+      </ul>
+      <button>Choose Starter</button>
+    </div>
+    <div class="slide-card">
+      <div class="slide-card-header">Standard Plan</div>
+      <p class="slide-price">₹999/mo</p>
+      <ul class="slide-features">
+        <li>Standard services</li>
+        <li>Priority email support</li>
+        <li>Up to 3 users</li>
+      </ul>
+      <button>Choose Standard</button>
+    </div>
+    <div class="slide-card">
+      <div class="slide-card-header">Advanced Plan</div>
+      <p class="slide-price">₹1,999/mo</p>
+      <ul class="slide-features">
+        <li>Advanced diagnostics</li>
+        <li>Phone support</li>
+        <li>Up to 5 users</li>
+      </ul>
+      <button>Choose Advanced</button>
+    </div>
+    <div class="slide-card">
+      <div class="slide-card-header">Premium Plan</div>
+      <p class="slide-price">₹2,999/mo</p>
+      <ul class="slide-features">
+        <li>All advanced features</li>
+        <li>Dedicated consultant</li>
+        <li>Unlimited users</li>
+      </ul>
+      <button>Choose Premium</button>
+    </div>
+    <div class="slide-card">
+      <div class="slide-card-header">Elite Plan</div>
+      <p class="slide-price">₹4,999/mo</p>
+      <ul class="slide-features">
+        <li>Premium + exclusive services</li>
+        <li>Personal health manager</li>
+        <li>Enterprise support</li>
+      </ul>
+      <button>Choose Elite</button>
+    </div>
+  </div>
+  
+<!-- Our Partners Section -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+
+<style>
+  .partners-section {
+    padding: 60px 20px;
+    background: linear-gradient(to bottom, #f9fafb, #ffffff);
+    height: 400px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .partners-section h2 {
+    font-size: 2.4rem;
+    color: #111827;
+    margin-bottom: 40px;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+    animation: fadeInDown 0.8s ease-out;
+  }
+
+  .partners-section h2::after {
+    content: '';
+    width: 70px;
+    height: 4px;
+    background: #06b6d4;
+    display: block;
+    margin: 12px auto 0;
+    border-radius: 3px;
+    animation: expandBar 1s ease-out;
+  }
+
+  .swiper {
+    padding-bottom: 40px;
+    transition: transform 0.5s ease-in-out;
+  }
+
+  .swiper-slide {
+    display: flex;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+
+  .partner-card {
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    padding: 25px;
+    width: 190px;
+    height: 190px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.35s ease;
+    transform: scale(1);
+    cursor: pointer;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards;
+  }
+
+  .swiper-slide:nth-child(1) .partner-card { animation-delay: 0.1s; }
+  .swiper-slide:nth-child(2) .partner-card { animation-delay: 0.2s; }
+  .swiper-slide:nth-child(3) .partner-card { animation-delay: 0.3s; }
+  .swiper-slide:nth-child(4) .partner-card { animation-delay: 0.4s; }
+
+  .partner-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  .partner-card img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    margin-bottom: 14px;
+    border-radius: 50%; /* Circular image */
+    filter: grayscale(40%);
+    transition: filter 0.3s ease, transform 0.3s ease;
+  }
+
+  .partner-card:hover img {
+    filter: none;
+    transform: scale(1.1);
+  }
+
+  .partner-card span {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #111827;
+    transition: color 0.3s ease;
+  }
+
+  @media (max-width: 768px) {
+    .partner-card {
+      width: 140px;
+      height: 140px;
+      padding: 15px;
+    }
+
+    .partner-card img {
+      width: 55px;
+      height: 55px;
+    }
+
+    .partner-card span {
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Animations */
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeUp {
+    0% {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes expandBar {
+    from {
+      width: 0;
+    }
+    to {
+      width: 70px;
+    }
+  }
+</style>
+
+<section class="partners-section">
+  <h2>Our Partners</h2>
+
+  <div class="swiper mySwiper">
+    <div class="swiper-wrapper">
+      <!-- Partner 1 -->
+      <div class="swiper-slide">
+        <div class="partner-card">
+          <img src="https://via.placeholder.com/80x80?text=Logo1" alt="Partner 1"/>
+          <span>Partner One</span>
+        </div>
+      </div>
+
+      <!-- Partner 2 -->
+      <div class="swiper-slide">
+        <div class="partner-card">
+          <img src="https://via.placeholder.com/80x80?text=Logo2" alt="Partner 2"/>
+          <span>Partner Two</span>
+        </div>
+      </div>
+
+      <!-- Partner 3 -->
+      <div class="swiper-slide">
+        <div class="partner-card">
+          <img src="https://via.placeholder.com/80x80?text=Logo3" alt="Partner 3"/>
+          <span>Partner Three</span>
+        </div>
+      </div>
+
+      <!-- Partner 4 -->
+      <div class="swiper-slide">
+        <div class="partner-card">
+          <img src="https://via.placeholder.com/80x80?text=Logo4" alt="Partner 4"/>
+          <span>Partner Four</span>
+        </div>
+      </div>
+
+      <!-- Add more partners as needed -->
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+  const swiper = new Swiper('.mySwiper', {
+    slidesPerView: 1.3,
+    spaceBetween: 20,
+    loop: true,
+    speed: 700,
+    autoplay: {
+      delay: 2500,
+      disableOnInteraction: false,
+    },
+    grabCursor: true,
+    centeredSlides: false,
+    breakpoints: {
+      480: {
+        slidesPerView: 2.2,
+      },
+      768: {
+        slidesPerView: 3.2,
+      },
+      1024: {
+        slidesPerView: 4.2,
+      }
+    }
+  });
+</script>
+
+
+
+
+    <section class="map-section">
+    <div class="map-wrapper">
+      <img src="images/map-image.jpg" alt="India Map Coverage">
+
+      <!-- Interactive markers -->
+      <div class="marker delhi" data-city="Delhi"></div>
+      <div class="marker mumbai" data-city="Mumbai"></div>
+      <div class="marker kolkata" data-city="Kolkata"></div>
+      <div class="marker bangalore" data-city="Bangalore"></div>
+      <div class="marker hyderabad" data-city="Hyderabad"></div>
+    </div>
+
+    <div class="map-text">
+      <h2>We Are Operational in 40+ Cities</h2>
+      <p>
+        Raghuvanshi Healthcare is present in over 40 cities across India. Our network is expanding to bring essential, compassionate care to your doorstep. Each marker below represents a city we're proudly serving.
+      </p>
+    </div>
+  </section>
+
+<div class="locations-container">
+  <h2 class="locations-title">Services Available In</h2>
+  <div class="locations-grid">
+    <div>Bangalore</div>
+    <div>Mumbai</div>
+    <div>Delhi</div>
+    <div>Kolkata</div>
+    <div>Chennai</div>
+    <div>Jaipur</div>
+    <div>Pune</div>
+    <div>Hyderabad</div>
+    <div>Ahmedabad</div>
+  </div>
+</div>  
+
+    <footer style="background: #004e89; color: #fff; padding: 3rem 2rem; font-family: 'Inter', sans-serif;">
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2rem; max-width: 1200px; margin: auto;">
+    <!-- Company Info -->
+    <div style="flex: 1; min-width: 250px;">
+      <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Raghuvanshi Healthcare</h3>
+      <p>Empowering lives with reliable medical equipment and services. We're committed to your health and care.</p>
+    </div>
+
+    <!-- Navigation Links -->
+    <div style="flex: 1; min-width: 200px;">
+      <h4 style="margin-bottom: 1rem;">Company</h4>
+      <ul style="list-style: none; padding: 0; line-height: 2;">
+        <a href="about.html" style="color: #fff; text-decoration: none;">About Us</a>   
+        <li><a href="privacy.html" style="color: #fff; text-decoration: none;">Privacy Policy</a></li>
+        <li><a href="terms.html" style="color: #fff; text-decoration: none;">Terms & Conditions</a></li>
+        <li><a href="cookies.html" style="color: #fff; text-decoration: none;">Cookies Policy</a></li>
+        <li><a href="contact.html" style="color: #fff; text-decoration: none;">Contact Us</a></li>
+      </ul>
+    </div>
+
+    <!-- Contact Info -->
+    <div style="flex: 1; min-width: 220px;">
+      <h4 style="margin-bottom: 1rem;">Contact Us</h4>
+      <p>Email: raghuvanshisamrajaya@gmail.com</p>
+      <p>Phone: +91-6367225694</p>
+      <p>Phone: +91-8824187767</p>
+    </div>
+
+    <!-- Social Media -->
+    <div style="flex: 1; min-width: 200px;">
+      <h4 style="margin-bottom: 1rem;">Follow Us</h4>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="https://www.instagram.com/raghuvanshihealthcare?igsh=czh0cHJieTQzcWQ3" target="_blank" style="color: #fff;" title="Instagram">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/instagram.svg" alt="Instagram" width="24" />
+        </a>
+        <a href="#facebook" target="_blank" style="color: #fff;" title="Facebook">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/facebook.svg" alt="Facebook" width="24" />
+        </a>
+        <a href="https://twitter.com" target="_blank" style="color: #fff;" title="Twitter">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/twitter.svg" alt="Twitter" width="24" />
+        </a>
+        <a href="https://youtube.com/@raghuvanshiihealthcare?si=Z4izxX0Pg-mvwjKQ" target="_blank" style="color: #fff;" title="YouTube">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/youtube.svg" alt="YouTube" width="24" />
+        </a>
+        <a href="" target="_blank" style="color: #fff;" title="LinkedIn">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/linkedin.svg" alt="LinkedIn" width="24" />
+        </a>
+        <a href="https://t.me/raghuvanshihealthcare" target="_blank" style="color: #fff;" title="Telegram">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/telegram.svg" alt="Telegram" width="24" />
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 2rem; font-size: 0.9rem; color: #ccc;">
+    &copy; 2025 Raghuvanshi Healthcare . All rights reserved.
+  </div>
+</footer>
+</html>
