@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Analytics Dashboard</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    .card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .fade-in {
+      animation: fadeInUp 0.6s ease-in-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-white via-blue-50 to-gray-100 min-h-screen p-6">
+
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-4xl font-bold text-center text-blue-900 mb-10 drop-shadow fade-in">📊 Admin Analytics</h1>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10 fade-in">
+      <div class="card bg-blue-100 rounded-xl shadow p-4 text-center">
+        <h2 class="text-sm text-gray-700">Users</h2>
+        <p id="totalUsers" class="text-2xl font-bold text-blue-900">0</p>
+      </div>
+      <div class="card bg-green-100 rounded-xl shadow p-4 text-center">
+        <h2 class="text-sm text-gray-700">Services</h2>
+        <p id="totalServices" class="text-2xl font-bold text-green-900">0</p>
+      </div>
+      <div class="card bg-purple-100 rounded-xl shadow p-4 text-center">
+        <h2 class="text-sm text-gray-700">Products</h2>
+        <p id="totalProducts" class="text-2xl font-bold text-purple-900">0</p>
+      </div>
+      <div class="card bg-pink-100 rounded-xl shadow p-4 text-center">
+        <h2 class="text-sm text-gray-700">Bookings</h2>
+        <p id="totalBookings" class="text-2xl font-bold text-pink-900">0</p>
+      </div>
+    </div>
+
+    <!-- Filter Dropdown -->
+    <div class="flex justify-end mb-6 fade-in">
+      <select id="filter" class="p-2 rounded-md border shadow bg-white focus:ring focus:outline-none transition-all">
+        <option value="month">Monthly</option>
+        <option value="week">Weekly</option>
+        <option value="day">Daily</option>
+      </select>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 fade-in">
+      <div class="card bg-white p-6 rounded-xl shadow">
+        <h2 class="text-lg font-semibold mb-4 text-gray-700">📈 Bookings Over Time</h2>
+        <canvas id="lineChart" height="300"></canvas>
+      </div>
+      <div class="card bg-white p-6 rounded-xl shadow">
+        <h2 class="text-lg font-semibold mb-4 text-gray-700">🥧 Service Distribution</h2>
+        <canvas id="pieChart" height="300"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase + Charts Script -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js';
+    import { getFirestore, collection, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
+      authDomain: "store-471f1.firebaseapp.com",
+      projectId: "store-471f1",
+      storageBucket: "store-471f1.appspot.com",
+      messagingSenderId: "619523242611",
+      appId: "1:619523242611:web:fdfa53044c62f844574806",
+      measurementId: "G-16C8MYT70G"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    let lineChart, pieChart;
+
+    function groupByDate(docs) {
+      const map = {};
+      docs.forEach(doc => {
+        const date = new Date(doc.data().date).toLocaleDateString('en-GB');
+        map[date] = (map[date] || 0) + 1;
+      });
+      return Object.entries(map).map(([date, count]) => ({ date, count }));
+    }
+
+    function groupByCategory(docs) {
+      const map = {};
+      docs.forEach(doc => {
+        const cat = doc.data().category || 'Uncategorized';
+        map[cat] = (map[cat] || 0) + 1;
+      });
+      return Object.entries(map).map(([name, value]) => ({ name, value }));
+    }
+
+    function renderCharts(bookingData, serviceData) {
+      const labels = bookingData.map(b => b.date);
+      const dataPoints = bookingData.map(b => b.count);
+
+      if (lineChart) lineChart.destroy();
+      if (pieChart) pieChart.destroy();
+
+      lineChart = new Chart(lineCtx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Bookings',
+            data: dataPoints,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59,130,246,0.2)',
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+
+      pieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+          labels: serviceData.map(s => s.name),
+          datasets: [{
+            data: serviceData.map(s => s.value),
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#14b8a6'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true
+        }
+      });
+    }
+
+    async function fetchData() {
+      const [usersSnap, servicesSnap, productsSnap, bookingsSnap] = await Promise.all([
+        getDocs(collection(db, 'users')),
+        getDocs(collection(db, 'services')),
+        getDocs(collection(db, 'products')),
+        getDocs(collection(db, 'bookings'))
+      ]);
+
+      document.getElementById('totalUsers').textContent = usersSnap.size;
+      document.getElementById('totalServices').textContent = servicesSnap.size;
+      document.getElementById('totalProducts').textContent = productsSnap.size;
+      document.getElementById('totalBookings').textContent = bookingsSnap.size;
+
+      const bookingsGrouped = groupByDate(bookingsSnap.docs);
+      const servicesGrouped = groupByCategory(servicesSnap.docs);
+
+      renderCharts(bookingsGrouped, servicesGrouped);
+    }
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) return window.location.href = "/login.html";
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (!userDoc.exists() || userDoc.data().role !== 'admin') {
+        alert("Access denied: Admins only.");
+        return window.location.href = "/";
+      }
+      fetchData();
+    });
+
+    document.getElementById('filter').addEventListener('change', () => fetchData());
+  </script>
+</body>
+</html>
