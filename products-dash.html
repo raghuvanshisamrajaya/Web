@@ -1,15 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Product Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Product Manager</title>
   <style>
     body {
-      font-family: "Segoe UI", sans-serif;
-      background: #f1f3f6;
-      padding: 30px;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
       margin: 0;
+      padding: 30px;
     }
     .container {
       display: grid;
@@ -22,13 +21,12 @@
       grid-column: span 2;
       text-align: center;
       font-size: 28px;
-      margin-bottom: 20px;
     }
     .card {
       background: #fff;
       border-radius: 14px;
       padding: 24px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
     }
     label {
       font-weight: 600;
@@ -38,10 +36,10 @@
     input, textarea, select {
       width: 100%;
       padding: 10px;
-      margin-top: 5px;
-      font-size: 15px;
+      margin-top: 6px;
       border: 1px solid #ccc;
       border-radius: 8px;
+      font-size: 15px;
     }
     textarea {
       resize: vertical;
@@ -53,23 +51,19 @@
       margin-top: 8px;
     }
     .tag-box label {
-      background: #e0f7fa;
+      background: #e3f2fd;
       padding: 6px 12px;
       border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
     }
     .preview img {
       width: 100%;
-      height: auto;
       max-height: 250px;
       object-fit: cover;
       border-radius: 10px;
       margin-bottom: 15px;
     }
     .preview .tag {
-      background: #f1f8e9;
+      background: #dcedc8;
       color: #33691e;
       font-size: 12px;
       padding: 4px 10px;
@@ -85,19 +79,24 @@
     button {
       background: #388e3c;
       color: white;
-      padding: 12px 24px;
+      padding: 12px;
       border: none;
       border-radius: 10px;
       font-size: 16px;
       cursor: pointer;
-      transition: background 0.3s;
       margin-top: 15px;
+      margin-right: 10px;
     }
-    button:hover {
-      background: #2e7d32;
+    button.danger {
+      background: #e53935;
     }
-    .product-select {
+    .controls {
+      display: flex;
+      gap: 10px;
       margin-bottom: 15px;
+    }
+    .controls input {
+      flex: 1;
     }
     @media (max-width: 768px) {
       .container {
@@ -107,71 +106,74 @@
   </style>
 </head>
 <body>
-
   <div class="container">
-    <h2>Admin Product Manager</h2>
-
-    <div class="card">
-      <select id="productSelector" class="product-select">
-        <option value="">➕ Create New Product</option>
-      </select>
-
-      <form id="productForm">
-        <label>Product Name</label>
-        <input type="text" id="name" required oninput="updatePreview()">
-
-        <label>Price (INR)</label>
-        <input type="number" id="price" min="0" required oninput="updatePreview()">
-
-        <label>Stock</label>
-        <input type="number" id="stock" min="0" value="0" oninput="updatePreview()">
-
-        <label>Category</label>
-        <input type="text" id="category" required oninput="updatePreview()">
-
-        <label>Brand</label>
-        <input type="text" id="brand" oninput="updatePreview()">
-
-        <label>Upload Image</label>
-        <input type="file" id="imageFile" accept="image/*" onchange="handleImageUpload()">
-
-        <label>Description</label>
-        <textarea id="desc" rows="4" required oninput="updatePreview()"></textarea>
-
-        <label>Rating (0–5)</label>
-        <input type="number" id="rating" step="0.1" min="0" max="5" oninput="updatePreview()">
-
-        <label>Discount (%)</label>
-        <input type="number" id="discount" min="0" max="100" oninput="updatePreview()">
-
-        <label>Tags</label>
-        <div class="tag-box">
-          <label><input type="checkbox" name="tag" value="Popular" onchange="updatePreview()"> Popular</label>
-          <label><input type="checkbox" name="tag" value="New Arrival" onchange="updatePreview()"> New Arrival</label>
-          <label><input type="checkbox" name="tag" value="Limited Offer" onchange="updatePreview()"> Limited Offer</label>
-        </div>
-
-        <button type="button" onclick="handleSubmit()">💾 Save Product</button>
-      </form>
-    </div>
-
-    <div class="card preview">
-      <img id="previewImage" src="https://via.placeholder.com/300x200?text=Product+Image" alt="Preview">
-      <h3 id="previewName">Product Name</h3>
-      <p><strong>₹</strong><span id="previewPrice">0.00</span></p>
-      <p><strong>Category:</strong> <span id="previewCategory">Category</span></p>
-      <p><strong>Brand:</strong> <span id="previewBrand">Brand</span></p>
-      <p id="previewDesc">Product description appears here.</p>
-      <div id="previewTags"></div>
-      <div class="meta" id="previewMeta"></div>
-    </div>
+    <h2>Admin Product Manager</h2><div class="card">
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="🔍 Search Products...">
+    <select id="sortSelect">
+      <option value="az">Sort A-Z</option>
+      <option value="za">Sort Z-A</option>
+    </select>
   </div>
+  <select id="productSelector">
+    <option value="">➕ Create New Product</option>
+  </select>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, addDoc, updateDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
+  <form id="productForm">
+    <label>Product Name</label>
+    <input type="text" id="name" oninput="updatePreview()" required>
+
+    <label>Price (INR)</label>
+    <input type="number" id="price" oninput="updatePreview()" required>
+
+    <label>Stock</label>
+    <input type="number" id="stock" oninput="updatePreview()">
+
+    <label>Category</label>
+    <input type="text" id="category" oninput="updatePreview()" required>
+
+    <label>Brand</label>
+    <input type="text" id="brand" oninput="updatePreview()">
+
+    <label>Image URL</label>
+    <input type="text" id="imageUrl" oninput="updatePreview()" placeholder="https://...">
+
+    <label>Description</label>
+    <textarea id="desc" rows="3" oninput="updatePreview()" required></textarea>
+
+    <label>Rating (0–5)</label>
+    <input type="number" id="rating" step="0.1" min="0" max="5" oninput="updatePreview()">
+
+    <label>Discount (%)</label>
+    <input type="number" id="discount" min="0" max="100" oninput="updatePreview()">
+
+    <label>Tags</label>
+    <div class="tag-box">
+      <label><input type="checkbox" name="tag" value="Popular" onchange="updatePreview()"> Popular</label>
+      <label><input type="checkbox" name="tag" value="New Arrival" onchange="updatePreview()"> New Arrival</label>
+      <label><input type="checkbox" name="tag" value="Limited Offer" onchange="updatePreview()"> Limited Offer</label>
+    </div>
+
+    <button type="submit">💾 Save Product</button>
+    <button type="button" class="danger" id="deleteBtn">🗑️ Delete Product</button>
+  </form>
+</div>
+
+<div class="card preview">
+  <img id="previewImage" src="https://via.placeholder.com/300x200?text=Product+Image" />
+  <h3 id="previewName">Product Name</h3>
+  <p><strong>₹</strong><span id="previewPrice">0.00</span></p>
+  <p><strong>Category:</strong> <span id="previewCategory">Category</span></p>
+  <p><strong>Brand:</strong> <span id="previewBrand">Brand</span></p>
+  <p id="previewDesc">Product description...</p>
+  <div id="previewTags"></div>
+  <div class="meta" id="previewMeta">Created by: —<br>Updated by: —</div>
+</div>
+
+  </div>  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
+    import { getFirestore, doc, getDoc, getDocs, collection, setDoc, addDoc, deleteDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
@@ -179,174 +181,112 @@
       projectId: "store-471f1",
       storageBucket: "store-471f1.appspot.com",
       messagingSenderId: "619523242611",
-      appId: "1:619523242611:web:fdfa53044c62f844574806",
-      measurementId: "G-16C8MYT70G"
+      appId: "1:619523242611:web:fdfa53044c62f844574806"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-    const storage = getStorage(app);
 
     let currentUser = null;
     let editingId = null;
-    let uploadedImageUrl = "";
+    let allProducts = [];
 
-    const form = {
-      name: document.getElementById("name"),
-      price: document.getElementById("price"),
-      stock: document.getElementById("stock"),
-      category: document.getElementById("category"),
-      brand: document.getElementById("brand"),
-      desc: document.getElementById("desc"),
-      rating: document.getElementById("rating"),
-      discount: document.getElementById("discount"),
-      tags: document.querySelectorAll("input[name='tag']"),
-      imageFile: document.getElementById("imageFile"),
-    };
-
-    const preview = {
-      name: document.getElementById("previewName"),
-      price: document.getElementById("previewPrice"),
-      category: document.getElementById("previewCategory"),
-      brand: document.getElementById("previewBrand"),
-      desc: document.getElementById("previewDesc"),
-      tags: document.getElementById("previewTags"),
-      image: document.getElementById("previewImage"),
-      meta: document.getElementById("previewMeta"),
-    };
-
+    const formEl = document.getElementById("productForm");
     const productSelector = document.getElementById("productSelector");
+    const searchInput = document.getElementById("searchInput");
+    const sortSelect = document.getElementById("sortSelect");
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        alert("You must be logged in.");
-        window.location.href = "index.html";
-        return;
-      }
+    const formFields = ['name', 'price', 'stock', 'category', 'brand', 'imageUrl', 'desc', 'rating', 'discount'];
 
+    onAuthStateChanged(auth, async user => {
+      if (!user) return location.href = "index.html";
       const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (!userDoc.exists() || userDoc.data().role !== "admin") {
-        alert("Access denied. Admins only.");
-        window.location.href = "index.html";
-        return;
-      }
-
+      if (!userDoc.exists() || userDoc.data().role !== "admin") return location.href = "index.html";
       currentUser = userDoc.data();
-      loadProductOptions();
+      loadProducts();
     });
 
-    async function handleImageUpload() {
-      const file = form.imageFile.files[0];
-      if (!file) return;
-
-      const imageRef = ref(storage, `productImages/${Date.now()}_${file.name}`);
-      await uploadBytes(imageRef, file);
-      uploadedImageUrl = await getDownloadURL(imageRef);
-      preview.image.src = uploadedImageUrl;
-    }
-
-    function updatePreview() {
-      preview.name.textContent = form.name.value || "Product Name";
-      preview.price.textContent = form.price.value || "0.00";
-      preview.category.textContent = form.category.value || "Category";
-      preview.brand.textContent = form.brand.value || "Brand";
-      preview.desc.textContent = form.desc.value || "Product description appears here.";
-
-      preview.tags.innerHTML = "";
-      form.tags.forEach(tag => {
-        if (tag.checked) {
-          preview.tags.innerHTML += `<span class="tag">${tag.value}</span>`;
-        }
-      });
-    }
-
-    async function loadProductOptions() {
+    async function loadProducts() {
       const snapshot = await getDocs(collection(db, "products"));
-      productSelector.innerHTML = `<option value="">➕ Create New Product</option>`;
-      snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        productSelector.innerHTML += `<option value="${docSnap.id}">${data.name}</option>`;
-      });
+      allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderProductOptions();
     }
 
-    productSelector.addEventListener("change", async () => {
+    function renderProductOptions() {
+      const keyword = searchInput.value.toLowerCase();
+      let products = allProducts.filter(p => p.name.toLowerCase().includes(keyword));
+      products.sort((a, b) => sortSelect.value === 'az' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+      productSelector.innerHTML = '<option value="">➕ Create New Product</option>' +
+        products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+    }
+
+    productSelector.onchange = async () => {
       const id = productSelector.value;
-      if (!id) {
-        formReset();
-        return;
-      }
-
+      if (!id) return resetForm();
       editingId = id;
-      const docSnap = await getDoc(doc(db, "products", id));
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        form.name.value = data.name;
-        form.price.value = data.price;
-        form.stock.value = data.stock || 0;
-        form.category.value = data.category;
-        form.brand.value = data.brand || "";
-        form.desc.value = data.desc;
-        form.rating.value = data.rating || 0;
-        form.discount.value = data.discount || 0;
-        uploadedImageUrl = data.imageUrl;
-        preview.image.src = uploadedImageUrl;
+      const data = await getDoc(doc(db, "products", id)).then(d => d.data());
+      formFields.forEach(f => document.getElementById(f).value = data[f] || "");
+      document.querySelectorAll("input[name='tag']").forEach(tag => tag.checked = data.tags?.includes(tag.value));
+      document.getElementById("previewMeta").innerHTML = `Created by: ${data.createdBy || '-'}<br>Updated by: ${data.updatedBy || '-'}`;
+      updatePreview();
+    };
 
-        form.tags.forEach(t => t.checked = data.tags?.includes(t.value));
-        preview.meta.innerHTML = `
-          Created by: ${data.createdBy || "N/A"}<br>
-          Updated by: ${data.updatedBy || "N/A"}
-        `;
-        updatePreview();
-      }
-    });
+    document.getElementById("searchInput").addEventListener("input", renderProductOptions);
+    sortSelect.onchange = renderProductOptions;
 
-    window.handleSubmit = async function () {
-      const product = {
-        name: form.name.value.trim(),
-        price: parseFloat(form.price.value),
-        stock: parseInt(form.stock.value),
-        category: form.category.value.trim(),
-        brand: form.brand.value.trim(),
-        imageUrl: uploadedImageUrl || "",
-        desc: form.desc.value.trim(),
-        rating: parseFloat(form.rating.value) || 0,
-        discount: parseFloat(form.discount.value) || 0,
-        tags: Array.from(form.tags).filter(t => t.checked).map(t => t.value),
-        updatedAt: serverTimestamp(),
-        updatedBy: currentUser?.name || currentUser?.email || "Unknown"
-      };
-
-      if (!editingId) {
+    formEl.onsubmit = async e => {
+      e.preventDefault();
+      const product = Object.fromEntries(formFields.map(f => [f, document.getElementById(f).value]));
+      product.tags = Array.from(document.querySelectorAll("input[name='tag']:checked"), t => t.value);
+      product.price = parseFloat(product.price);
+      product.stock = parseInt(product.stock);
+      product.rating = parseFloat(product.rating);
+      product.discount = parseFloat(product.discount);
+      product.updatedAt = serverTimestamp();
+      product.updatedBy = currentUser?.name || currentUser?.email;
+      if (editingId) {
+        await updateDoc(doc(db, "products", editingId), product);
+        alert("Product updated");
+      } else {
         product.createdAt = serverTimestamp();
-        product.createdBy = currentUser?.name || currentUser?.email || "Unknown";
+        product.createdBy = currentUser?.name || currentUser?.email;
+        await addDoc(collection(db, "products"), product);
+        alert("Product created");
       }
+      resetForm();
+      loadProducts();
+    };
 
-      try {
-        if (editingId) {
-          await updateDoc(doc(db, "products", editingId), product);
-          alert("Product updated!");
-        } else {
-          await addDoc(collection(db, "products"), product);
-          alert("Product created!");
-        }
-        formReset();
-        loadProductOptions();
-      } catch (e) {
-        console.error(e);
-        alert("Something went wrong.");
+    document.getElementById("deleteBtn").onclick = async () => {
+      if (!editingId) return alert("Select a product to delete");
+      if (confirm("Are you sure?")) {
+        await deleteDoc(doc(db, "products", editingId));
+        alert("Product deleted");
+        resetForm();
+        loadProducts();
       }
     };
 
-    function formReset() {
+    function resetForm() {
       editingId = null;
-      document.getElementById("productForm").reset();
-      uploadedImageUrl = "";
-      preview.image.src = "https://via.placeholder.com/300x200?text=Product+Image";
-      preview.meta.innerHTML = "";
-      updatePreview();
+      formEl.reset();
       productSelector.value = "";
+      document.getElementById("previewImage").src = "https://via.placeholder.com/300x200?text=Product+Image";
+      document.getElementById("previewMeta").innerHTML = "Created by: —<br>Updated by: —";
+      updatePreview();
     }
-  </script>
-</body>
+
+    window.updatePreview = () => {
+      document.getElementById("previewName").textContent = document.getElementById("name").value || "Product Name";
+      document.getElementById("previewPrice").textContent = parseFloat(document.getElementById("price").value || 0).toFixed(2);
+      document.getElementById("previewCategory").textContent = document.getElementById("category").value || "Category";
+      document.getElementById("previewBrand").textContent = document.getElementById("brand").value || "Brand";
+      document.getElementById("previewDesc").textContent = document.getElementById("desc").value || "Product description...";
+      document.getElementById("previewImage").src = document.getElementById("imageUrl").value || "https://via.placeholder.com/300x200?text=Product+Image";
+      const tags = Array.from(document.querySelectorAll("input[name='tag']:checked"))
+        .map(t => `<span class='tag'>${t.value}</span>`).join(" ");
+      document.getElementById("previewTags").innerHTML = tags;
+    }
+  </script></body>
 </html>
