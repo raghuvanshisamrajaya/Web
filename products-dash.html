@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,6 +22,9 @@
       grid-column: span 2;
       text-align: center;
       font-size: 28px;
+    }
+    h3 {
+      margin-top: 0;
     }
     .card {
       background: #fff;
@@ -98,6 +102,42 @@
     .controls input {
       flex: 1;
     }
+    .product-card {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 15px;
+      background: #fff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .product-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .product-card h4 {
+      margin: 10px 0 4px;
+      font-size: 16px;
+    }
+    .product-card p {
+      margin: 0;
+      font-size: 14px;
+      color: #555;
+    }
+    .product-card button {
+      margin-top: 10px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
     @media (max-width: 768px) {
       .container {
         grid-template-columns: 1fr;
@@ -107,70 +147,80 @@
 </head>
 <body>
   <div class="container">
-    <h2>Admin Product Manager</h2><div class="card">
-  <div class="controls">
-    <input type="text" id="searchInput" placeholder="🔍 Search Products...">
-    <select id="sortSelect">
-      <option value="az">Sort A-Z</option>
-      <option value="za">Sort Z-A</option>
-    </select>
-  </div>
-  <select id="productSelector">
-    <option value="">➕ Create New Product</option>
-  </select>
+    <h2>Admin Product Manager</h2>
 
-  <form id="productForm">
-    <label>Product Name</label>
-    <input type="text" id="name" oninput="updatePreview()" required>
+    <div class="card">
+      <div class="controls">
+        <input type="text" id="searchInput" placeholder="🔍 Search Products...">
+        <select id="sortSelect">
+          <option value="az">Sort A-Z</option>
+          <option value="za">Sort Z-A</option>
+        </select>
+      </div>
 
-    <label>Price (INR)</label>
-    <input type="number" id="price" oninput="updatePreview()" required>
+      <select id="productSelector">
+        <option value="">➕ Create New Product</option>
+      </select>
 
-    <label>Stock</label>
-    <input type="number" id="stock" oninput="updatePreview()">
+      <h3 id="formTitle">Create New Product</h3>
+      <form id="productForm">
+        <label>Product Name</label>
+        <input type="text" id="name" oninput="updatePreview()" required>
 
-    <label>Category</label>
-    <input type="text" id="category" oninput="updatePreview()" required>
+        <label>Price (INR)</label>
+        <input type="number" id="price" oninput="updatePreview()" required>
 
-    <label>Brand</label>
-    <input type="text" id="brand" oninput="updatePreview()">
+        <label>Stock</label>
+        <input type="number" id="stock" oninput="updatePreview()">
 
-    <label>Image URL</label>
-    <input type="text" id="imageUrl" oninput="updatePreview()" placeholder="https://...">
+        <label>Category</label>
+        <input type="text" id="category" oninput="updatePreview()" required>
 
-    <label>Description</label>
-    <textarea id="desc" rows="3" oninput="updatePreview()" required></textarea>
+        <label>Brand</label>
+        <input type="text" id="brand" oninput="updatePreview()">
 
-    <label>Rating (0–5)</label>
-    <input type="number" id="rating" step="0.1" min="0" max="5" oninput="updatePreview()">
+        <label>Image URL</label>
+        <input type="text" id="imageUrl" oninput="updatePreview()" placeholder="https://...">
 
-    <label>Discount (%)</label>
-    <input type="number" id="discount" min="0" max="100" oninput="updatePreview()">
+        <label>Description</label>
+        <textarea id="desc" rows="3" oninput="updatePreview()" required></textarea>
 
-    <label>Tags</label>
-    <div class="tag-box">
-      <label><input type="checkbox" name="tag" value="Popular" onchange="updatePreview()"> Popular</label>
-      <label><input type="checkbox" name="tag" value="New Arrival" onchange="updatePreview()"> New Arrival</label>
-      <label><input type="checkbox" name="tag" value="Limited Offer" onchange="updatePreview()"> Limited Offer</label>
+        <label>Rating (0–5)</label>
+        <input type="number" id="rating" step="0.1" min="0" max="5" oninput="updatePreview()">
+
+        <label>Discount (%)</label>
+        <input type="number" id="discount" min="0" max="100" oninput="updatePreview()">
+
+        <label>Tags</label>
+        <div class="tag-box">
+          <label><input type="checkbox" name="tag" value="Popular" onchange="updatePreview()"> Popular</label>
+          <label><input type="checkbox" name="tag" value="New Arrival" onchange="updatePreview()"> New Arrival</label>
+          <label><input type="checkbox" name="tag" value="Limited Offer" onchange="updatePreview()"> Limited Offer</label>
+        </div>
+
+        <button type="submit">💾 Save Product</button>
+        <button type="button" class="danger" id="deleteBtn">🗑️ Delete Product</button>
+      </form>
     </div>
 
-    <button type="submit">💾 Save Product</button>
-    <button type="button" class="danger" id="deleteBtn">🗑️ Delete Product</button>
-  </form>
-</div>
+    <div class="card preview">
+      <img id="previewImage" src="https://via.placeholder.com/300x200?text=Product+Image" />
+      <h3 id="previewName">Product Name</h3>
+      <p><strong>₹</strong><span id="previewPrice">0.00</span></p>
+      <p><strong>Category:</strong> <span id="previewCategory">Category</span></p>
+      <p><strong>Brand:</strong> <span id="previewBrand">Brand</span></p>
+      <p id="previewDesc">Product description...</p>
+      <div id="previewTags"></div>
+      <div class="meta" id="previewMeta">Created by: —<br>Updated by: —</div>
+    </div>
 
-<div class="card preview">
-  <img id="previewImage" src="https://via.placeholder.com/300x200?text=Product+Image" />
-  <h3 id="previewName">Product Name</h3>
-  <p><strong>₹</strong><span id="previewPrice">0.00</span></p>
-  <p><strong>Category:</strong> <span id="previewCategory">Category</span></p>
-  <p><strong>Brand:</strong> <span id="previewBrand">Brand</span></p>
-  <p id="previewDesc">Product description...</p>
-  <div id="previewTags"></div>
-  <div class="meta" id="previewMeta">Created by: —<br>Updated by: —</div>
-</div>
+    <h3 style="grid-column: span 2;">All Products</h3>
+    <div class="card" style="grid-column: span 2;">
+      <div id="productGrid" style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));"></div>
+    </div>
+  </div>
 
-  </div>  <script type="module">
+  <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
     import { getFirestore, doc, getDoc, getDocs, collection, setDoc, addDoc, deleteDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
     import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js';
@@ -196,6 +246,7 @@
     const productSelector = document.getElementById("productSelector");
     const searchInput = document.getElementById("searchInput");
     const sortSelect = document.getElementById("sortSelect");
+    const formTitle = document.getElementById("formTitle");
 
     const formFields = ['name', 'price', 'stock', 'category', 'brand', 'imageUrl', 'desc', 'rating', 'discount'];
 
@@ -217,22 +268,51 @@
       const keyword = searchInput.value.toLowerCase();
       let products = allProducts.filter(p => p.name.toLowerCase().includes(keyword));
       products.sort((a, b) => sortSelect.value === 'az' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+
       productSelector.innerHTML = '<option value="">➕ Create New Product</option>' +
         products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+      if (products.length > 0) {
+        productSelector.value = products[0].id;
+        productSelector.dispatchEvent(new Event('change'));
+      } else {
+        resetForm();
+      }
+
+      const grid = document.getElementById("productGrid");
+      grid.innerHTML = products.map(p => `
+        <div class="product-card">
+          <img src="${p.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${p.name}">
+          <h4>${p.name}</h4>
+          <p>₹${p.price.toFixed(2)}</p>
+          <p><small>${p.category || '-'}</small></p>
+          <button onclick="editProduct('${p.id}')">✏️ Edit</button>
+        </div>
+      `).join('');
+    }
+
+    window.editProduct = async function(id) {
+      productSelector.value = id;
+      productSelector.dispatchEvent(new Event('change'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     productSelector.onchange = async () => {
       const id = productSelector.value;
-      if (!id) return resetForm();
+      if (!id) {
+        formTitle.textContent = "Create New Product";
+        return resetForm();
+      }
       editingId = id;
       const data = await getDoc(doc(db, "products", id)).then(d => d.data());
       formFields.forEach(f => document.getElementById(f).value = data[f] || "");
       document.querySelectorAll("input[name='tag']").forEach(tag => tag.checked = data.tags?.includes(tag.value));
       document.getElementById("previewMeta").innerHTML = `Created by: ${data.createdBy || '-'}<br>Updated by: ${data.updatedBy || '-'}`;
+      formTitle.textContent = "Edit Product";
       updatePreview();
     };
 
-    document.getElementById("searchInput").addEventListener("input", renderProductOptions);
+    searchInput.addEventListener("input", renderProductOptions);
     sortSelect.onchange = renderProductOptions;
 
     formEl.onsubmit = async e => {
@@ -272,6 +352,7 @@
       editingId = null;
       formEl.reset();
       productSelector.value = "";
+      formTitle.textContent = "Create New Product";
       document.getElementById("previewImage").src = "https://via.placeholder.com/300x200?text=Product+Image";
       document.getElementById("previewMeta").innerHTML = "Created by: —<br>Updated by: —";
       updatePreview();
@@ -288,5 +369,6 @@
         .map(t => `<span class='tag'>${t.value}</span>`).join(" ");
       document.getElementById("previewTags").innerHTML = tags;
     }
-  </script></body>
+  </script>
+</body>
 </html>
