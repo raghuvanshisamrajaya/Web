@@ -11,7 +11,6 @@
       padding: 30px;
       margin: 0;
     }
-
     .container {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -19,27 +18,23 @@
       max-width: 1200px;
       margin: auto;
     }
-
     h2 {
       grid-column: span 2;
       text-align: center;
       font-size: 28px;
       margin-bottom: 20px;
     }
-
     .card {
       background: #fff;
       border-radius: 14px;
       padding: 24px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.06);
     }
-
     label {
       font-weight: 600;
       margin-top: 12px;
       display: block;
     }
-
     input, textarea, select {
       width: 100%;
       padding: 10px;
@@ -48,18 +43,15 @@
       border: 1px solid #ccc;
       border-radius: 8px;
     }
-
     textarea {
       resize: vertical;
     }
-
     .tag-box {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       margin-top: 8px;
     }
-
     .tag-box label {
       background: #e0f7fa;
       padding: 6px 12px;
@@ -68,7 +60,6 @@
       align-items: center;
       gap: 5px;
     }
-
     .preview img {
       width: 100%;
       height: auto;
@@ -77,7 +68,6 @@
       border-radius: 10px;
       margin-bottom: 15px;
     }
-
     .preview .tag {
       background: #f1f8e9;
       color: #33691e;
@@ -85,8 +75,13 @@
       padding: 4px 10px;
       border-radius: 50px;
       margin-right: 5px;
+      display: inline-block;
     }
-
+    .meta {
+      font-size: 13px;
+      color: #666;
+      margin-top: 10px;
+    }
     button {
       background: #388e3c;
       color: white;
@@ -98,15 +93,12 @@
       transition: background 0.3s;
       margin-top: 15px;
     }
-
     button:hover {
       background: #2e7d32;
     }
-
     .product-select {
       margin-bottom: 15px;
     }
-
     @media (max-width: 768px) {
       .container {
         grid-template-columns: 1fr;
@@ -124,39 +116,39 @@
         <option value="">➕ Create New Product</option>
       </select>
 
-      <form id="productForm" oninput="updatePreview()">
+      <form id="productForm">
         <label>Product Name</label>
-        <input type="text" id="name" required>
+        <input type="text" id="name" required oninput="updatePreview()">
 
         <label>Price (INR)</label>
-        <input type="number" id="price" min="0" required>
+        <input type="number" id="price" min="0" required oninput="updatePreview()">
 
         <label>Stock</label>
-        <input type="number" id="stock" min="0" value="0">
+        <input type="number" id="stock" min="0" value="0" oninput="updatePreview()">
 
         <label>Category</label>
-        <input type="text" id="category" required>
+        <input type="text" id="category" required oninput="updatePreview()">
 
         <label>Brand</label>
-        <input type="text" id="brand">
+        <input type="text" id="brand" oninput="updatePreview()">
 
-        <label>Image URL</label>
-        <input type="text" id="imageUrl" placeholder="https://example.com/image.jpg" required>
+        <label>Upload Image</label>
+        <input type="file" id="imageFile" accept="image/*" onchange="handleImageUpload()">
 
         <label>Description</label>
-        <textarea id="desc" rows="4" required></textarea>
+        <textarea id="desc" rows="4" required oninput="updatePreview()"></textarea>
 
         <label>Rating (0–5)</label>
-        <input type="number" id="rating" step="0.1" min="0" max="5">
+        <input type="number" id="rating" step="0.1" min="0" max="5" oninput="updatePreview()">
 
         <label>Discount (%)</label>
-        <input type="number" id="discount" min="0" max="100">
+        <input type="number" id="discount" min="0" max="100" oninput="updatePreview()">
 
         <label>Tags</label>
         <div class="tag-box">
-          <label><input type="checkbox" name="tag" value="Popular"> Popular</label>
-          <label><input type="checkbox" name="tag" value="New Arrival"> New Arrival</label>
-          <label><input type="checkbox" name="tag" value="Limited Offer"> Limited Offer</label>
+          <label><input type="checkbox" name="tag" value="Popular" onchange="updatePreview()"> Popular</label>
+          <label><input type="checkbox" name="tag" value="New Arrival" onchange="updatePreview()"> New Arrival</label>
+          <label><input type="checkbox" name="tag" value="Limited Offer" onchange="updatePreview()"> Limited Offer</label>
         </div>
 
         <button type="button" onclick="handleSubmit()">💾 Save Product</button>
@@ -171,28 +163,34 @@
       <p><strong>Brand:</strong> <span id="previewBrand">Brand</span></p>
       <p id="previewDesc">Product description appears here.</p>
       <div id="previewTags"></div>
+      <div class="meta" id="previewMeta"></div>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, addDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, addDoc, updateDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
+      authDomain: "store-471f1.firebaseapp.com",
+      projectId: "store-471f1",
+      storageBucket: "store-471f1.appspot.com",
+      messagingSenderId: "619523242611",
+      appId: "1:619523242611:web:fdfa53044c62f844574806",
+      measurementId: "G-16C8MYT70G"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+    const storage = getStorage(app);
 
+    let currentUser = null;
     let editingId = null;
+    let uploadedImageUrl = "";
 
     const form = {
       name: document.getElementById("name"),
@@ -200,11 +198,11 @@
       stock: document.getElementById("stock"),
       category: document.getElementById("category"),
       brand: document.getElementById("brand"),
-      imageUrl: document.getElementById("imageUrl"),
       desc: document.getElementById("desc"),
       rating: document.getElementById("rating"),
       discount: document.getElementById("discount"),
       tags: document.querySelectorAll("input[name='tag']"),
+      imageFile: document.getElementById("imageFile"),
     };
 
     const preview = {
@@ -215,13 +213,14 @@
       desc: document.getElementById("previewDesc"),
       tags: document.getElementById("previewTags"),
       image: document.getElementById("previewImage"),
+      meta: document.getElementById("previewMeta"),
     };
 
     const productSelector = document.getElementById("productSelector");
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        alert("You must be logged in as admin.");
+        alert("You must be logged in.");
         window.location.href = "index.html";
         return;
       }
@@ -233,8 +232,34 @@
         return;
       }
 
+      currentUser = userDoc.data();
       loadProductOptions();
     });
+
+    async function handleImageUpload() {
+      const file = form.imageFile.files[0];
+      if (!file) return;
+
+      const imageRef = ref(storage, `productImages/${Date.now()}_${file.name}`);
+      await uploadBytes(imageRef, file);
+      uploadedImageUrl = await getDownloadURL(imageRef);
+      preview.image.src = uploadedImageUrl;
+    }
+
+    function updatePreview() {
+      preview.name.textContent = form.name.value || "Product Name";
+      preview.price.textContent = form.price.value || "0.00";
+      preview.category.textContent = form.category.value || "Category";
+      preview.brand.textContent = form.brand.value || "Brand";
+      preview.desc.textContent = form.desc.value || "Product description appears here.";
+
+      preview.tags.innerHTML = "";
+      form.tags.forEach(tag => {
+        if (tag.checked) {
+          preview.tags.innerHTML += `<span class="tag">${tag.value}</span>`;
+        }
+      });
+    }
 
     async function loadProductOptions() {
       const snapshot = await getDocs(collection(db, "products"));
@@ -261,31 +286,20 @@
         form.stock.value = data.stock || 0;
         form.category.value = data.category;
         form.brand.value = data.brand || "";
-        form.imageUrl.value = data.imageUrl;
         form.desc.value = data.desc;
         form.rating.value = data.rating || 0;
         form.discount.value = data.discount || 0;
+        uploadedImageUrl = data.imageUrl;
+        preview.image.src = uploadedImageUrl;
 
         form.tags.forEach(t => t.checked = data.tags?.includes(t.value));
+        preview.meta.innerHTML = `
+          Created by: ${data.createdBy || "N/A"}<br>
+          Updated by: ${data.updatedBy || "N/A"}
+        `;
         updatePreview();
       }
     });
-
-    window.updatePreview = function () {
-      preview.name.textContent = form.name.value || "Product Name";
-      preview.price.textContent = form.price.value || "0.00";
-      preview.category.textContent = form.category.value || "Category";
-      preview.brand.textContent = form.brand.value || "Brand";
-      preview.desc.textContent = form.desc.value || "Product description appears here.";
-      preview.image.src = form.imageUrl.value || "https://via.placeholder.com/300x200?text=Product+Image";
-
-      preview.tags.innerHTML = "";
-      form.tags.forEach(tag => {
-        if (tag.checked) {
-          preview.tags.innerHTML += `<span class="tag">${tag.value}</span>`;
-        }
-      });
-    };
 
     window.handleSubmit = async function () {
       const product = {
@@ -294,12 +308,19 @@
         stock: parseInt(form.stock.value),
         category: form.category.value.trim(),
         brand: form.brand.value.trim(),
-        imageUrl: form.imageUrl.value.trim(),
+        imageUrl: uploadedImageUrl || "",
         desc: form.desc.value.trim(),
         rating: parseFloat(form.rating.value) || 0,
         discount: parseFloat(form.discount.value) || 0,
-        tags: Array.from(form.tags).filter(t => t.checked).map(t => t.value)
+        tags: Array.from(form.tags).filter(t => t.checked).map(t => t.value),
+        updatedAt: serverTimestamp(),
+        updatedBy: currentUser?.name || currentUser?.email || "Unknown"
       };
+
+      if (!editingId) {
+        product.createdAt = serverTimestamp();
+        product.createdBy = currentUser?.name || currentUser?.email || "Unknown";
+      }
 
       try {
         if (editingId) {
@@ -320,6 +341,9 @@
     function formReset() {
       editingId = null;
       document.getElementById("productForm").reset();
+      uploadedImageUrl = "";
+      preview.image.src = "https://via.placeholder.com/300x200?text=Product+Image";
+      preview.meta.innerHTML = "";
       updatePreview();
       productSelector.value = "";
     }
