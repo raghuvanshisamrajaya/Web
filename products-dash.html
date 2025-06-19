@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Product Editor</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f1f3f6;
+      padding: 30px;
+      margin: 0;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    h2 {
+      grid-column: span 2;
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+
+    label {
+      font-weight: 600;
+      margin-top: 12px;
+      display: block;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .tag-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .tag-box label {
+      background: #e0f7fa;
+      padding: 6px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .preview img {
+      width: 100%;
+      height: auto;
+      max-height: 250px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .preview .tag {
+      background: #f1f8e9;
+      color: #33691e;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 50px;
+      margin-right: 5px;
+    }
+
+    button {
+      background: #388e3c;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 15px;
+    }
+
+    button:hover {
+      background: #2e7d32;
+    }
+
+    .product-select {
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Admin Product Manager</h2>
+
+    <div class="card">
+      <select id="productSelector" class="product-select">
+        <option value="">➕ Create New Product</option>
+      </select>
+
+      <form id="productForm" oninput="updatePreview()">
+        <label>Product Name</label>
+        <input type="text" id="name" required>
+
+        <label>Price (INR)</label>
+        <input type="number" id="price" min="0" required>
+
+        <label>Stock</label>
+        <input type="number" id="stock" min="0" value="0">
+
+        <label>Category</label>
+        <input type="text" id="category" required>
+
+        <label>Brand</label>
+        <input type="text" id="brand">
+
+        <label>Image URL</label>
+        <input type="text" id="imageUrl" placeholder="https://example.com/image.jpg" required>
+
+        <label>Description</label>
+        <textarea id="desc" rows="4" required></textarea>
+
+        <label>Rating (0–5)</label>
+        <input type="number" id="rating" step="0.1" min="0" max="5">
+
+        <label>Discount (%)</label>
+        <input type="number" id="discount" min="0" max="100">
+
+        <label>Tags</label>
+        <div class="tag-box">
+          <label><input type="checkbox" name="tag" value="Popular"> Popular</label>
+          <label><input type="checkbox" name="tag" value="New Arrival"> New Arrival</label>
+          <label><input type="checkbox" name="tag" value="Limited Offer"> Limited Offer</label>
+        </div>
+
+        <button type="button" onclick="handleSubmit()">💾 Save Product</button>
+      </form>
+    </div>
+
+    <div class="card preview">
+      <img id="previewImage" src="https://via.placeholder.com/300x200?text=Product+Image" alt="Preview">
+      <h3 id="previewName">Product Name</h3>
+      <p><strong>₹</strong><span id="previewPrice">0.00</span></p>
+      <p><strong>Category:</strong> <span id="previewCategory">Category</span></p>
+      <p><strong>Brand:</strong> <span id="previewBrand">Brand</span></p>
+      <p id="previewDesc">Product description appears here.</p>
+      <div id="previewTags"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, addDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let editingId = null;
+
+    const form = {
+      name: document.getElementById("name"),
+      price: document.getElementById("price"),
+      stock: document.getElementById("stock"),
+      category: document.getElementById("category"),
+      brand: document.getElementById("brand"),
+      imageUrl: document.getElementById("imageUrl"),
+      desc: document.getElementById("desc"),
+      rating: document.getElementById("rating"),
+      discount: document.getElementById("discount"),
+      tags: document.querySelectorAll("input[name='tag']"),
+    };
+
+    const preview = {
+      name: document.getElementById("previewName"),
+      price: document.getElementById("previewPrice"),
+      category: document.getElementById("previewCategory"),
+      brand: document.getElementById("previewBrand"),
+      desc: document.getElementById("previewDesc"),
+      tags: document.getElementById("previewTags"),
+      image: document.getElementById("previewImage"),
+    };
+
+    const productSelector = document.getElementById("productSelector");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        alert("You must be logged in as admin.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (!userDoc.exists() || userDoc.data().role !== "admin") {
+        alert("Access denied. Admins only.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      loadProductOptions();
+    });
+
+    async function loadProductOptions() {
+      const snapshot = await getDocs(collection(db, "products"));
+      productSelector.innerHTML = `<option value="">➕ Create New Product</option>`;
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        productSelector.innerHTML += `<option value="${docSnap.id}">${data.name}</option>`;
+      });
+    }
+
+    productSelector.addEventListener("change", async () => {
+      const id = productSelector.value;
+      if (!id) {
+        formReset();
+        return;
+      }
+
+      editingId = id;
+      const docSnap = await getDoc(doc(db, "products", id));
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        form.name.value = data.name;
+        form.price.value = data.price;
+        form.stock.value = data.stock || 0;
+        form.category.value = data.category;
+        form.brand.value = data.brand || "";
+        form.imageUrl.value = data.imageUrl;
+        form.desc.value = data.desc;
+        form.rating.value = data.rating || 0;
+        form.discount.value = data.discount || 0;
+
+        form.tags.forEach(t => t.checked = data.tags?.includes(t.value));
+        updatePreview();
+      }
+    });
+
+    window.updatePreview = function () {
+      preview.name.textContent = form.name.value || "Product Name";
+      preview.price.textContent = form.price.value || "0.00";
+      preview.category.textContent = form.category.value || "Category";
+      preview.brand.textContent = form.brand.value || "Brand";
+      preview.desc.textContent = form.desc.value || "Product description appears here.";
+      preview.image.src = form.imageUrl.value || "https://via.placeholder.com/300x200?text=Product+Image";
+
+      preview.tags.innerHTML = "";
+      form.tags.forEach(tag => {
+        if (tag.checked) {
+          preview.tags.innerHTML += `<span class="tag">${tag.value}</span>`;
+        }
+      });
+    };
+
+    window.handleSubmit = async function () {
+      const product = {
+        name: form.name.value.trim(),
+        price: parseFloat(form.price.value),
+        stock: parseInt(form.stock.value),
+        category: form.category.value.trim(),
+        brand: form.brand.value.trim(),
+        imageUrl: form.imageUrl.value.trim(),
+        desc: form.desc.value.trim(),
+        rating: parseFloat(form.rating.value) || 0,
+        discount: parseFloat(form.discount.value) || 0,
+        tags: Array.from(form.tags).filter(t => t.checked).map(t => t.value)
+      };
+
+      try {
+        if (editingId) {
+          await updateDoc(doc(db, "products", editingId), product);
+          alert("Product updated!");
+        } else {
+          await addDoc(collection(db, "products"), product);
+          alert("Product created!");
+        }
+        formReset();
+        loadProductOptions();
+      } catch (e) {
+        console.error(e);
+        alert("Something went wrong.");
+      }
+    };
+
+    function formReset() {
+      editingId = null;
+      document.getElementById("productForm").reset();
+      updatePreview();
+      productSelector.value = "";
+    }
+  </script>
+</body>
+</html>
