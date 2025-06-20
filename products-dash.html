@@ -1,33 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Product Manager</title>
   <style>
-    body { font-family: sans-serif; margin: 0; background: #f4f4f4; padding: 20px; }
-    .container { max-width: 1200px; margin: auto; display: flex; flex-direction: column; gap: 20px; }
-    form, .preview, .product-list { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    form { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
-    input, textarea { padding: 8px; border-radius: 6px; border: 1px solid #ccc; width: 100%; }
-    input[type="submit"] { background: #1976d2; color: white; font-weight: bold; cursor: pointer; }
-    input[type="submit"]:hover { background: #155a9e; }
-    .preview img { max-width: 100%; max-height: 200px; border-radius: 8px; object-fit: cover; }
-    .tags { display: flex; gap: 6px; flex-wrap: wrap; }
-    .tag { background: #1976d2; color: white; padding: 4px 10px; border-radius: 20px; font-size: 13px; }
-    .product-card { border: 1px solid #ddd; padding: 15px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px; background: #fff; }
-    .product-card img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px; }
-    .product-card button { background: #1976d2; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; margin-right: 10px; }
-    .product-card .delete { background-color: #d32f2f; }
-    #notAuthorized { color: red; text-align: center; font-weight: bold; display: none; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #1976d2;
+    }
+
+    #notAuthorized {
+      color: #d32f2f;
+      text-align: center;
+      font-weight: bold;
+      display: none;
+    }
+
+    form,
+    .preview,
+    .product-list {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    form {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      display: grid;
+    }
+
+    input,
+    textarea {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 100%;
+      font-size: 14px;
+    }
+
+    input[type="submit"] {
+      background-color: #1976d2;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #155a9e;
+    }
+
+    .product-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-card img {
+      max-width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .product-card button {
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px 0;
+      transition: background-color 0.3s;
+    }
+
+    .product-card .edit {
+      background-color: #1976d2;
+      color: white;
+    }
+
+    .product-card .edit:hover {
+      background-color: #155a9e;
+    }
+
+    .product-card .delete {
+      background-color: #d32f2f;
+      color: white;
+    }
+
+    .product-card .delete:hover {
+      background-color: #c62828;
+    }
+
+    .tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      background: #1976d2;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+
+    .preview img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .preview p {
+      margin: 0;
+      color: #555;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+
+      form {
+        grid-template-columns: 1fr;
+      }
+
+      .product-card {
+        flex-direction: column;
+      }
+
+      .product-list {
+        margin-top: 30px;
+      }
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h2>Admin Product Manager</h2>
     <div id="notAuthorized">Access Denied: Admins only.</div>
-    
-    <form id="productForm" style="display:none;">
+
+    <form id="productForm" style="display: none;">
       <input type="hidden" id="docId" />
       <input type="text" id="name" placeholder="Product Name" required />
       <input type="text" id="brand" placeholder="Brand" />
@@ -42,7 +189,7 @@
       <input type="submit" value="Save Product" />
     </form>
 
-    <div class="preview" id="previewBox" style="display:none;">
+    <div class="preview" id="previewBox" style="display: none;">
       <h3>Live Preview</h3>
       <img id="previewImage" src="https://via.placeholder.com/300x200?text=Preview" alt="Preview" />
       <p><strong>Name:</strong> <span id="pname"></span></p>
@@ -54,9 +201,9 @@
       <div class="tags" id="ptags"></div>
     </div>
 
-    <div class="product-list" id="productSection" style="display:none;">
+    <div class="product-list" id="productSection" style="display: none;">
       <h3>All Products</h3>
-      <div id="productCards" style="display:grid; gap:15px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));"></div>
+      <div id="productCards" style="display: grid; gap: 15px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));"></div>
     </div>
   </div>
 
@@ -84,22 +231,45 @@
     const docId = document.getElementById('docId');
     const previewImage = document.getElementById('previewImage');
 
-    const userData = { email: null };
+    const inputEls = {
+      name: document.getElementById('name'),
+      brand: document.getElementById('brand'),
+      category: document.getElementById('category'),
+      desc: document.getElementById('desc'),
+      price: document.getElementById('price'),
+      discount: document.getElementById('discount'),
+      stock: document.getElementById('stock'),
+      rating: document.getElementById('rating'),
+      tags: document.getElementById('tags'),
+      imageUrl: document.getElementById('imageUrl'),
+    };
 
-    const updatePreview = () => {
-      previewImage.src = imageUrl.value || "https://via.placeholder.com/300x200?text=Preview";
-      pname.innerText = name.value;
-      pbrand.innerText = brand.value;
-      pcategory.innerText = category.value;
-      pprice.innerText = price.value;
-      pdiscount.innerText = discount.value;
-      pstock.innerText = stock.value;
-      prating.innerText = rating.value;
-      pdesc.innerText = desc.value;
+    const previewEls = {
+      pname: document.getElementById('pname'),
+      pbrand: document.getElementById('pbrand'),
+      pcategory: document.getElementById('pcategory'),
+      pprice: document.getElementById('pprice'),
+      pdiscount: document.getElementById('pdiscount'),
+      pstock: document.getElementById('pstock'),
+      prating: document.getElementById('prating'),
+      pdesc: document.getElementById('pdesc'),
+      ptags: document.getElementById('ptags'),
+    };
 
-      const tagsContainer = document.getElementById("ptags");
+    function updatePreview() {
+      previewImage.src = inputEls.imageUrl.value || "https://via.placeholder.com/300x200?text=Preview";
+      previewEls.pname.innerText = inputEls.name.value;
+      previewEls.pbrand.innerText = inputEls.brand.value;
+      previewEls.pcategory.innerText = inputEls.category.value;
+      previewEls.pprice.innerText = inputEls.price.value;
+      previewEls.pdiscount.innerText = inputEls.discount.value;
+      previewEls.pstock.innerText = inputEls.stock.value;
+      previewEls.prating.innerText = inputEls.rating.value;
+      previewEls.pdesc.innerText = inputEls.desc.value;
+
+      const tagsContainer = previewEls.ptags;
       tagsContainer.innerHTML = "";
-      tags.value.split(",").forEach(tag => {
+      inputEls.tags.value.split(",").forEach(tag => {
         if (tag.trim()) {
           const span = document.createElement("span");
           span.className = "tag";
@@ -107,27 +277,27 @@
           tagsContainer.appendChild(span);
         }
       });
-    };
+    }
 
     form.addEventListener("input", updatePreview);
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const product = {
-        name: name.value,
-        brand: brand.value,
-        category: category.value,
-        desc: desc.value,
-        price: +price.value,
-        discount: +discount.value,
-        stock: +stock.value,
-        rating: +rating.value,
-        tags: tags.value.split(",").map(t => t.trim()),
-        imageUrl: imageUrl.value,
-        createdBy: userData.email,
-        updatedBy: userData.email,
+        name: inputEls.name.value,
+        brand: inputEls.brand.value,
+        category: inputEls.category.value,
+        desc: inputEls.desc.value,
+        price: +inputEls.price.value,
+        discount: +inputEls.discount.value,
+        stock: +inputEls.stock.value,
+        rating: +inputEls.rating.value,
+        tags: inputEls.tags.value.split(',').map(t=>t.trim()),
+        imageUrl: inputEls.imageUrl.value,
+        createdBy: auth.currentUser.email,
+        updatedBy: auth.currentUser.email,
         createdAt: new Date(),
-        updatedAt: new Date(),
+        updatedAt: new Date()
       };
 
       if (docId.value) {
@@ -138,85 +308,69 @@
         alert("Product created!");
       }
 
-      form.reset();
-      docId.value = "";
-      updatePreview();
-      loadProducts();
+      form.reset(); docId.value = '';
+      updatePreview(); loadProducts();
     });
 
     async function loadProducts() {
-      const querySnapshot = await getDocs(collection(db, "products"));
       const productCards = document.getElementById("productCards");
-      productCards.innerHTML = "";
-
-      querySnapshot.forEach((docSnap) => {
+      productCards.innerHTML = '';
+      const snap = await getDocs(collection(db, "products"));
+      snap.forEach((docSnap) => {
         const p = docSnap.data();
-        const card = document.createElement("div");
-        card.className = "product-card";
-        card.innerHTML = `
-          <img src="${p.imageUrl}" alt="${p.name}" />
+        const div = document.createElement('div');
+        div.className = 'product-card';
+        div.innerHTML = `
+          <img src="${p.imageUrl}" />
           <h4>${p.name}</h4>
-          <p><strong>₹${p.price}</strong> - ${p.brand}</p>
+          <p><strong>₹${p.price}</strong> – ${p.brand}</p>
           <p>${p.category} | ⭐ ${p.rating}</p>
           <p>Stock: ${p.stock}</p>
           <div>
-            <button onclick="editProduct('${docSnap.id}')">Edit</button>
+            <button class="edit" onclick="editProduct('${docSnap.id}')">Edit</button>
             <button class="delete" onclick="deleteProduct('${docSnap.id}')">Delete</button>
           </div>
         `;
-        productCards.appendChild(card);
+        productCards.appendChild(div);
       });
     }
 
     window.editProduct = async (id) => {
-      const ref = doc(db, "products", id);
-      const snap = await getDoc(ref);
+      const snap = await getDoc(doc(db, "products", id));
       if (snap.exists()) {
         const p = snap.data();
-        name.value = p.name;
-        brand.value = p.brand;
-        category.value = p.category;
-        desc.value = p.desc;
-        price.value = p.price;
-        discount.value = p.discount;
-        stock.value = p.stock;
-        rating.value = p.rating;
-        tags.value = p.tags.join(",");
-        imageUrl.value = p.imageUrl;
         docId.value = id;
+        for (const [key, el] of Object.entries(inputEls)) {
+          el.value = Array.isArray(p[key]) ? p[key].join(",") : p[key] || "";
+        }
         updatePreview();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     };
 
     window.deleteProduct = async (id) => {
-      if (confirm("Are you sure you want to delete this product?")) {
+      if (confirm("Delete this product?")) {
         await deleteDoc(doc(db, "products", id));
-        alert("Product deleted!");
+        alert("Deleted!");
         loadProducts();
       }
     };
 
     onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        const role = userDoc.exists() ? userDoc.data().role : null;
-        userData.email = user.email;
-
-        if (role === "admin") {
-          form.style.display = "grid";
-          document.getElementById("previewBox").style.display = "block";
-          document.getElementById("productSection").style.display = "block";
-          loadProducts();
-          updatePreview();
-        } else {
-          document.getElementById("notAuthorized").style.display = "block";
-        }
+      if (!user) return location.href = "/login.html";
+      const uSnap = await getDoc(doc(db, "users", user.uid));
+      const role = uSnap.exists() ? uSnap.data().role : null;
+      if (role === "admin") {
+        document.getElementById("productForm").style.display = "grid";
+        document.getElementById("previewBox").style.display = "block";
+        document.getElementById("productSection").style.display = "block";
+        document.getElementById("notAuthorized").style.display = "none";
+        updatePreview(); loadProducts();
       } else {
-        alert("You must be logged in as an admin to use this page.");
-        location.href = "/login.html"; // redirect if needed
+        document.getElementById("notAuthorized").style.display = "block";
       }
     });
   </script>
 </body>
+
 </html>
