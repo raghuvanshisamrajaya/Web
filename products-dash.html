@@ -2,510 +2,221 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Product Manager</title>
-  
-<style>
-
-  :root {
-  --bg-color: #f4f6f8;
-  --card-bg: #ffffff;
-  --primary-color: #1976d2;
-  --success-color: #2e7d32;
-  --danger-color: #d32f2f;
-  --text-color: #333333;
-  --muted-color: #666666;
-  --border-color: #e0e0e0;
-  --font: 'Segoe UI', sans-serif;
-  --radius: 12px;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --transition-fast: 0.2s ease-in-out;
-  --transition-slow: 0.4s ease-in-out;
-}
-
-/* DARK MODE */
-.dark-mode {
-  --bg-color: #1e1e1e;
-  --card-bg: #2c2c2c;
-  --text-color: #f0f0f0;
-  --muted-color: #aaaaaa;
-  --border-color: #444;
-  --shadow: 0 4px 12px rgba(255, 255, 255, 0.08);
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  transition: background-color var(--transition-slow), color var(--transition-slow);
-}
-
-body {
-  font-family: var(--font);
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  padding: 20px;
-  line-height: 1.5;
-}
-
-.container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 16px;
-}
-
-/* Headings */
-h2 {
-  font-size: 32px;
-  text-align: center;
-  margin-bottom: 30px;
-  animation: fadeIn 0.8s ease-in;
-}
-
-h3 {
-  font-size: 22px;
-  margin-bottom: 20px;
-  color: var(--primary-color);
-}
-
-/* Cards & Forms */
-.card {
-  background-color: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 24px;
-  margin-bottom: 30px;
-  animation: fadeInUp 0.6s ease-out;
-}
-
-label {
-  font-weight: 600;
-  display: block;
-  margin-top: 18px;
-  margin-bottom: 6px;
-}
-
-input,
-textarea,
-select {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  background-color: #fafafa;
-  font-size: 15px;
-  transition: border-color var(--transition-fast), background-color var(--transition-fast);
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  background-color: #fff;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-/* Tag UI */
-.tag-box {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-.tag-box label {
-  background-color: #e3f2fd;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* Buttons */
-.form-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 24px;
-  justify-content: space-between;
-}
-
-button {
-  flex: 1 1 48%;
-  padding: 12px 16px;
-  font-size: 16px;
-  border: none;
-  border-radius: var(--radius);
-  cursor: pointer;
-  min-width: 140px;
-  max-width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-.live-preview {
-  margin-top: 30px;
-  border-top: 1px dashed var(--border-color);
-  padding-top: 20px;
-}
-
-.live-preview h3 {
-  font-size: 20px;
-  margin-bottom: 12px;
-  color: var(--primary-color);
-}
-
-.preview-box {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 24px;
-  background-color: transparent;
-  padding: 0;
-}
-
-.preview-card {
-  background-color: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  width: calc(50% - 12px); /* Two cards per row on desktop */
-  max-width: 100%;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease;
-}
-
-.preview-card:hover {
-  transform: translateY(-5px);
-}
-
-.preview-card img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  display: block;
-}
-
-.preview-details {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-}
-
-.preview-details h3 {
-  font-size: 18px;
-  margin-bottom: 6px;
-  color: var(--primary-color);
-}
-
-.preview-details p {
-  font-size: 14px;
-  color: var(--muted-color);
-  margin: 4px 0;
-}
-
-.preview-details .tag {
-  display: inline-block;
-  background-color: #dcedc8;
-  color: #33691e;
-  font-size: 13px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  margin: 4px 4px 0 0;
-}
-
-.meta {
-  font-size: 12px;
-  color: #999;
-  margin-top: 10px;
-}
-
-/* Responsive Fixes */
-@media (max-width: 992px) {
-  .preview-card {
-    width: 100%;
-  }
-}
-
-@media (max-width: 576px) {
-  .preview-card img {
-    height: 180px;
-  }
-
-  .preview-details h3 {
-    font-size: 16px;
-  }
-
-  .preview-details p {
-    font-size: 13px;
-  }
-}  gap: 8px;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
-}
-
-button:hover {
-  transform: translateY(-2px);
-}
-
-button[type="submit"] {
-  background-color: var(--success-color);
-  color: white;
-}
-
-button.danger {
-  background-color: var(--danger-color);
-  color: white;
-}
-
-button svg {
-  width: 18px;
-  height: 18px;
-  fill: white;
-}
-
-/* Live Preview */
-
+  <style>
+    body { font-family: sans-serif; margin: 0; background: #f4f4f4; padding: 20px; }
+    .container { max-width: 1200px; margin: auto; display: flex; flex-direction: column; gap: 20px; }
+    form, .preview, .product-list { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    form { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+    input, textarea { padding: 8px; border-radius: 6px; border: 1px solid #ccc; width: 100%; }
+    input[type="submit"] { background: #1976d2; color: white; font-weight: bold; cursor: pointer; }
+    input[type="submit"]:hover { background: #155a9e; }
+    .preview img { max-width: 100%; max-height: 200px; border-radius: 8px; object-fit: cover; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag { background: #1976d2; color: white; padding: 4px 10px; border-radius: 20px; font-size: 13px; }
+    .product-card { border: 1px solid #ddd; padding: 15px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px; background: #fff; }
+    .product-card img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px; }
+    .product-card button { background: #1976d2; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; margin-right: 10px; }
+    .product-card .delete { background-color: #d32f2f; }
+    #notAuthorized { color: red; text-align: center; font-weight: bold; display: none; }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Admin Product Manager</h2>
-          <button id="darkToggle">🌙 Toggle Dark Mode</button>
+    <div id="notAuthorized">Access Denied: Admins only.</div>
+    
+    <form id="productForm" style="display:none;">
+      <input type="hidden" id="docId" />
+      <input type="text" id="name" placeholder="Product Name" required />
+      <input type="text" id="brand" placeholder="Brand" />
+      <input type="text" id="category" placeholder="Category" />
+      <textarea id="desc" placeholder="Description"></textarea>
+      <input type="number" id="price" placeholder="Price" />
+      <input type="number" id="discount" placeholder="Discount (%)" />
+      <input type="number" id="stock" placeholder="Stock" />
+      <input type="number" step="0.1" id="rating" placeholder="Rating" />
+      <input type="text" id="tags" placeholder="Tags (comma-separated)" />
+      <input type="url" id="imageUrl" placeholder="Image URL" />
+      <input type="submit" value="Save Product" />
+    </form>
 
-    <div class="card">
-      <div class="controls">
-        <input type="text" id="searchInput" placeholder="🔍 Search Products...">
-        <select id="sortSelect">
-          <option value="az">Sort A-Z</option>
-          <option value="za">Sort Z-A</option>
-        </select>
-      </div>
-
-
-
-      <select id="productSelector">
-        <option value="">➕ Create New Product</option>
-      </select>
-
-      <h3 id="formTitle">Create New Product</h3>
-      <form id="productForm">
-        <label>Product Name</label>
-        <input type="text" id="name" oninput="updatePreview()" required>
-
-        <label>Price (INR)</label>
-        <input type="number" id="price" oninput="updatePreview()" required>
-
-        <label>Stock</label>
-        <input type="number" id="stock" oninput="updatePreview()">
-
-        <label>Category</label>
-        <input type="text" id="category" oninput="updatePreview()" required>
-
-        <label>Brand</label>
-        <input type="text" id="brand" oninput="updatePreview()">
-
-        <label>Image URL</label>
-        <input type="text" id="imageUrl" oninput="updatePreview()" placeholder="https://...">
-
-        <label>Description</label>
-        <textarea id="desc" rows="3" oninput="updatePreview()" required></textarea>
-
-        <label>Rating (0–5)</label>
-        <input type="number" id="rating" step="0.1" min="0" max="5" oninput="updatePreview()">
-
-        <label>Discount (%)</label>
-        <input type="number" id="discount" min="0" max="100" oninput="updatePreview()">
-
-        <label>Tags</label>
-        <div class="tag-box">
-          <label><input type="checkbox" name="tag" value="Popular" onchange="updatePreview()"> Popular</label>
-          <label><input type="checkbox" name="tag" value="New Arrival" onchange="updatePreview()"> New Arrival</label>
-          <label><input type="checkbox" name="tag" value="Limited Offer" onchange="updatePreview()"> Limited Offer</label>
-        </div>
-
-        <button type="submit">💾 Save Product</button>
-        <button type="button" class="danger" id="deleteBtn">🗑️ Delete Product</button>
-      </form>
+    <div class="preview" id="previewBox" style="display:none;">
+      <h3>Live Preview</h3>
+      <img id="previewImage" src="https://via.placeholder.com/300x200?text=Preview" alt="Preview" />
+      <p><strong>Name:</strong> <span id="pname"></span></p>
+      <p><strong>Brand:</strong> <span id="pbrand"></span></p>
+      <p><strong>Category:</strong> <span id="pcategory"></span></p>
+      <p><strong>Price:</strong> ₹<span id="pprice"></span> | Discount: <span id="pdiscount"></span>%</p>
+      <p><strong>Stock:</strong> <span id="pstock"></span> | Rating: <span id="prating"></span></p>
+      <p><strong>Description:</strong> <span id="pdesc"></span></p>
+      <div class="tags" id="ptags"></div>
     </div>
 
-    <div class="preview-box">
-  <div class="preview-card">
-    <img src="https://via.placeholder.com/400x220" alt="Service Image" />
-    <div class="preview-details">
-      <h3>Service/Product Name</h3>
-      <p>Description or summary of the product.</p>
-      <div class="tag">Popular</div>
-      <div class="tag">Limited Offer</div>
-      <div class="meta">Updated: June 2025</div>
+    <div class="product-list" id="productSection" style="display:none;">
+      <h3>All Products</h3>
+      <div id="productCards" style="display:grid; gap:15px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));"></div>
     </div>
   </div>
-  <!-- Repeat .preview-card for each item -->
-    </div>
 
+  <!-- Firebase -->
   <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
-    import { getFirestore, doc, getDoc, getDocs, collection, setDoc, addDoc, deleteDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
-    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js';
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
+      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6c62CNUhhwLc",
       authDomain: "store-471f1.firebaseapp.com",
       projectId: "store-471f1",
       storageBucket: "store-471f1.appspot.com",
       messagingSenderId: "619523242611",
-      appId: "1:619523242611:web:fdfa53044c62f844574806"
+      appId: "1:619523242611:web:fdfa53044c62f844574806",
+      measurementId: "G-16C8MYT70G"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    let currentUser = null;
-    let editingId = null;
-    let allProducts = [];
+    const form = document.getElementById('productForm');
+    const docId = document.getElementById('docId');
+    const previewImage = document.getElementById('previewImage');
 
-    const formEl = document.getElementById("productForm");
-    const productSelector = document.getElementById("productSelector");
-    const searchInput = document.getElementById("searchInput");
-    const sortSelect = document.getElementById("sortSelect");
-    const formTitle = document.getElementById("formTitle");
+    const userData = { email: null };
 
-    const formFields = ['name', 'price', 'stock', 'category', 'brand', 'imageUrl', 'desc', 'rating', 'discount'];
+    const updatePreview = () => {
+      previewImage.src = imageUrl.value || "https://via.placeholder.com/300x200?text=Preview";
+      pname.innerText = name.value;
+      pbrand.innerText = brand.value;
+      pcategory.innerText = category.value;
+      pprice.innerText = price.value;
+      pdiscount.innerText = discount.value;
+      pstock.innerText = stock.value;
+      prating.innerText = rating.value;
+      pdesc.innerText = desc.value;
 
-    onAuthStateChanged(auth, async user => {
-      if (!user) return location.href = "index.html";
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (!userDoc.exists() || userDoc.data().role !== "admin") return location.href = "index.html";
-      currentUser = userDoc.data();
+      const tagsContainer = document.getElementById("ptags");
+      tagsContainer.innerHTML = "";
+      tags.value.split(",").forEach(tag => {
+        if (tag.trim()) {
+          const span = document.createElement("span");
+          span.className = "tag";
+          span.innerText = tag.trim();
+          tagsContainer.appendChild(span);
+        }
+      });
+    };
+
+    form.addEventListener("input", updatePreview);
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const product = {
+        name: name.value,
+        brand: brand.value,
+        category: category.value,
+        desc: desc.value,
+        price: +price.value,
+        discount: +discount.value,
+        stock: +stock.value,
+        rating: +rating.value,
+        tags: tags.value.split(",").map(t => t.trim()),
+        imageUrl: imageUrl.value,
+        createdBy: userData.email,
+        updatedBy: userData.email,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      if (docId.value) {
+        await updateDoc(doc(db, "products", docId.value), product);
+        alert("Product updated!");
+      } else {
+        await addDoc(collection(db, "products"), product);
+        alert("Product created!");
+      }
+
+      form.reset();
+      docId.value = "";
+      updatePreview();
       loadProducts();
     });
 
     async function loadProducts() {
-      const snapshot = await getDocs(collection(db, "products"));
-      allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      renderProductOptions();
-    }
+      const querySnapshot = await getDocs(collection(db, "products"));
+      const productCards = document.getElementById("productCards");
+      productCards.innerHTML = "";
 
-    function renderProductOptions() {
-      const keyword = searchInput.value.toLowerCase();
-      let products = allProducts.filter(p => p.name.toLowerCase().includes(keyword));
-      products.sort((a, b) => sortSelect.value === 'az' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
-
-      productSelector.innerHTML = '<option value="">➕ Create New Product</option>' +
-        products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-
-      if (products.length > 0) {
-        productSelector.value = products[0].id;
-        productSelector.dispatchEvent(new Event('change'));
-      } else {
-        resetForm();
-      }
-
-      const grid = document.getElementById("productGrid");
-      grid.innerHTML = products.map(p => `
-        <div class="product-card">
-          <img src="${p.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${p.name}">
+      querySnapshot.forEach((docSnap) => {
+        const p = docSnap.data();
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <img src="${p.imageUrl}" alt="${p.name}" />
           <h4>${p.name}</h4>
-          <p>₹${p.price.toFixed(2)}</p>
-          <p><small>${p.category || '-'}</small></p>
-          <button onclick="editProduct('${p.id}')">✏️ Edit</button>
-        </div>
-      `).join('');
+          <p><strong>₹${p.price}</strong> - ${p.brand}</p>
+          <p>${p.category} | ⭐ ${p.rating}</p>
+          <p>Stock: ${p.stock}</p>
+          <div>
+            <button onclick="editProduct('${docSnap.id}')">Edit</button>
+            <button class="delete" onclick="deleteProduct('${docSnap.id}')">Delete</button>
+          </div>
+        `;
+        productCards.appendChild(card);
+      });
     }
 
-    window.editProduct = async function(id) {
-      productSelector.value = id;
-      productSelector.dispatchEvent(new Event('change'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    productSelector.onchange = async () => {
-      const id = productSelector.value;
-      if (!id) {
-        formTitle.textContent = "Create New Product";
-        return resetForm();
+    window.editProduct = async (id) => {
+      const ref = doc(db, "products", id);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        const p = snap.data();
+        name.value = p.name;
+        brand.value = p.brand;
+        category.value = p.category;
+        desc.value = p.desc;
+        price.value = p.price;
+        discount.value = p.discount;
+        stock.value = p.stock;
+        rating.value = p.rating;
+        tags.value = p.tags.join(",");
+        imageUrl.value = p.imageUrl;
+        docId.value = id;
+        updatePreview();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
-      editingId = id;
-      const data = await getDoc(doc(db, "products", id)).then(d => d.data());
-      formFields.forEach(f => document.getElementById(f).value = data[f] || "");
-      document.querySelectorAll("input[name='tag']").forEach(tag => tag.checked = data.tags?.includes(tag.value));
-      document.getElementById("previewMeta").innerHTML = `Created by: ${data.createdBy || '-'}<br>Updated by: ${data.updatedBy || '-'}`;
-      formTitle.textContent = "Edit Product";
-      updatePreview();
     };
 
-    searchInput.addEventListener("input", renderProductOptions);
-    sortSelect.onchange = renderProductOptions;
-
-    formEl.onsubmit = async e => {
-      e.preventDefault();
-      const product = Object.fromEntries(formFields.map(f => [f, document.getElementById(f).value]));
-      product.tags = Array.from(document.querySelectorAll("input[name='tag']:checked"), t => t.value);
-      product.price = parseFloat(product.price);
-      product.stock = parseInt(product.stock);
-      product.rating = parseFloat(product.rating);
-      product.discount = parseFloat(product.discount);
-      product.updatedAt = serverTimestamp();
-      product.updatedBy = currentUser?.name || currentUser?.email;
-      if (editingId) {
-        await updateDoc(doc(db, "products", editingId), product);
-        alert("Product updated");
-      } else {
-        product.createdAt = serverTimestamp();
-        product.createdBy = currentUser?.name || currentUser?.email;
-        await addDoc(collection(db, "products"), product);
-        alert("Product created");
-      }
-      resetForm();
-      loadProducts();
-    };
-
-    document.getElementById("deleteBtn").onclick = async () => {
-      if (!editingId) return alert("Select a product to delete");
-      if (confirm("Are you sure?")) {
-        await deleteDoc(doc(db, "products", editingId));
-        alert("Product deleted");
-        resetForm();
+    window.deleteProduct = async (id) => {
+      if (confirm("Are you sure you want to delete this product?")) {
+        await deleteDoc(doc(db, "products", id));
+        alert("Product deleted!");
         loadProducts();
       }
     };
 
-    function resetForm() {
-      editingId = null;
-      formEl.reset();
-      productSelector.value = "";
-      formTitle.textContent = "Create New Product";
-      document.getElementById("previewImage").src = "https://via.placeholder.com/300x200?text=Product+Image";
-      document.getElementById("previewMeta").innerHTML = "Created by: --<br>Updated by: --";
-      updatePreview();
-    }
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const role = userDoc.exists() ? userDoc.data().role : null;
+        userData.email = user.email;
 
-    window.updatePreview = () => {
-      document.getElementById("previewName").textContent = document.getElementById("name").value || "Product Name";
-      document.getElementById("previewPrice").textContent = parseFloat(document.getElementById("price").value || 0).toFixed(2);
-      document.getElementById("previewCategory").textContent = document.getElementById("category").value || "Category";
-      document.getElementById("previewBrand").textContent = document.getElementById("brand").value || "Brand";
-      document.getElementById("previewDesc").textContent = document.getElementById("desc").value || "Product description...";
-      document.getElementById("previewImage").src = document.getElementById("imageUrl").value || "https://via.placeholder.com/300x200?text=Product+Image";
-      const tags = Array.from(document.querySelectorAll("input[name='tag']:checked"))
-        .map(t => `<span class='tag'>${t.value}</span>`).join(" ");
-      document.getElementById("previewTags").innerHTML = tags;
-    }
-
-    document.getElementById("darkToggle").addEventListener("click", () => {
-  document.body.classList.toggle("dark-mode");
-});
-    
+        if (role === "admin") {
+          form.style.display = "grid";
+          document.getElementById("previewBox").style.display = "block";
+          document.getElementById("productSection").style.display = "block";
+          loadProducts();
+          updatePreview();
+        } else {
+          document.getElementById("notAuthorized").style.display = "block";
+        }
+      } else {
+        alert("You must be logged in as an admin to use this page.");
+        location.href = "/login.html"; // redirect if needed
+      }
+    });
   </script>
 </body>
 </html>
