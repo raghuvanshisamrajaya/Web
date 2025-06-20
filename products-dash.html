@@ -1,217 +1,146 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Product Manager</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Product Creator</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f4;
+      margin: 0;
+      background-color: #f5f7fa;
       padding: 20px;
-      color: #333;
     }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-    }
-
     h2 {
       text-align: center;
-      margin-bottom: 20px;
       color: #1976d2;
+      margin-bottom: 20px;
     }
-
-    #notAuthorized {
-      color: #d32f2f;
-      text-align: center;
-      font-weight: bold;
-      display: none;
-    }
-
-    form,
-    .preview,
-    .product-list {
+    form {
+      max-width: 1200px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
       background: #fff;
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
-
-    form {
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      display: grid;
-    }
-
-    input,
-    textarea {
+    input, textarea {
+      width: 100%;
       padding: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
-      width: 100%;
       font-size: 14px;
     }
-
     input[type="submit"] {
-      background-color: #1976d2;
+      background: #1976d2;
       color: white;
       font-weight: bold;
       cursor: pointer;
-      transition: background-color 0.3s;
+      border: none;
     }
-
-    input[type="submit"]:hover {
-      background-color: #155a9e;
-    }
-
-    .product-card {
+    .preview, .product-list {
+      max-width: 1200px;
+      margin: 30px auto;
       background: #fff;
-      border: 1px solid #ddd;
-      padding: 15px;
       border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
-
-    .product-card img {
-      max-width: 100%;
-      height: 180px;
+    .preview img {
+      width: 100%;
+      max-width: 300px;
+      max-height: 200px;
       object-fit: cover;
       border-radius: 8px;
-    }
-
-    .product-card button {
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      margin: 5px 0;
-      transition: background-color 0.3s;
-    }
-
-    .product-card .edit {
-      background-color: #1976d2;
-      color: white;
-    }
-
-    .product-card .edit:hover {
-      background-color: #155a9e;
-    }
-
-    .product-card .delete {
-      background-color: #d32f2f;
-      color: white;
-    }
-
-    .product-card .delete:hover {
-      background-color: #c62828;
-    }
-
-    .tags {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .tag {
-      background: #1976d2;
-      color: white;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 13px;
-    }
-
-    .preview img {
-      max-width: 100%;
-      border-radius: 8px;
+      display: block;
       margin-bottom: 10px;
     }
-
-    .preview p {
-      margin: 0;
+    .tag {
+      display: inline-block;
+      background: #1976d2;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin: 2px;
+      font-size: 12px;
+    }
+    .field {
+      margin-bottom: 10px;
+    }
+    .field strong {
       color: #555;
     }
-
-    @media (max-width: 768px) {
-      .container {
-        padding: 15px;
-      }
-
-      form {
-        grid-template-columns: 1fr;
-      }
-
-      .product-card {
-        flex-direction: column;
-      }
-
-      .product-list {
-        margin-top: 30px;
+    .product-card {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .product-card img {
+      height: 60px;
+      width: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+    .product-card button {
+      padding: 5px 10px;
+      margin-left: 5px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .edit-btn {
+      background-color: #ffa726;
+      color: white;
+    }
+    .delete-btn {
+      background-color: #ef5350;
+      color: white;
+    }
+    @media (max-width: 600px) {
+      .preview {
+        padding: 10px;
       }
     }
   </style>
 </head>
-
-<body>
-  <div class="container">
-    <h2>Admin Product Manager</h2>
-    <div id="notAuthorized">Access Denied: Admins only.</div>
-
-    <form id="productForm" style="display: none;">
-      <input type="hidden" id="docId" />
-      <input type="text" id="name" placeholder="Product Name" required />
-      <input type="text" id="brand" placeholder="Brand" />
-      <input type="text" id="category" placeholder="Category" />
-      <textarea id="desc" placeholder="Description"></textarea>
-      <input type="number" id="price" placeholder="Price" />
-      <input type="number" id="discount" placeholder="Discount (%)" />
-      <input type="number" id="stock" placeholder="Stock" />
-      <input type="number" step="0.1" id="rating" placeholder="Rating" />
-      <input type="text" id="tags" placeholder="Tags (comma-separated)" />
-      <input type="url" id="imageUrl" placeholder="Image URL" />
-      <input type="submit" value="Save Product" />
-    </form>
-
-    <div class="preview" id="previewBox" style="display: none;">
-      <h3>Live Preview</h3>
-      <img id="previewImage" src="https://via.placeholder.com/300x200?text=Preview" alt="Preview" />
-      <p><strong>Name:</strong> <span id="pname"></span></p>
-      <p><strong>Brand:</strong> <span id="pbrand"></span></p>
-      <p><strong>Category:</strong> <span id="pcategory"></span></p>
-      <p><strong>Price:</strong> ₹<span id="pprice"></span> | Discount: <span id="pdiscount"></span>%</p>
-      <p><strong>Stock:</strong> <span id="pstock"></span> | Rating: <span id="prating"></span></p>
-      <p><strong>Description:</strong> <span id="pdesc"></span></p>
-      <div class="tags" id="ptags"></div>
-    </div>
-
-    <div class="product-list" id="productSection" style="display: none;">
-      <h3>All Products</h3>
-      <div id="productCards" style="display: grid; gap: 15px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));"></div>
-    </div>
-  </div>
-
-  <!-- Firebase -->
-  <script type="module">
+<body>  <h2>Admin Product Creator</h2>  <form id="productForm">
+    <input type="hidden" id="docId">
+    <input type="text" id="name" placeholder="Product Name" required>
+    <input type="text" id="brand" placeholder="Brand">
+    <input type="text" id="category" placeholder="Category">
+    <textarea id="desc" placeholder="Description"></textarea>
+    <input type="number" id="price" placeholder="Price">
+    <input type="number" id="discount" placeholder="Discount %">
+    <input type="number" id="stock" placeholder="Stock">
+    <input type="number" id="rating" placeholder="Rating" step="0.1">
+    <input type="text" id="tags" placeholder="Tags (comma separated)">
+    <input type="url" id="imageUrl" placeholder="Image URL">
+    <input type="submit" value="Save Product">
+  </form>  <div class="preview">
+    <h3>Live Preview</h3>
+    <img id="previewImage" src="https://via.placeholder.com/300x200?text=Preview" alt="Preview Image">
+    <div class="field"><strong>Name:</strong> <span id="pname"></span></div>
+    <div class="field"><strong>Brand:</strong> <span id="pbrand"></span></div>
+    <div class="field"><strong>Category:</strong> <span id="pcategory"></span></div>
+    <div class="field"><strong>Price:</strong> ₹<span id="pprice"></span></div>
+    <div class="field"><strong>Stock:</strong> <span id="pstock"></span></div>
+    <div class="field"><strong>Rating:</strong> <span id="prating"></span></div>
+    <div class="field"><strong>Description:</strong> <span id="pdesc"></span></div>
+    <div class="field"><strong>Tags:</strong> <span id="ptags"></span></div>
+  </div>  <div class="product-list">
+    <h3>All Products</h3>
+    <div id="productContainer"></div>
+  </div>  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6c62CNUhhwLc",
@@ -224,153 +153,134 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
     const form = document.getElementById('productForm');
-    const docId = document.getElementById('docId');
-    const previewImage = document.getElementById('previewImage');
+    const container = document.getElementById('productContainer');
 
-    const inputEls = {
-      name: document.getElementById('name'),
-      brand: document.getElementById('brand'),
-      category: document.getElementById('category'),
-      desc: document.getElementById('desc'),
-      price: document.getElementById('price'),
-      discount: document.getElementById('discount'),
-      stock: document.getElementById('stock'),
-      rating: document.getElementById('rating'),
-      tags: document.getElementById('tags'),
-      imageUrl: document.getElementById('imageUrl'),
-    };
-
-    const previewEls = {
-      pname: document.getElementById('pname'),
-      pbrand: document.getElementById('pbrand'),
-      pcategory: document.getElementById('pcategory'),
-      pprice: document.getElementById('pprice'),
-      pdiscount: document.getElementById('pdiscount'),
-      pstock: document.getElementById('pstock'),
-      prating: document.getElementById('prating'),
-      pdesc: document.getElementById('pdesc'),
-      ptags: document.getElementById('ptags'),
+    const fieldMap = {
+      name: 'pname', brand: 'pbrand', category: 'pcategory', price: 'pprice',
+      stock: 'pstock', rating: 'prating', desc: 'pdesc', imageUrl: 'previewImage'
     };
 
     function updatePreview() {
-      previewImage.src = inputEls.imageUrl.value || "https://via.placeholder.com/300x200?text=Preview";
-      previewEls.pname.innerText = inputEls.name.value;
-      previewEls.pbrand.innerText = inputEls.brand.value;
-      previewEls.pcategory.innerText = inputEls.category.value;
-      previewEls.pprice.innerText = inputEls.price.value;
-      previewEls.pdiscount.innerText = inputEls.discount.value;
-      previewEls.pstock.innerText = inputEls.stock.value;
-      previewEls.prating.innerText = inputEls.rating.value;
-      previewEls.pdesc.innerText = inputEls.desc.value;
-
-      const tagsContainer = previewEls.ptags;
-      tagsContainer.innerHTML = "";
-      inputEls.tags.value.split(",").forEach(tag => {
-        if (tag.trim()) {
-          const span = document.createElement("span");
-          span.className = "tag";
-          span.innerText = tag.trim();
-          tagsContainer.appendChild(span);
+      Object.entries(fieldMap).forEach(([inputId, spanId]) => {
+        const input = document.getElementById(inputId);
+        const output = document.getElementById(spanId);
+        if (input && output) {
+          if (inputId === 'imageUrl') {
+            output.src = input.value || 'https://via.placeholder.com/300x200?text=Preview';
+          } else {
+            output.textContent = input.value;
+          }
         }
+      });
+
+      const tagsInput = document.getElementById('tags').value;
+      const tagsContainer = document.getElementById('ptags');
+      tagsContainer.innerHTML = '';
+      tagsInput.split(',').filter(tag => tag.trim()).forEach(tag => {
+        const span = document.createElement('span');
+        span.className = 'tag';
+        span.textContent = tag.trim();
+        tagsContainer.appendChild(span);
       });
     }
 
-    form.addEventListener("input", updatePreview);
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const product = {
-        name: inputEls.name.value,
-        brand: inputEls.brand.value,
-        category: inputEls.category.value,
-        desc: inputEls.desc.value,
-        price: +inputEls.price.value,
-        discount: +inputEls.discount.value,
-        stock: +inputEls.stock.value,
-        rating: +inputEls.rating.value,
-        tags: inputEls.tags.value.split(',').map(t=>t.trim()),
-        imageUrl: inputEls.imageUrl.value,
-        createdBy: auth.currentUser.email,
-        updatedBy: auth.currentUser.email,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-
-      if (docId.value) {
-        await updateDoc(doc(db, "products", docId.value), product);
-        alert("Product updated!");
-      } else {
-        await addDoc(collection(db, "products"), product);
-        alert("Product created!");
-      }
-
-      form.reset(); docId.value = '';
-      updatePreview(); loadProducts();
-    });
-
-    async function loadProducts() {
-      const productCards = document.getElementById("productCards");
-      productCards.innerHTML = '';
-      const snap = await getDocs(collection(db, "products"));
-      snap.forEach((docSnap) => {
-        const p = docSnap.data();
+    function renderProducts(products) {
+      container.innerHTML = '';
+      products.forEach(doc => {
+        const data = doc.data();
         const div = document.createElement('div');
         div.className = 'product-card';
         div.innerHTML = `
-          <img src="${p.imageUrl}" />
-          <h4>${p.name}</h4>
-          <p><strong>₹${p.price}</strong> – ${p.brand}</p>
-          <p>${p.category} | ⭐ ${p.rating}</p>
-          <p>Stock: ${p.stock}</p>
+          <div style="display: flex; align-items: center;">
+            <img src="${data.imageUrl}" alt="img">
+            <div>
+              <div><strong>${data.name}</strong></div>
+              <div>₹${data.price} | ${data.stock} in stock</div>
+            </div>
+          </div>
           <div>
-            <button class="edit" onclick="editProduct('${docSnap.id}')">Edit</button>
-            <button class="delete" onclick="deleteProduct('${docSnap.id}')">Delete</button>
+            <button class="edit-btn" onclick="editProduct('${doc.id}')">Edit</button>
+            <button class="delete-btn" onclick="deleteProduct('${doc.id}')">Delete</button>
           </div>
         `;
-        productCards.appendChild(div);
+        container.appendChild(div);
       });
     }
 
     window.editProduct = async (id) => {
-      const snap = await getDoc(doc(db, "products", id));
+      const snap = await getDoc(doc(db, 'products', id));
       if (snap.exists()) {
         const p = snap.data();
-        docId.value = id;
-        for (const [key, el] of Object.entries(inputEls)) {
-          el.value = Array.isArray(p[key]) ? p[key].join(",") : p[key] || "";
+        for (let key in p) {
+          if (document.getElementById(key)) document.getElementById(key).value = p[key];
         }
+        document.getElementById('docId').value = id;
         updatePreview();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     };
 
     window.deleteProduct = async (id) => {
-      if (confirm("Delete this product?")) {
-        await deleteDoc(doc(db, "products", id));
-        alert("Deleted!");
+      if (confirm('Delete this product?')) {
+        await deleteDoc(doc(db, 'products', id));
         loadProducts();
       }
     };
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return location.href = "/login.html";
-      const uSnap = await getDoc(doc(db, "users", user.uid));
-      const role = uSnap.exists() ? uSnap.data().role : null;
-      if (role === "admin") {
-        document.getElementById("productForm").style.display = "grid";
-        document.getElementById("previewBox").style.display = "block";
-        document.getElementById("productSection").style.display = "block";
-        document.getElementById("notAuthorized").style.display = "none";
-        updatePreview(); loadProducts();
-      } else {
-        document.getElementById("notAuthorized").style.display = "block";
+    async function loadProducts() {
+      const snapshot = await getDocs(collection(db, 'products'));
+      renderProducts(snapshot.docs);
+    }
+
+    document.querySelectorAll('input, textarea').forEach(el => {
+      el.addEventListener('input', updatePreview);
+    });
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) return location.href = '/login.html';
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists() || userSnap.data().role !== 'admin') {
+        alert("Access denied: Admins only");
+        return location.href = '/login.html';
+      }
+      loadProducts();
+    });
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const data = {
+        name: name.value,
+        brand: brand.value,
+        category: category.value,
+        desc: desc.value,
+        price: +price.value,
+        discount: +discount.value,
+        stock: +stock.value,
+        rating: +rating.value,
+        tags: tags.value.split(',').map(t => t.trim()),
+        imageUrl: imageUrl.value,
+        updatedAt: new Date().toISOString()
+      };
+      const id = docId.value;
+      try {
+        if (id) {
+          await updateDoc(doc(db, 'products', id), data);
+          alert('Product updated!');
+        } else {
+          await addDoc(collection(db, 'products'), data);
+          alert('Product created!');
+        }
+        form.reset();
+        updatePreview();
+        loadProducts();
+      } catch (err) {
+        console.error('Error saving product:', err);
+        alert('Error saving product');
       }
     });
-  </script>
-</body>
-
+  </script></body>
 </html>
