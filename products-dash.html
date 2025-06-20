@@ -150,7 +150,106 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+.live-preview {
+  margin-top: 30px;
+  border-top: 1px dashed var(--border-color);
+  padding-top: 20px;
+}
+
+.live-preview h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: var(--primary-color);
+}
+
+.preview-box {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 24px;
+  background-color: transparent;
+  padding: 0;
+}
+
+.preview-card {
+  background-color: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  width: calc(50% - 12px); /* Two cards per row on desktop */
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+}
+
+.preview-card:hover {
+  transform: translateY(-5px);
+}
+
+.preview-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.preview-details {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-details h3 {
+  font-size: 18px;
+  margin-bottom: 6px;
+  color: var(--primary-color);
+}
+
+.preview-details p {
+  font-size: 14px;
+  color: var(--muted-color);
+  margin: 4px 0;
+}
+
+.preview-details .tag {
+  display: inline-block;
+  background-color: #dcedc8;
+  color: #33691e;
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin: 4px 4px 0 0;
+}
+
+.meta {
+  font-size: 12px;
+  color: #999;
+  margin-top: 10px;
+}
+
+/* Responsive Fixes */
+@media (max-width: 992px) {
+  .preview-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .preview-card img {
+    height: 180px;
+  }
+
+  .preview-details h3 {
+    font-size: 16px;
+  }
+
+  .preview-details p {
+    font-size: 13px;
+  }
+}  gap: 8px;
   transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
@@ -175,156 +274,6 @@ button svg {
 }
 
 /* Live Preview */
-.live-preview {
-  margin-top: 30px;
-  border-top: 1px dashed var(--border-color);
-  padding-top: 20px;
-}
-
-.live-preview h3 {
-  font-size: 20px;
-  margin-bottom: 12px;
-  color: var(--primary-color);
-}
-
-.preview-box {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  background-color: #fafafa;
-  padding: 16px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  align-items: flex-start;
-  justify-content: center;
-}
-
-.preview-box img {
-  width: 100px;
-  max-width: 100px;
-  height: 100px;
-  border-radius: 10px;
-  object-fit: contain;
-  transition: transform var(--transition-fast);
-}
-
-.preview-box img:hover {
-  transform: scale(1.03);
-}
-
-.preview-details {
-  flex: 1 1 200px;
-  min-width: 200px;
-  max-width: 100%;
-}
-
-.preview-details h3 {
-  font-size: 20px;
-  margin-bottom: 8px;
-}
-
-.preview-details p {
-  margin: 6px 0;
-  font-size: 14px;
-  color: var(--muted-color);
-}
-
-.preview-details .tag {
-  display: inline-block;
-  background-color: #dcedc8;
-  color: #33691e;
-  font-size: 13px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  margin-right: 6px;
-  margin-top: 5px;
-}
-
-.meta {
-  font-size: 12px;
-  color: #999;
-  margin-top: 10px;
-}
-
-/* Responsive */
-@media (max-width: 992px) {
-  .form-actions {
-    flex-direction: column;
-  }
-
-  button {
-    width: 100%;
-  }
-
-  .preview-box {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .preview-details {
-    width: 100%;
-  }
-
-  h2 {
-    font-size: 26px;
-  }
-
-  h3 {
-    font-size: 20px;
-  }
-}
-
-@media (max-width: 576px) {
-  h2 {
-    font-size: 22px;
-  }
-
-  h3 {
-    font-size: 18px;
-  }
-
-  .card {
-    padding: 16px;
-  }
-
-  .preview-box {
-    gap: 16px;
-    padding: 12px;
-  }
-
-  .preview-details h3 {
-    font-size: 18px;
-  }
-
-  .preview-details p {
-    font-size: 13px;
-  }
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-  
 
   </style>
 </head>
@@ -389,20 +338,19 @@ button svg {
       </form>
     </div>
 
-    <div class="card preview-container">
-  <div class="preview-image">
-    <img id="previewImage" src="https://via.placeholder.com/300x200?text=Product+Image" />
+    <div class="preview-box">
+  <div class="preview-card">
+    <img src="https://via.placeholder.com/400x220" alt="Service Image" />
+    <div class="preview-details">
+      <h3>Service/Product Name</h3>
+      <p>Description or summary of the product.</p>
+      <div class="tag">Popular</div>
+      <div class="tag">Limited Offer</div>
+      <div class="meta">Updated: June 2025</div>
+    </div>
   </div>
-  <div class="preview-info">
-    <h3 id="previewName">Product Name</h3>
-    <p><strong>₹</strong><span id="previewPrice">0.00</span></p>
-    <p><strong>Category:</strong> <span id="previewCategory">Category</span></p>
-    <p><strong>Brand:</strong> <span id="previewBrand">Brand</span></p>
-    <p id="previewDesc">Product description...</p>
-    <div id="previewTags"></div>
-    <div class="meta" id="previewMeta">Created by: --<br>Updated by: --</div>
-  </div>
-</div>
+  <!-- Repeat .preview-card for each item -->
+    </div>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
