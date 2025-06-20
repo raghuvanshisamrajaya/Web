@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Cart | Raghuvanshi Health Care</title>
+  <style>
+    :root {
+      --bg-color: #f4f6f8;
+      --card-bg: #ffffff;
+      --primary: #1976d2;
+      --danger: #e53935;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+      --radius: 16px;
+      --font: 'Segoe UI', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg-color);
+      font-family: var(--font);
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #222;
+    }
+
+    .cart-container {
+      max-width: 1000px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .cart-card {
+      background: var(--card-bg);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .cart-img {
+      flex: 0 0 120px;
+      height: 120px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .cart-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .cart-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cart-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .cart-price {
+      font-size: 16px;
+      color: var(--primary);
+    }
+
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .quantity-controls button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .quantity-controls span {
+      min-width: 24px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .cart-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .remove-btn {
+      background: var(--danger);
+    }
+
+    .remove-btn, .checkout-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .checkout-btn { background: var(--primary); }
+
+    .cart-summary {
+      background: var(--card-bg);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .summary-title {
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .summary-detail {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .summary-total {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    @media (max-width: 600px) {
+      .cart-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .cart-img {
+        width: 100%;
+        height: 180px;
+      }
+      .cart-actions {
+        width: 100%;
+        flex-direction: column;
+      }
+      .checkout-btn, .remove-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🛒 Your Shopping Cart</h1>
+
+  <div class="cart-container" id="cart-container">
+    <!-- Products will be added here -->
+  </div>
+
+  <div class="cart-summary" id="cart-summary" style="display:none;">
+    <div class="summary-title">🧾 Order Summary</div>
+    <div class="summary-detail">
+      <span>Items Total:</span>
+      <span id="items-total">₹0</span>
+    </div>
+    <div class="summary-detail">
+      <span>Delivery Charges:</span>
+      <span>Free</span>
+    </div>
+    <div class="summary-detail summary-total">
+      <span>Total Amount:</span>
+      <span id="grand-total">₹0</span>
+    </div>
+    <button class="checkout-btn" style="margin-top: 20px; width: 100%;">Proceed to Checkout</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
+      authDomain: "store-471f1.firebaseapp.com",
+      projectId: "store-471f1",
+      storageBucket: "store-471f1.appspot.com",
+      messagingSenderId: "619523242611",
+      appId: "1:619523242611:web:YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const cartContainer = document.getElementById("cart-container");
+    const cartSummary = document.getElementById("cart-summary");
+    const totalText = document.getElementById("items-total");
+    const grandText = document.getElementById("grand-total");
+
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        alert("Please log in to access your cart.");
+        window.location.href = "login.html";
+        return;
+      }
+
+      const userRef = db.collection("users").doc(user.uid);
+
+      userRef.onSnapshot(doc => {
+        const data = doc.data();
+        const cart = data?.cart || {};
+        cartContainer.innerHTML = "";
+        let total = 0;
+
+        const productIds = Object.keys(cart);
+        if (productIds.length === 0) {
+          cartContainer.innerHTML = "<p>Your cart is empty.</p>";
+          cartSummary.style.display = "none";
+          return;
+        }
+
+        productIds.forEach(productId => {
+          const item = cart[productId];
+          const itemTotal = item.price * item.quantity;
+          total += itemTotal;
+
+          const card = document.createElement("div");
+          card.className = "cart-card";
+          card.innerHTML = `
+            <div class="cart-img">
+              <img src="${item.image}" alt="${item.name}" />
+            </div>
+            <div class="cart-details">
+              <div class="cart-title">${item.name}</div>
+              <div class="cart-price">₹${item.price}</div>
+              <div class="quantity-controls">
+                <button onclick="updateQty('${productId}', ${item.quantity - 1})">-</button>
+                <span>${item.quantity}</span>
+                <button onclick="updateQty('${productId}', ${item.quantity + 1})">+</button>
+              </div>
+              <div class="cart-actions">
+                <button class="remove-btn" onclick="removeItem('${productId}')">Remove</button>
+                <button class="checkout-btn">Buy Now</button>
+              </div>
+            </div>
+          `;
+          cartContainer.appendChild(card);
+        });
+
+        totalText.textContent = `₹${total}`;
+        grandText.textContent = `₹${total}`;
+        cartSummary.style.display = "block";
+      });
+
+      window.updateQty = async (productId, qty) => {
+        if (qty <= 0) return removeItem(productId);
+        const updateObj = {};
+        updateObj[`cart.${productId}.quantity`] = qty;
+        await db.collection("users").doc(user.uid).update(updateObj);
+      };
+
+      window.removeItem = async (productId) => {
+        const updateObj = {};
+        updateObj[`cart.${productId}`] = firebase.firestore.FieldValue.delete();
+        await db.collection("users").doc(user.uid).update(updateObj);
+      };
+    });
+  </script>
+</body>
+</html>
