@@ -1,12 +1,11 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Products | Raghuvanshi Health Care</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
@@ -24,14 +23,8 @@
       animation: fadeInDown 0.5s ease-in-out;
     }
     @keyframes fadeInDown {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .controls {
       display: flex;
@@ -62,12 +55,8 @@
       animation: fadeIn 0.6s ease-in-out;
     }
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     .card {
       background: white;
@@ -78,7 +67,6 @@
       flex-direction: column;
       position: relative;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
-      animation: fadeIn 0.5s ease-in-out;
     }
     .card:hover {
       transform: translateY(-6px);
@@ -97,31 +85,11 @@
       flex-direction: column;
       flex-grow: 1;
     }
-    .card h3 {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 600;
-      color: #333;
-    }
-    .price {
-      color: #388e3c;
-      font-size: 16px;
-      margin-top: 6px;
-      font-weight: bold;
-    }
-    .category {
-      font-size: 13px;
-      color: #777;
-    }
-    .desc {
-      font-size: 14px;
-      color: #444;
-      margin: 10px 0;
-      flex-grow: 1;
-    }
-    .tags {
-      margin: 10px 0;
-    }
+    .card h3 { margin: 0; font-size: 18px; font-weight: 600; color: #333; }
+    .price { color: #388e3c; font-size: 16px; margin-top: 6px; font-weight: bold; }
+    .category { font-size: 13px; color: #777; }
+    .desc { font-size: 14px; color: #444; margin: 10px 0; flex-grow: 1; }
+    .tags { margin: 10px 0; }
     .tag {
       display: inline-block;
       background: #e3f2fd;
@@ -159,9 +127,7 @@
       cursor: pointer;
       transition: background 0.3s ease;
     }
-    .btns button:hover {
-      background: #145ea8;
-    }
+    .btns button:hover { background: #145ea8; }
     .cart-btn-fixed {
       position: fixed;
       bottom: 20px;
@@ -177,9 +143,7 @@
       z-index: 999;
       transition: background 0.3s;
     }
-    .cart-btn-fixed:hover {
-      background: #2e7d32;
-    }
+    .cart-btn-fixed:hover { background: #2e7d32; }
     .popup-message {
       position: fixed;
       bottom: 100px;
@@ -217,125 +181,146 @@
   <div class="products-grid" id="productsGrid"></div>
   <div class="cart-btn-fixed" onclick="goToCart()">🛒 View Cart</div>
   <div id="popup" class="popup-message">Added to cart!</div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";const firebaseConfig = {
-  apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
-  authDomain: "store-471f1.firebaseapp.com",
-  projectId: "store-471f1",
-  storageBucket: "store-471f1.appspot.com",
-  messagingSenderId: "619523242611",
-  appId: "1:619523242611:web:fdfa53044c62f844574806"
-};
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-let currentUser = null;
-let products = [];
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
+      authDomain: "store-471f1.firebaseapp.com",
+      projectId: "store-471f1",
+      storageBucket: "store-471f1.appspot.com",
+      messagingSenderId: "619523242611",
+      appId: "1:619523242611:web:fdfa53044c62f844574806"
+    };
 
-const searchInput = document.getElementById("searchInput");
-const categoryFilter = document.getElementById("categoryFilter");
-const sortSelect = document.getElementById("sortSelect");
-const productsGrid = document.getElementById("productsGrid");
-const popup = document.getElementById("popup");
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-function showPopup(msg) {
-  popup.textContent = msg;
-  popup.classList.add("show");
-  setTimeout(() => popup.classList.remove("show"), 2500);
-}
+    let currentUser = null;
+    let products = [];
 
-onAuthStateChanged(auth, user => {
-  currentUser = user;
-});
+    const searchInput = document.getElementById("searchInput");
+    const categoryFilter = document.getElementById("categoryFilter");
+    const sortSelect = document.getElementById("sortSelect");
+    const productsGrid = document.getElementById("productsGrid");
+    const popup = document.getElementById("popup");
 
-async function loadProducts() {
-  const snapshot = await getDocs(collection(db, "products"));
-  products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  renderCategories();
-  renderProducts();
-}
+    function showPopup(msg) {
+      popup.textContent = msg;
+      popup.classList.add("show");
+      setTimeout(() => popup.classList.remove("show"), 2500);
+    }
 
-function renderCategories() {
-  const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
-  categoryFilter.innerHTML = `<option value="">All Categories</option>` +
-    categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
-}
+    onAuthStateChanged(auth, user => {
+      currentUser = user;
+    });
 
-function renderProducts() {
-  let filtered = products.filter(p =>
-    p.name.toLowerCase().includes(searchInput.value.toLowerCase()) &&
-    (categoryFilter.value === "" || p.category === categoryFilter.value)
-  );
+    async function loadProducts() {
+      const snapshot = await getDocs(collection(db, "products"));
+      products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderCategories();
+      renderProducts();
+    }
 
-  if (sortSelect.value === "low-high") {
-    filtered.sort((a, b) => a.price - b.price);
-  } else if (sortSelect.value === "high-low") {
-    filtered.sort((a, b) => b.price - a.price);
-  }
+    function renderCategories() {
+      const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
+      categoryFilter.innerHTML = `<option value="">All Categories</option>` +
+        categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+    }
 
-  productsGrid.innerHTML = filtered.map(p => `
-    <div class="card">
-      ${p.discount ? `<div class="discount-badge">-${p.discount}%</div>` : ""}
-      <img src="${p.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${p.name}">
-      <div class="card-content">
-        <h3>${p.name}</h3>
-        <div class="price">₹${p.price.toFixed(2)}</div>
-        <div class="category">${p.category || ''}</div>
-        <div class="desc">${p.desc || ''}</div>
-        <div class="tags">
-          ${(p.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
+    function renderProducts() {
+      let filtered = products.filter(p =>
+        p.name.toLowerCase().includes(searchInput.value.toLowerCase()) &&
+        (categoryFilter.value === "" || p.category === categoryFilter.value)
+      );
+
+      if (sortSelect.value === "low-high") {
+        filtered.sort((a, b) => a.price - b.price);
+      } else if (sortSelect.value === "high-low") {
+        filtered.sort((a, b) => b.price - a.price);
+      }
+
+      productsGrid.innerHTML = filtered.map(p => `
+        <div class="card">
+          ${p.discount ? `<div class="discount-badge">-${p.discount}%</div>` : ""}
+          <img src="${p.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${p.name}">
+          <div class="card-content">
+            <h3>${p.name}</h3>
+            <div class="price">₹${p.price.toFixed(2)}</div>
+            <div class="category">${p.category || ''}</div>
+            <div class="desc">${p.desc || ''}</div>
+            <div class="tags">
+              ${(p.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>
+            <div class="btns">
+              <button onclick="addToCart('${p.id}')">Add to Cart</button>
+              <button onclick="buyProduct('${p.id}')">Buy Now</button>
+            </div>
+          </div>
         </div>
-        <div class="btns">
-          <button onclick="addToCart('${p.id}')">Add to Cart</button>
-          <button onclick="buyProduct('${p.id}')">Buy Now</button>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
+      `).join('');
+    }
 
-searchInput.addEventListener("input", renderProducts);
-categoryFilter.addEventListener("change", renderProducts);
-sortSelect.addEventListener("change", renderProducts);
+    searchInput.addEventListener("input", renderProducts);
+    categoryFilter.addEventListener("change", renderProducts);
+    sortSelect.addEventListener("change", renderProducts);
 
-window.addToCart = async function(productId) {
-  if (!currentUser) {
-    alert("Please login to add to cart.");
-    return location.href = "login.html";
-  }
-  const product = products.find(p => p.id === productId);
-  const cartRef = doc(db, `users/${currentUser.uid}/cart`, productId);
-  const existing = await getDoc(cartRef);
-  if (existing.exists()) {
-    showPopup("Already in cart.");
-  } else {
-    await setDoc(cartRef, { ...product, addedAt: new Date() });
-    showPopup("Added to cart!");
-  }
-}
+    window.addToCart = async function(productId) {
+      if (!currentUser) {
+        alert("Please login to add to cart.");
+        return location.href = "login.html";
+      }
+      try {
+        const product = products.find(p => p.id === productId);
+        const cartRef = doc(db, `users/${currentUser.uid}/cart`, productId);
+        const existing = await getDoc(cartRef);
 
-window.buyProduct = function(productId) {
-  if (!currentUser) {
-    alert("Please login to buy this product.");
-    return location.href = "login.html";
-  }
-  sessionStorage.setItem("selectedProductId", productId);
-  location.href = "checkout.html";
-}
+        if (existing.exists()) {
+          const currentQty = existing.data().quantity || 1;
+          await setDoc(cartRef, {
+            ...product,
+            quantity: currentQty + 1,
+            totalPrice: (currentQty + 1) * product.price,
+            addedAt: new Date()
+          });
+          showPopup("Increased quantity in cart.");
+        } else {
+          await setDoc(cartRef, {
+            ...product,
+            quantity: 1,
+            totalPrice: product.price,
+            addedAt: new Date()
+          });
+          showPopup("Added to cart!");
+        }
+      } catch (error) {
+        console.error("Cart error:", error);
+        showPopup("Something went wrong.");
+      }
+    }
 
-window.goToCart = function() {
-  if (!currentUser) {
-    alert("Please login to view your cart.");
-    return location.href = "login.html";
-  }
-  location.href = "cart.html";
-}
+    window.buyProduct = function(productId) {
+      if (!currentUser) {
+        alert("Please login to buy this product.");
+        return location.href = "login.html";
+      }
+      sessionStorage.setItem("selectedProductId", productId);
+      location.href = "checkout.html";
+    }
 
-loadProducts();
+    window.goToCart = function() {
+      if (!currentUser) {
+        alert("Please login to view your cart.");
+        return location.href = "login.html";
+      }
+      location.href = "cart.html";
+    }
 
+    loadProducts();
   </script>
 </body>
 </html>
