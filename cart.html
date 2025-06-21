@@ -1,286 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Cart | Raghuvanshi Health Care</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cart</title>
   <style>
-    :root {
-      --bg-color: #f4f6f8;
-      --card-bg: #ffffff;
-      --primary: #1976d2;
-      --danger: #e53935;
-      --shadow: 0 4px 12px rgba(0,0,0,0.1);
-      --radius: 16px;
-      --font: 'Segoe UI', sans-serif;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: var(--bg-color);
-      font-family: var(--font);
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      color: #222;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f3f4f6;
+      padding-bottom: 180px;
     }
 
     .cart-container {
-      max-width: 1000px;
-      margin: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+      max-width: 900px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     }
 
-    .cart-card {
-      background: var(--card-bg);
-      box-shadow: var(--shadow);
-      border-radius: var(--radius);
-      padding: 16px;
+    .cart-header {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #1976d2;
+    }
+
+    .cart-items {
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
+      flex-direction: column;
       gap: 16px;
     }
 
-    .cart-img {
-      flex: 0 0 120px;
-      height: 120px;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .cart-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .cart-details {
-      flex: 1;
+    .cart-item {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+      padding: 12px 0;
+      animation: fadeIn 0.4s ease-in-out;
     }
 
-    .cart-title {
+    .cart-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .item-info {
+      flex: 1;
+      margin-left: 20px;
+    }
+
+    .item-name {
       font-size: 18px;
       font-weight: 600;
     }
 
-    .cart-price {
-      font-size: 16px;
-      color: var(--primary);
+    .item-price,
+    .item-subtotal {
+      font-size: 15px;
+      color: #555;
+      margin-top: 4px;
     }
 
-    .quantity-controls {
+    .item-controls {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
-    .quantity-controls button {
-      background: var(--primary);
+    .item-controls button {
+      padding: 6px 10px;
+      background: #1976d2;
       color: white;
       border: none;
-      padding: 5px 10px;
-      font-size: 16px;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
+      transition: background 0.3s;
     }
 
-    .quantity-controls span {
-      min-width: 24px;
-      text-align: center;
-      font-weight: bold;
+    .item-controls button:hover {
+      background: #145ca7;
     }
 
-    .cart-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .remove-btn {
-      background: var(--danger);
-    }
-
-    .remove-btn, .checkout-btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-weight: 500;
-      cursor: pointer;
-    }
-
-    .checkout-btn { background: var(--primary); }
-
-    .cart-summary {
-      background: var(--card-bg);
-      box-shadow: var(--shadow);
-      border-radius: var(--radius);
+    .sticky-summary {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: white;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
       padding: 20px;
-      margin-top: 20px;
+      z-index: 1000;
     }
 
-    .summary-title {
-      font-size: 20px;
-      margin-bottom: 16px;
-    }
-
-    .summary-detail {
+    .summary-details {
+      max-width: 900px;
+      margin: auto;
       display: flex;
       justify-content: space-between;
-      margin-bottom: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .summary-total {
-      font-size: 18px;
-      font-weight: bold;
-      color: var(--primary);
+    .checkout-btn {
+      padding: 10px 20px;
+      background: #2e7d32;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .checkout-btn:hover {
+      background: #256429;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      right: 20px;
+      background: #323232;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 6px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @media (max-width: 600px) {
-      .cart-card {
+      .cart-item {
         flex-direction: column;
         align-items: flex-start;
       }
-      .cart-img {
-        width: 100%;
-        height: 180px;
+
+      .item-controls {
+        justify-content: start;
       }
-      .cart-actions {
-        width: 100%;
+
+      .summary-details {
         flex-direction: column;
-      }
-      .checkout-btn, .remove-btn {
-        width: 100%;
+        align-items: flex-start;
       }
     }
   </style>
 </head>
 <body>
 
-  <h1>🛒 Your Shopping Cart</h1>
+<div class="cart-container">
+  <div class="cart-header">Your Shopping Cart</div>
+  <div id="cartItems" class="cart-items"></div>
 
-  <div class="cart-container" id="cart-container">
-    <!-- Products will be added here -->
+  <div style="margin-top: 25px;">
+    <label for="promoCode"><strong>Promo Code</strong></label><br>
+    <input type="text" id="promoCode" placeholder="Enter code e.g. SAVE10" style="padding: 8px; margin-top: 8px; width: 60%; max-width: 300px;" />
+    <button onclick="applyPromoCode()" style="padding: 8px 12px; background: #1976d2; color: white; border: none; border-radius: 4px; margin-left: 10px;">Apply</button>
+    <div id="promoStatus" style="margin-top: 8px; color: green;"></div>
   </div>
+</div>
 
-  <div class="cart-summary" id="cart-summary" style="display:none;">
-    <div class="summary-title">🧾 Order Summary</div>
-    <div class="summary-detail">
-      <span>Items Total:</span>
-      <span id="items-total">₹0</span>
-    </div>
-    <div class="summary-detail">
-      <span>Delivery Charges:</span>
-      <span>Free</span>
-    </div>
-    <div class="summary-detail summary-total">
-      <span>Total Amount:</span>
-      <span id="grand-total">₹0</span>
-    </div>
-    <button class="checkout-btn" style="margin-top: 20px; width: 100%;">Proceed to Checkout</button>
+<!-- Sticky Checkout Bar -->
+<div class="sticky-summary">
+  <div class="summary-details">
+    <div><strong>Total:</strong> ₹<span id="cartTotal">0</span></div>
+    <div><strong>Discount:</strong> ₹<span id="discountAmount">0</span></div>
+    <div><strong>Final Total:</strong> ₹<span id="finalTotal">0</span></div>
+    <button class="checkout-btn" onclick="goToCheckout()">Proceed to Checkout</button>
   </div>
+</div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
-      authDomain: "store-471f1.firebaseapp.com",
-      projectId: "store-471f1",
-      storageBucket: "store-471f1.appspot.com",
-      messagingSenderId: "619523242611",
-      appId: "1:619523242611:web:YOUR_APP_ID"
-    };
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+<script>
+  const firebaseConfig = {
+    
+  };
+  firebase.initializeApp(firebaseConfig);
 
-    const cartContainer = document.getElementById("cart-container");
-    const cartSummary = document.getElementById("cart-summary");
-    const totalText = document.getElementById("items-total");
-    const grandText = document.getElementById("grand-total");
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  let currentUser = null;
 
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        alert("Please log in to access your cart.");
-        window.location.href = "login.html";
+  let total = 0;
+  let appliedDiscount = 0;
+  let appliedCode = null;
+
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      alert("Please log in to view your cart.");
+      window.location.href = "login.html";
+    } else {
+      currentUser = user;
+      loadCartItems();
+    }
+  });
+
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
+  }
+
+  async function loadCartItems() {
+    const cartRef = db.collection("users").doc(currentUser.uid).collection("cart");
+    const cartItemsContainer = document.getElementById("cartItems");
+    cartItemsContainer.innerHTML = '';
+    total = 0;
+
+    const snapshot = await cartRef.get();
+    if (snapshot.empty) {
+      cartItemsContainer.innerHTML = `<p>Your cart is empty.</p>`;
+      document.querySelector(".sticky-summary").style.display = 'none';
+      return;
+    }
+
+    document.querySelector(".sticky-summary").style.display = 'block';
+
+    snapshot.forEach(doc => {
+      const item = doc.data();
+      const subtotal = item.price * item.quantity;
+      total += subtotal;
+
+      const itemDiv = document.createElement("div");
+      itemDiv.className = "cart-item";
+      itemDiv.innerHTML = `
+        <img src="${item.image}" alt="${item.name}" />
+        <div class="item-info">
+          <div class="item-name">${item.name}</div>
+          <div class="item-price">₹${item.price} × ${item.quantity}</div>
+          <div class="item-subtotal">Subtotal: ₹${subtotal.toFixed(2)}</div>
+        </div>
+        <div class="item-controls">
+          <button onclick="updateQuantity('${doc.id}', ${item.quantity - 1})">−</button>
+          <span>${item.quantity}</span>
+          <button onclick="updateQuantity('${doc.id}', ${item.quantity + 1})">+</button>
+          <button onclick="confirmRemove('${doc.id}')">Remove</button>
+        </div>
+      `;
+      cartItemsContainer.appendChild(itemDiv);
+    });
+
+    document.getElementById("cartTotal").textContent = total.toFixed(2);
+    updateFinalTotal();
+  }
+
+  async function updateQuantity(itemId, newQty) {
+    if (newQty < 1) return;
+    await db.collection("users").doc(currentUser.uid).collection("cart").doc(itemId).update({
+      quantity: newQty
+    });
+    showToast("Quantity updated");
+    loadCartItems();
+  }
+
+  function confirmRemove(itemId) {
+    if (confirm("Are you sure you want to remove this item?")) {
+      removeItem(itemId);
+    }
+  }
+
+  async function removeItem(itemId) {
+    await db.collection("users").doc(currentUser.uid).collection("cart").doc(itemId).delete();
+    showToast("Item removed");
+    loadCartItems();
+  }
+
+  async function applyPromoCode() {
+    const code = document.getElementById("promoCode").value.trim().toUpperCase();
+    const promoStatus = document.getElementById("promoStatus");
+
+    if (!code) return;
+
+    try {
+      const docRef = db.collection("promoCodes").doc(code);
+      const doc = await docRef.get();
+
+      if (!doc.exists) {
+        appliedDiscount = 0;
+        appliedCode = null;
+        promoStatus.textContent = "❌ Invalid promo code";
+        promoStatus.style.color = "red";
+        updateFinalTotal();
+        showToast("Promo code invalid");
         return;
       }
 
-      const userRef = db.collection("users").doc(user.uid);
+      const promo = doc.data();
+      const now = new Date();
 
-      userRef.onSnapshot(doc => {
-        const data = doc.data();
-        const cart = data?.cart || {};
-        cartContainer.innerHTML = "";
-        let total = 0;
+      if (promo.expires && promo.expires.toDate() < now) {
+        promoStatus.textContent = "⚠ Promo code expired";
+        promoStatus.style.color = "orange";
+        appliedDiscount = 0;
+        appliedCode = null;
+        updateFinalTotal();
+        return;
+      }
 
-        const productIds = Object.keys(cart);
-        if (productIds.length === 0) {
-          cartContainer.innerHTML = "<p>Your cart is empty.</p>";
-          cartSummary.style.display = "none";
-          return;
-        }
+      if (promo.type === "flat") {
+        appliedDiscount = promo.amount;
+        promoStatus.textContent = `✔ ${promo.code} applied: ₹${promo.amount} off`;
+      } else if (promo.type === "percent") {
+        appliedDiscount = (total * promo.amount) / 100;
+        promoStatus.textContent = `✔ ${promo.code} applied: ${promo.amount}% off`;
+      }
 
-        productIds.forEach(productId => {
-          const item = cart[productId];
-          const itemTotal = item.price * item.quantity;
-          total += itemTotal;
+      promoStatus.style.color = "green";
+      appliedCode = promo.code;
+      updateFinalTotal();
+      showToast("Promo applied successfully");
 
-          const card = document.createElement("div");
-          card.className = "cart-card";
-          card.innerHTML = `
-            <div class="cart-img">
-              <img src="${item.image}" alt="${item.name}" />
-            </div>
-            <div class="cart-details">
-              <div class="cart-title">${item.name}</div>
-              <div class="cart-price">₹${item.price}</div>
-              <div class="quantity-controls">
-                <button onclick="updateQty('${productId}', ${item.quantity - 1})">-</button>
-                <span>${item.quantity}</span>
-                <button onclick="updateQty('${productId}', ${item.quantity + 1})">+</button>
-              </div>
-              <div class="cart-actions">
-                <button class="remove-btn" onclick="removeItem('${productId}')">Remove</button>
-                <button class="checkout-btn">Buy Now</button>
-              </div>
-            </div>
-          `;
-          cartContainer.appendChild(card);
-        });
+    } catch (error) {
+      console.error("Error applying promo:", error);
+      promoStatus.textContent = "❌ Failed to apply promo";
+      promoStatus.style.color = "red";
+      showToast("Error validating promo");
+    }
+  }
 
-        totalText.textContent = `₹${total}`;
-        grandText.textContent = `₹${total}`;
-        cartSummary.style.display = "block";
-      });
+  function updateFinalTotal() {
+    const discountElem = document.getElementById("discountAmount");
+    const finalTotalElem = document.getElementById("finalTotal");
 
-      window.updateQty = async (productId, qty) => {
-        if (qty <= 0) return removeItem(productId);
-        const updateObj = {};
-        updateObj[`cart.${productId}.quantity`] = qty;
-        await db.collection("users").doc(user.uid).update(updateObj);
-      };
+    discountElem.textContent = appliedDiscount.toFixed(2);
+    finalTotalElem.textContent = (total - appliedDiscount).toFixed(2);
+  }
 
-      window.removeItem = async (productId) => {
-        const updateObj = {};
-        updateObj[`cart.${productId}`] = firebase.firestore.FieldValue.delete();
-        await db.collection("users").doc(user.uid).update(updateObj);
-      };
-    });
-  </script>
+  function goToCheckout() {
+    window.location.href = "checkout.html";
+  }
+</script>
+
 </body>
 </html>
