@@ -253,7 +253,7 @@ body {
         const el = document.createElement('div');
         el.className = 'cart-item';
         el.innerHTML = `
-          <img class="item-image" src="${item.image}" alt="${item.name}" />
+          <img class="item-image" src="\${item.image || 'https://via.placeholder.com/100'}" alt="\${item.name}" onerror="this.src='https://via.placeholder.com/100'" />
           <div class="item-details">
             <div class="item-name">${item.name}</div>
             <div class="item-price">₹${item.price} × ${item.quantity} = ₹${itemTotal}</div>
