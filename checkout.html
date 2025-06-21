@@ -1,46 +1,185 @@
-<!-- checkout.html --><!DOCTYPE html><html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Checkout</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f8f9fa; }
-    h2 { color: #333; }
-    .form-group { margin-bottom: 12px; }
-    input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
-    button { background-color: #1976d2; color: #fff; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; }
-    button:disabled { background-color: #ccc; cursor: not-allowed; }
-    #cart-items p { margin: 5px 0; }
-    #total-amount { font-weight: bold; color: green; }
+
+
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #eef2f5;
+      padding: 20px;
+      animation: fadeIn 0.8s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .checkout-container {
+      max-width: 920px;
+      margin: auto;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease;
+    }
+    .checkout-container:hover {
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #1976d2;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input:focus, textarea:focus {
+      border-color: #1976d2;
+      box-shadow: 0 0 6px rgba(25, 118, 210, 0.3);
+      outline: none;
+    }
+    .btn {
+      width: 100%;
+      padding: 16px;
+      background-color: #1976d2;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+    .btn:hover {
+      background-color: #125ea2;
+      transform: scale(1.01);
+    }
+    .cart-items {
+      background-color: #f9fafb;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      animation: slideInUp 0.6s ease-in-out;
+    }
+    .cart-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 16px;
+    }
+    .cart-item:last-child {
+      border-bottom: none;
+    }
+    .total-amount {
+      font-weight: bold;
+      font-size: 20px;
+      color: #2e7d32;
+      text-align: right;
+      margin-bottom: 20px;
+    }
+    @keyframes slideInUp {
+      from {
+        transform: translateY(40px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }/* Enhanced alert popup styles */
+.custom-popup {
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+.custom-popup.success {
+  border-color: #2e7d32;
+  color: #2e7d32;
+}
+.custom-popup.error {
+  border-color: #d32f2f;
+  color: #d32f2f;
+}
+
+@media (max-width: 600px) {
+  .checkout-container {
+    padding: 20px;
+  }
+  .btn {
+    font-size: 16px;
+    padding: 14px;
+  }
+}
+
   </style>
 </head>
 <body>
-  <h2>Checkout</h2>  <div id="cart-items"></div>
-  <h3>Total: ₹<span id="total-amount">0</span></h3>  <form id="checkout-form">
-    <div class="form-group">
-      <input type="text" id="fullName" placeholder="Full Name" required />
-    </div>
-    <div class="form-group">
-      <input type="tel" id="phone" placeholder="Phone Number (10 digits)" required />
-      <small id="phoneError" style="color:red;"></small>
-    </div>
-    <div class="form-group">
-      <input type="text" id="address" placeholder="Address" required />
-    </div>
-    <div class="form-group">
-      <input type="text" id="pincode" placeholder="Pincode" required />
-    </div>
-    <div class="form-group">
-      <input type="text" id="city" placeholder="City" required />
-    </div>
-    <div class="form-group">
-      <input type="text" id="state" placeholder="State" required />
-    </div>
-    <div class="form-group">
-      <textarea id="notes" placeholder="Any notes (optional)"></textarea>
-    </div>
-    <button type="submit" id="placeOrderBtn">Place Order</button>
-  </form>  <script type="module">
+  <!-- HTML and JS remain unchanged -->
+</body>
+</html>
+
+  </style>
+</head>
+<body>
+  <div class="checkout-container">
+    <h2>Checkout</h2>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="total-amount">Total: ₹<span id="total-amount">0</span></div>
+    <form id="checkout-form">
+      <div class="form-group">
+        <input type="text" id="fullName" placeholder="Full Name" required />
+      </div>
+      <div class="form-group">
+        <input type="tel" id="phone" placeholder="Phone Number (10 digits)" required />
+        <small id="phoneError" style="color:red;"></small>
+      </div>
+      <div class="form-group">
+        <input type="text" id="address" placeholder="Address" required />
+      </div>
+      <div class="form-group">
+        <input type="text" id="pincode" placeholder="Pincode" required />
+      </div>
+      <div class="form-group">
+        <input type="text" id="city" placeholder="City" required />
+      </div>
+      <div class="form-group">
+        <input type="text" id="state" placeholder="State" required />
+      </div>
+      <div class="form-group">
+        <textarea id="notes" placeholder="Any notes (optional)"></textarea>
+      </div>
+      <button type="submit" class="btn" id="placeOrderBtn">Place Order</button>
+    </form>
+  </div>  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import {
       getFirestore, collection, getDocs, addDoc, deleteDoc, doc, serverTimestamp
@@ -89,7 +228,7 @@
       total = 0;
       cartItems = [];
 
-      cartContainer.innerHTML = "";
+      cartContainer.innerHTML = "<h3>Cart Items:</h3>";
 
       snapshot.forEach((docSnap) => {
         const item = docSnap.data();
@@ -97,7 +236,8 @@
         cartItems.push({ ...item, id: docSnap.id });
 
         const div = document.createElement("div");
-        div.innerHTML = `<p><strong>${item.name}</strong> (x${item.quantity || 1}) — ₹${item.price}</p>`;
+        div.className = "cart-item";
+        div.innerHTML = `<strong>${item.name}</strong> (x${item.quantity || 1}) — ₹${item.price}`;
         cartContainer.appendChild(div);
       });
 
@@ -175,7 +315,7 @@
         for (const item of cartItems) {
           await deleteDoc(doc(db, "users", currentUser.uid, "cart", item.id));
         }
-        alert("\u2705 Order placed successfully!");
+        alert("✅ Order placed successfully!");
         window.location.href = "order-success.html";
       } catch (err) {
         console.error("Order error:", err);
