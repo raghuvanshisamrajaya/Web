@@ -1,0 +1,186 @@
+<!-- checkout.html --><!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f8f9fa; }
+    h2 { color: #333; }
+    .form-group { margin-bottom: 12px; }
+    input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+    button { background-color: #1976d2; color: #fff; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; }
+    button:disabled { background-color: #ccc; cursor: not-allowed; }
+    #cart-items p { margin: 5px 0; }
+    #total-amount { font-weight: bold; color: green; }
+  </style>
+</head>
+<body>
+  <h2>Checkout</h2>  <div id="cart-items"></div>
+  <h3>Total: ₹<span id="total-amount">0</span></h3>  <form id="checkout-form">
+    <div class="form-group">
+      <input type="text" id="fullName" placeholder="Full Name" required />
+    </div>
+    <div class="form-group">
+      <input type="tel" id="phone" placeholder="Phone Number (10 digits)" required />
+      <small id="phoneError" style="color:red;"></small>
+    </div>
+    <div class="form-group">
+      <input type="text" id="address" placeholder="Address" required />
+    </div>
+    <div class="form-group">
+      <input type="text" id="pincode" placeholder="Pincode" required />
+    </div>
+    <div class="form-group">
+      <input type="text" id="city" placeholder="City" required />
+    </div>
+    <div class="form-group">
+      <input type="text" id="state" placeholder="State" required />
+    </div>
+    <div class="form-group">
+      <textarea id="notes" placeholder="Any notes (optional)"></textarea>
+    </div>
+    <button type="submit" id="placeOrderBtn">Place Order</button>
+  </form>  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore, collection, getDocs, addDoc, deleteDoc, doc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import {
+      getAuth, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
+      authDomain: "store-471f1.firebaseapp.com",
+      projectId: "store-471f1",
+      storageBucket: "store-471f1.appspot.com",
+      messagingSenderId: "619523242611",
+      appId: "1:619523242611:web:yourappid"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const cartContainer = document.getElementById("cart-items");
+    const totalAmountSpan = document.getElementById("total-amount");
+    const checkoutForm = document.getElementById("checkout-form");
+    const phoneInput = document.getElementById("phone");
+    const phoneError = document.getElementById("phoneError");
+    const placeOrderBtn = document.getElementById("placeOrderBtn");
+
+    let currentUser = null;
+    let cartItems = [];
+    let total = 0;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        alert("Please log in first.");
+        window.location.href = "login.html";
+        return;
+      }
+      currentUser = user;
+      await loadCart();
+    });
+
+    async function loadCart() {
+      const cartRef = collection(db, "users", currentUser.uid, "cart");
+      const snapshot = await getDocs(cartRef);
+      total = 0;
+      cartItems = [];
+
+      cartContainer.innerHTML = "";
+
+      snapshot.forEach((docSnap) => {
+        const item = docSnap.data();
+        total += item.price * (item.quantity || 1);
+        cartItems.push({ ...item, id: docSnap.id });
+
+        const div = document.createElement("div");
+        div.innerHTML = `<p><strong>${item.name}</strong> (x${item.quantity || 1}) — ₹${item.price}</p>`;
+        cartContainer.appendChild(div);
+      });
+
+      totalAmountSpan.innerText = total;
+    }
+
+    phoneInput.addEventListener("input", () => {
+      const phone = phoneInput.value.trim();
+      if (!/^\d{10}$/.test(phone)) {
+        phoneError.textContent = "Phone must be exactly 10 digits.";
+        placeOrderBtn.disabled = true;
+      } else {
+        phoneError.textContent = "";
+        placeOrderBtn.disabled = false;
+      }
+    });
+
+    document.getElementById("pincode").addEventListener("blur", async () => {
+      const pincode = document.getElementById("pincode").value.trim();
+      if (!/^\d{6}$/.test(pincode)) {
+        alert("Pincode must be 6 digits.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+        const data = await res.json();
+
+        if (data[0].Status === "Success") {
+          const postOffice = data[0].PostOffice[0];
+          document.getElementById("state").value = postOffice.State;
+          document.getElementById("city").value = postOffice.District;
+        } else {
+          alert("Invalid Pincode. Please enter a valid one.");
+        }
+      } catch (err) {
+        console.error("Pincode API error:", err);
+        alert("Error validating pincode. Try again.");
+      }
+    });
+
+    checkoutForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (cartItems.length === 0) {
+        alert("Cart is empty!");
+        return;
+      }
+
+      const fullName = document.getElementById("fullName").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const pincode = document.getElementById("pincode").value.trim();
+      const city = document.getElementById("city").value.trim();
+      const state = document.getElementById("state").value.trim();
+      const notes = document.getElementById("notes").value.trim();
+
+      const orderData = {
+        uid: currentUser.uid,
+        userEmail: currentUser.email,
+        fullName,
+        phone,
+        address,
+        pincode,
+        city,
+        state,
+        notes,
+        items: cartItems,
+        totalAmount: total,
+        status: "pending",
+        createdAt: serverTimestamp()
+      };
+
+      try {
+        await addDoc(collection(db, "orders"), orderData);
+        for (const item of cartItems) {
+          await deleteDoc(doc(db, "users", currentUser.uid, "cart", item.id));
+        }
+        alert("\u2705 Order placed successfully!");
+        window.location.href = "order-success.html";
+      } catch (err) {
+        console.error("Order error:", err);
+        alert("Something went wrong. Please try again.");
+      }
+    });
+  </script></body>
+</html>
