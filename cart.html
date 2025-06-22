@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,193 +15,153 @@
       --bg-color: #f2f4f7;
       --card-bg: #ffffff;
       --shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    }* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: var(--bg-color);
-  color: #333;
-}
-
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-}
-
-.cart-header {
-  font-size: 2.4rem;
-  font-weight: bold;
-  margin-bottom: 32px;
-  color: var(--primary-color);
-  text-align: center;
-  animation: slideIn 0.8s ease;
-}
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.cart-items {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.cart-item {
-  display: flex;
-  gap: 20px;
-  background-color: var(--card-bg);
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-  padding: 20px;
-  align-items: center;
-  flex-wrap: wrap;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.item-image {
-  flex-shrink: 0;
-  width: 100px;
-  height: 100px;
-  border-radius: 10px;
-  object-fit: contain;
-  border: 1px solid #ccc;
-  background-color: #fff;
-}
-
-.item-details {
-  flex: 1;
-}
-
-.item-name {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.item-price {
-  color: #666;
-  margin: 4px 0 12px;
-}
-
-.item-controls {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.item-controls button {
-  padding: 8px 16px;
-  background-color: var(--primary-color);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s;
-}
-
-.item-controls button:hover {
-  background-color: #125a9e;
-  transform: scale(1.05);
-}
-
-.cart-summary {
-  margin-top: 40px;
-  background-color: #fff;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-  text-align: center;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.cart-summary h3 {
-  margin: 0 0 16px;
-  font-size: 1.6rem;
-}
-
-.cart-summary .total {
-  font-size: 1.6rem;
-  font-weight: bold;
-  color: var(--success-color);
-  margin-bottom: 12px;
-}
-
-.promo-section {
-  margin-bottom: 20px;
-}
-
-.promo-section input {
-  padding: 10px;
-  width: 60%;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  margin-right: 10px;
-}
-
-.promo-section button {
-  padding: 10px 16px;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.checkout-btn, .clear-btn {
-  padding: 14px 28px;
-  background-color: var(--success-color);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  margin: 10px;
-}
-
-.clear-btn {
-  background-color: var(--danger-color);
-}
-
-.checkout-btn:hover, .clear-btn:hover {
-  transform: scale(1.05);
-}
-
-@media (max-width: 768px) {
-  .cart-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .item-image {
-    width: 100%;
-    height: auto;
-  }
-
-  .checkout-btn, .clear-btn {
-    width: 100%;
-  }
-
-  .promo-section input {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-}
-
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      color: #333;
+    }
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
+    .cart-header {
+      font-size: 2.4rem;
+      font-weight: bold;
+      margin-bottom: 32px;
+      color: var(--primary-color);
+      text-align: center;
+      animation: slideIn 0.8s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .cart-items {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .cart-item {
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .item-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .item-price {
+      color: #666;
+      margin: 4px 0 12px;
+    }
+    .item-controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .item-controls button {
+      padding: 8px 16px;
+      background-color: var(--primary-color);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s;
+    }
+    .item-controls button:hover {
+      background-color: #125a9e;
+      transform: scale(1.05);
+    }
+    .cart-summary {
+      margin-top: 40px;
+      background-color: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cart-summary h3 {
+      margin: 0 0 16px;
+      font-size: 1.6rem;
+    }
+    .cart-summary .total {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: var(--success-color);
+      margin-bottom: 12px;
+    }
+    .promo-section {
+      margin-bottom: 20px;
+    }
+    .promo-section input {
+      padding: 10px;
+      width: 60%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-right: 10px;
+    }
+    .promo-section button {
+      padding: 10px 16px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #promoMessage {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    #availablePromos {
+      margin-top: 20px;
+      text-align: left;
+    }
+    #availablePromos ul {
+      padding-left: 20px;
+    }
+    .checkout-btn, .clear-btn {
+      padding: 14px 28px;
+      background-color: var(--success-color);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      margin: 10px;
+    }
+    .clear-btn {
+      background-color: var(--danger-color);
+    }
+    .checkout-btn:hover, .clear-btn:hover {
+      transform: scale(1.05);
+    }
+    @media (max-width: 768px) {
+      .checkout-btn, .clear-btn {
+        width: 100%;
+      }
+      .promo-section input {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -213,12 +174,18 @@ body {
       <div class="promo-section">
         <input type="text" id="promoCode" placeholder="Enter promo code">
         <button onclick="applyPromo()">Apply</button>
-        <div id="promoMessage" style="margin-top: 10px; color: green;"></div>
+        <div id="promoMessage"></div>
+        <div id="availablePromos">
+          <strong>Available Promo Codes:</strong>
+          <ul id="promoList"></ul>
+        </div>
       </div>
       <button class="checkout-btn" onclick="goToCheckout()">Proceed to Checkout</button>
       <button class="clear-btn" onclick="clearCart()">Clear Cart</button>
     </div>
-  </div>  <script>
+  </div>
+
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
       authDomain: "store-471f1.firebaseapp.com",
@@ -240,6 +207,7 @@ body {
       const snapshot = await db.collection(`users/${user.uid}/cart`).get();
       cartData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       renderCart();
+      loadAvailablePromos();
     });
 
     function renderCart() {
@@ -247,21 +215,18 @@ body {
       let total = 0;
       cartItemsEl.innerHTML = '';
 
-      cartData.forEach((item, index) => {
+      cartData.forEach((item) => {
         const itemTotal = item.price * item.quantity;
         total += itemTotal;
         const el = document.createElement('div');
         el.className = 'cart-item';
         el.innerHTML = `
-          <img class="item-image" src="\${item.image || 'https://via.placeholder.com/100'}" alt="\${item.name}" onerror="this.src='https://via.placeholder.com/100'" />
-          <div class="item-details">
-            <div class="item-name">${item.name}</div>
-            <div class="item-price">₹${item.price} × ${item.quantity} = ₹${itemTotal}</div>
-            <div class="item-controls">
-              <button onclick="changeQty('${item.id}', -1)">-</button>
-              <button onclick="changeQty('${item.id}', 1)">+</button>
-              <button onclick="removeItem('${item.id}')">Remove</button>
-            </div>
+          <div class="item-name">${item.name}</div>
+          <div class="item-price">₹${item.price} × ${item.quantity} = ₹${itemTotal}</div>
+          <div class="item-controls">
+            <button onclick="changeQty('${item.id}', -1)">-</button>
+            <button onclick="changeQty('${item.id}', 1)">+</button>
+            <button onclick="removeItem('${item.id}')">Remove</button>
           </div>
         `;
         cartItemsEl.appendChild(el);
@@ -314,8 +279,30 @@ body {
       renderCart();
     }
 
+    async function loadAvailablePromos() {
+      const promoListEl = document.getElementById('promoList');
+      promoListEl.innerHTML = '';
+      try {
+        const promoSnapshot = await db.collection('promoCodes').get();
+        if (promoSnapshot.empty) {
+          promoListEl.innerHTML = '<li>No active promo codes available.</li>';
+          return;
+        }
+        promoSnapshot.forEach(doc => {
+          const data = doc.data();
+          const li = document.createElement('li');
+          li.textContent = `${doc.id} - ₹${data.discountAmount || 0} off`;
+          promoListEl.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Error loading promos:', error);
+        promoListEl.innerHTML = '<li>Error loading promo codes.</li>';
+      }
+    }
+
     function goToCheckout() {
       window.location.href = 'checkout.html';
     }
-  </script></body>
+  </script>
+</body>
 </html>
