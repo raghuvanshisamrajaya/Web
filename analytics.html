@@ -1,96 +1,144 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Analytics Dashboard</title>
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
-
-  <!-- Chart.js -->
+  <title>Admin Analytics</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
   <style>
-    .card {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .card:hover {
-      transform: scale(1.03);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    }
+    :root {
+      --bg: #f0f4f8;
+      --primary: #1976d2;
+      --accent: #42a5f5;
+      --card-bg: #ffffff;
+      --text-dark: #333;
+    }* {
+  box-sizing: border-box;
+}
 
-    .fade-in {
-      animation: fadeInUp 0.6s ease-in-out forwards;
-      opacity: 0;
-      transform: translateY(20px);
-    }
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text-dark);
+  line-height: 1.6;
+}
 
-    @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+h1 {
+  text-align: center;
+  margin: 2rem 1rem 1rem;
+  font-size: 2.2rem;
+}
+
+.filter-container {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+select {
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  background-color: #fff;
+  transition: all 0.3s ease;
+}
+
+select:hover {
+  border-color: var(--primary);
+}
+
+.dashboard {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.6s ease forwards;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary);
+}
+
+.card h2 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+canvas {
+  display: block;
+  width: 90%;
+  max-width: 900px;
+  margin: 2rem auto;
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.6rem;
+    margin: 1.5rem 1rem 1rem;
+  }
+
+  .card h2 {
+    font-size: 2rem;
+  }
+}
+
   </style>
 </head>
-<body class="bg-gradient-to-br from-white via-blue-50 to-gray-100 min-h-screen p-6">
+<body>
+  <h1>📊 Admin Analytics Dashboard</h1>  <div class="filter-container">
+    <label for="timeFilter">📅 Filter: </label>
+    <select id="timeFilter">
+      <option value="all">All Time</option>
+      <option value="today">Today</option>
+      <option value="week">This Week</option>
+      <option value="month">This Month</option>
+    </select>
+  </div>  <div class="dashboard">
+    <div class="card"><h3>Total Users</h3><h2 id="userCount">--</h2></div>
+    <div class="card"><h3>Total Orders</h3><h2 id="orderCount">--</h2></div>
+    <div class="card"><h3>Total Products</h3><h2 id="productCount">--</h2></div>
+    <div class="card"><h3>Total Services</h3><h2 id="serviceCount">--</h2></div>
+    <div class="card"><h3>Total Bookings</h3><h2 id="bookingCount">--</h2></div>
+  </div><canvas id="analyticsChart"></canvas> <canvas id="trendChart"></canvas> <canvas id="categoryChart"></canvas>
 
-  <div class="max-w-6xl mx-auto">
-    <h1 class="text-4xl font-bold text-center text-blue-900 mb-10 drop-shadow fade-in">📊 Admin Analytics</h1>
-
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10 fade-in">
-      <div class="card bg-blue-100 rounded-xl shadow p-4 text-center">
-        <h2 class="text-sm text-gray-700">Users</h2>
-        <p id="totalUsers" class="text-2xl font-bold text-blue-900">0</p>
-      </div>
-      <div class="card bg-green-100 rounded-xl shadow p-4 text-center">
-        <h2 class="text-sm text-gray-700">Services</h2>
-        <p id="totalServices" class="text-2xl font-bold text-green-900">0</p>
-      </div>
-      <div class="card bg-purple-100 rounded-xl shadow p-4 text-center">
-        <h2 class="text-sm text-gray-700">Products</h2>
-        <p id="totalProducts" class="text-2xl font-bold text-purple-900">0</p>
-      </div>
-      <div class="card bg-pink-100 rounded-xl shadow p-4 text-center">
-        <h2 class="text-sm text-gray-700">Bookings</h2>
-        <p id="totalBookings" class="text-2xl font-bold text-pink-900">0</p>
-      </div>
-    </div>
-
-    <!-- Filter Dropdown -->
-    <div class="flex justify-end mb-6 fade-in">
-      <select id="filter" class="p-2 rounded-md border shadow bg-white focus:ring focus:outline-none transition-all">
-        <option value="month">Monthly</option>
-        <option value="week">Weekly</option>
-        <option value="day">Daily</option>
-      </select>
-    </div>
-
-    <!-- Charts -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 fade-in">
-      <div class="card bg-white p-6 rounded-xl shadow">
-        <h2 class="text-lg font-semibold mb-4 text-gray-700">📈 Bookings Over Time</h2>
-        <canvas id="lineChart" height="300"></canvas>
-      </div>
-      <div class="card bg-white p-6 rounded-xl shadow">
-        <h2 class="text-lg font-semibold mb-4 text-gray-700">🥧 Service Distribution</h2>
-        <canvas id="pieChart" height="300"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- Firebase + Charts Script -->
   <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
-    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js';
-    import { getFirestore, collection, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
@@ -103,105 +151,157 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getFirestore(app);
+    const auth = getAuth(app);
 
-    const lineCtx = document.getElementById('lineChart').getContext('2d');
-    const pieCtx = document.getElementById('pieChart').getContext('2d');
-    let lineChart, pieChart;
+    const userCount = document.getElementById("userCount");
+    const orderCount = document.getElementById("orderCount");
+    const productCount = document.getElementById("productCount");
+    const serviceCount = document.getElementById("serviceCount");
+    const bookingCount = document.getElementById("bookingCount");
+    const filter = document.getElementById("timeFilter");
 
-    function groupByDate(docs) {
-      const map = {};
-      docs.forEach(doc => {
-        const date = new Date(doc.data().date).toLocaleDateString('en-GB');
-        map[date] = (map[date] || 0) + 1;
-      });
-      return Object.entries(map).map(([date, count]) => ({ date, count }));
-    }
+    const getTimeRange = (type) => {
+      const now = new Date();
+      if (type === "today") {
+        now.setHours(0, 0, 0, 0);
+        return Timestamp.fromDate(now);
+      }
+      if (type === "week") {
+        const weekAgo = new Date(now);
+        weekAgo.setDate(now.getDate() - 7);
+        return Timestamp.fromDate(weekAgo);
+      }
+      if (type === "month") {
+        const monthAgo = new Date(now);
+        monthAgo.setMonth(now.getMonth() - 1);
+        return Timestamp.fromDate(monthAgo);
+      }
+      return null;
+    };
 
-    function groupByCategory(docs) {
-      const map = {};
-      docs.forEach(doc => {
-        const cat = doc.data().category || 'Uncategorized';
-        map[cat] = (map[cat] || 0) + 1;
-      });
-      return Object.entries(map).map(([name, value]) => ({ name, value }));
-    }
+    const countDocs = async (col, dateFilter) => {
+      const ref = collection(db, col);
+      const q = dateFilter ? query(ref, where("createdAt", ">=", dateFilter)) : ref;
+      const snap = await getDocs(q);
+      return snap.size;
+    };
 
-    function renderCharts(bookingData, serviceData) {
-      const labels = bookingData.map(b => b.date);
-      const dataPoints = bookingData.map(b => b.count);
+    const fetchAllAnalytics = async (filterValue = "all") => {
+      const time = getTimeRange(filterValue);
+      const [users, orders, products, services] = await Promise.all([
+        countDocs("users", time),
+        countDocs("orders", time),
+        countDocs("products", time),
+        countDocs("services", time),
+      ]);
 
-      if (lineChart) lineChart.destroy();
-      if (pieChart) pieChart.destroy();
+      let bookings = 0;
+      const usersSnap = await getDocs(collection(db, "users"));
+      for (const u of usersSnap.docs) {
+        const bookingsCol = collection(db, `users/${u.id}/bookings`);
+        const q = time ? query(bookingsCol, where("createdAt", ">=", time)) : bookingsCol;
+        const bSnap = await getDocs(q);
+        bookings += bSnap.size;
+      }
 
-      lineChart = new Chart(lineCtx, {
-        type: 'line',
+      userCount.textContent = users;
+      orderCount.textContent = orders;
+      productCount.textContent = products;
+      serviceCount.textContent = services;
+      bookingCount.textContent = bookings;
+
+      renderOverviewChart([users, orders, products, services, bookings]);
+      renderTrendChart();
+      renderCategoryChart();
+    };
+
+    const renderOverviewChart = (data) => {
+      new Chart(document.getElementById("analyticsChart"), {
+        type: 'bar',
         data: {
-          labels,
+          labels: ["Users", "Orders", "Products", "Services", "Bookings"],
           datasets: [{
-            label: 'Bookings',
-            data: dataPoints,
-            borderColor: '#3b82f6',
-            backgroundColor: 'rgba(59,130,246,0.2)',
-            tension: 0.3,
-            fill: true
+            label: "Total",
+            data,
+            backgroundColor: ["#42a5f5", "#66bb6a", "#ffa726", "#ab47bc", "#ef5350"],
+            borderRadius: 6
           }]
         },
         options: {
           responsive: true,
-          scales: {
-            y: { beginAtZero: true }
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: "Platform Totals" }
           }
         }
       });
+    };
 
-      pieChart = new Chart(pieCtx, {
-        type: 'pie',
+    const renderTrendChart = () => {
+      const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+      const data = [12, 19, 3, 5, 2, 3, 7];
+      new Chart(document.getElementById("trendChart"), {
+        type: "line",
         data: {
-          labels: serviceData.map(s => s.name),
+          labels,
           datasets: [{
-            data: serviceData.map(s => s.value),
-            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#14b8a6'],
-            borderWidth: 1
+            label: "Bookings (Mock)",
+            data,
+            fill: true,
+            borderColor: "#1976d2",
+            tension: 0.4,
+            backgroundColor: "rgba(25, 118, 210, 0.1)"
           }]
         },
         options: {
-          responsive: true
+          responsive: true,
+          plugins: {
+            title: { display: true, text: "Weekly Booking Trend" }
+          }
         }
       });
-    }
+    };
 
-    async function fetchData() {
-      const [usersSnap, servicesSnap, productsSnap, bookingsSnap] = await Promise.all([
-        getDocs(collection(db, 'users')),
-        getDocs(collection(db, 'services')),
-        getDocs(collection(db, 'products')),
-        getDocs(collection(db, 'bookings'))
-      ]);
+    const renderCategoryChart = async () => {
+      const snap = await getDocs(collection(db, "services"));
+      const counts = {};
+      snap.docs.forEach(doc => {
+        const cat = doc.data().category || "Other";
+        counts[cat] = (counts[cat] || 0) + 1;
+      });
+      const labels = Object.keys(counts);
+      const data = Object.values(counts);
+      new Chart(document.getElementById("categoryChart"), {
+        type: "pie",
+        data: {
+          labels,
+          datasets: [{
+            label: "Categories",
+            data,
+            backgroundColor: ["#66bb6a", "#42a5f5", "#ab47bc", "#ffa726", "#ef5350"]
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: "Service Category Distribution" }
+          }
+        }
+      });
+    };
 
-      document.getElementById('totalUsers').textContent = usersSnap.size;
-      document.getElementById('totalServices').textContent = servicesSnap.size;
-      document.getElementById('totalProducts').textContent = productsSnap.size;
-      document.getElementById('totalBookings').textContent = bookingsSnap.size;
-
-      const bookingsGrouped = groupByDate(bookingsSnap.docs);
-      const servicesGrouped = groupByCategory(servicesSnap.docs);
-
-      renderCharts(bookingsGrouped, servicesGrouped);
-    }
-
-    onAuthStateChanged(auth, async user => {
-      if (!user) return window.location.href = "/login.html";
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (!userDoc.exists() || userDoc.data().role !== 'admin') {
-        alert("Access denied: Admins only.");
-        return window.location.href = "/";
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return location.href = "/login.html";
+      const userSnap = await getDocs(collection(db, "users"));
+      const userDoc = userSnap.docs.find(doc => doc.id === user.uid);
+      if (!userDoc || userDoc.data().role !== "admin") {
+        alert("Access Denied");
+        return location.href = "/";
       }
-      fetchData();
+      fetchAllAnalytics();
     });
 
-    document.getElementById('filter').addEventListener('change', () => fetchData());
-  </script>
-</body>
+    filter.addEventListener("change", () => fetchAllAnalytics(filter.value));
+  </script></body>
 </html>
