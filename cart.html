@@ -8,191 +8,220 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <style>
+    :root {
+      --primary-color: #1976d2;
+      --success-color: #2e7d32;
+      --danger-color: #d32f2f;
+      --bg-color: #f2f4f7;
+      --card-bg: #ffffff;
+      --shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+    * { box-sizing: border-box; }
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      padding: 20px;
       margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      color: #333;
     }
-
-    .cart-container {
-      max-width: 900px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-
+    .container { max-width: 1200px; margin: auto; padding: 20px; }
     .cart-header {
-      font-size: 2rem;
+      font-size: 2.4rem;
       font-weight: bold;
-      margin-bottom: 20px;
-      color: #1976d2;
+      margin-bottom: 32px;
+      color: var(--primary-color);
       text-align: center;
+      animation: slideIn 0.8s ease;
     }
-
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .cart-items { display: flex; flex-direction: column; gap: 24px; }
     .cart-item {
-      border-bottom: 1px solid #ddd;
-      padding: 16px 0;
+      display: flex;
+      gap: 20px;
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeIn 0.5s ease;
     }
-
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .item-image {
+      flex-shrink: 0;
+      width: 100px;
+      height: 100px;
+      border-radius: 10px;
+      object-fit: contain;
+      border: 1px solid #ccc;
+      background-color: #fff;
+    }
+    .item-details { flex: 1; }
     .item-name {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       font-weight: 600;
+      margin-bottom: 4px;
     }
-
-    .item-price {
-      color: #666;
-      margin: 8px 0;
+    .item-price { color: #666; margin: 4px 0 12px; }
+    .item-controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
-
     .item-controls button {
-      padding: 6px 14px;
-      margin-right: 8px;
-      background-color: #1976d2;
-      color: white;
+      padding: 8px 16px;
+      background-color: var(--primary-color);
+      color: #fff;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s;
     }
-
     .item-controls button:hover {
-      background-color: #145a9e;
+      background-color: #125a9e;
+      transform: scale(1.05);
     }
-
     .cart-summary {
-      margin-top: 30px;
+      margin-top: 40px;
+      background-color: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
       text-align: center;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
     }
-
+    .cart-summary h3 {
+      margin: 0 0 16px;
+      font-size: 1.6rem;
+    }
+    .cart-summary .total {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: var(--success-color);
+      margin-bottom: 12px;
+    }
     .promo-section {
-      margin: 20px 0;
+      margin-bottom: 20px;
     }
-
     .promo-section input {
       padding: 10px;
-      border-radius: 6px;
+      width: 60%;
       border: 1px solid #ccc;
-      width: 200px;
+      border-radius: 8px;
+      margin-right: 10px;
     }
-
     .promo-section button {
       padding: 10px 16px;
-      background: #1976d2;
+      background-color: var(--primary-color);
       color: white;
-      border: none;
-      border-radius: 6px;
-      margin-left: 8px;
-      cursor: pointer;
-    }
-
-    .promo-message {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    .total {
-      font-size: 1.5rem;
-      margin-top: 10px;
-      color: #2e7d32;
-    }
-
-    .action-buttons {
-      margin-top: 20px;
-    }
-
-    .action-buttons button {
-      padding: 12px 24px;
-      margin: 10px;
-      font-size: 1rem;
       border: none;
       border-radius: 8px;
       cursor: pointer;
     }
-
-    .checkout-btn {
-      background-color: #2e7d32;
+    .checkout-btn, .clear-btn {
+      padding: 14px 28px;
+      background-color: var(--success-color);
       color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      margin: 10px;
     }
-
-    .clear-btn {
-      background-color: #d32f2f;
-      color: white;
+    .clear-btn { background-color: var(--danger-color); }
+    .checkout-btn:hover, .clear-btn:hover {
+      transform: scale(1.05);
+    }
+    .promo-message {
+      margin-top: 10px;
+      font-size: 0.95rem;
+    }
+    @media (max-width: 768px) {
+      .cart-item { flex-direction: column; align-items: flex-start; }
+      .item-image { width: 100%; height: auto; }
+      .checkout-btn, .clear-btn { width: 100%; }
+      .promo-section input { width: 100%; margin-bottom: 10px; }
     }
   </style>
 </head>
 <body>
-
-  <div class="cart-container">
-    <div class="cart-header">🛒 Your Shopping Cart</div>
-
-    <div id="cartItems"></div>
-
+  <div class="container">
+    <div class="cart-header">🛒 Shopping Cart</div>
+    <div class="cart-items" id="cartItems"></div>
     <div class="cart-summary">
+      <h3>Summary</h3>
+      <div class="total">Total: ₹<span id="cartTotal">0.00</span></div>
       <div class="promo-section">
-        <input type="text" id="promoCode" placeholder="Enter promo code">
+        <input type="text" id="promoCode" placeholder="Enter promo code" oninput="validatePromoLive()">
         <button onclick="applyPromo()">Apply</button>
+        <div id="promoLiveStatus" class="promo-message"></div>
         <div id="promoMessage" class="promo-message"></div>
       </div>
-      <div class="total">Total: ₹<span id="cartTotal">0.00</span></div>
-      <div class="action-buttons">
-        <button class="checkout-btn" onclick="goToCheckout()">Checkout</button>
-        <button class="clear-btn" onclick="clearCart()">Clear Cart</button>
-      </div>
+      <button class="checkout-btn" onclick="goToCheckout()">Proceed to Checkout</button>
+      <button class="clear-btn" onclick="clearCart()">Clear Cart</button>
     </div>
   </div>
 
   <script>
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
       authDomain: "store-471f1.firebaseapp.com",
       projectId: "store-471f1",
       storageBucket: "store-471f1.appspot.com",
       messagingSenderId: "619523242611",
-      appId: "1:619523242611:web:fdfa53044c62f844574806"
+      appId: "1:619523242611:web:fdfa53044c62f844574806",
+      measurementId: "G-16C8MYT70G"
     };
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    let cartData = [];
-    let promoDiscount = 0;
+    let cartData = [], promoDiscount = 0;
 
     auth.onAuthStateChanged(async user => {
-      if (!user) return alert("Please login to see your cart.");
+      if (!user) return alert("Please log in to view your cart.");
       const snapshot = await db.collection(`users/${user.uid}/cart`).get();
       cartData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       renderCart();
     });
 
     function renderCart() {
-      const container = document.getElementById('cartItems');
-      container.innerHTML = '';
+      const cartItemsEl = document.getElementById('cartItems');
       let total = 0;
+      cartItemsEl.innerHTML = '';
 
       cartData.forEach(item => {
         const itemTotal = item.price * item.quantity;
         total += itemTotal;
-
-        const div = document.createElement('div');
-        div.className = 'cart-item';
-        div.innerHTML = `
-          <div class="item-name">${item.name}</div>
-          <div class="item-price">₹${item.price} × ${item.quantity} = ₹${itemTotal}</div>
-          <div class="item-controls">
-            <button onclick="changeQty('${item.id}', -1)">-</button>
-            <button onclick="changeQty('${item.id}', 1)">+</button>
-            <button onclick="removeItem('${item.id}')">Remove</button>
+        const el = document.createElement('div');
+        el.className = 'cart-item';
+        el.innerHTML = `
+          <img class="item-image" src="${item.image || 'https://via.placeholder.com/100'}" />
+          <div class="item-details">
+            <div class="item-name">${item.name}</div>
+            <div class="item-price">₹${item.price} × ${item.quantity} = ₹${itemTotal}</div>
+            <div class="item-controls">
+              <button onclick="changeQty('${item.id}', -1)">-</button>
+              <button onclick="changeQty('${item.id}', 1)">+</button>
+              <button onclick="removeItem('${item.id}')">Remove</button>
+            </div>
           </div>
         `;
-        container.appendChild(div);
+        cartItemsEl.appendChild(el);
       });
 
-      const discounted = Math.max(0, total - promoDiscount);
-      document.getElementById('cartTotal').textContent = discounted.toFixed(2);
+      const discounted = total - promoDiscount;
+      document.getElementById('cartTotal').innerText = discounted.toFixed(2);
     }
 
     async function changeQty(id, delta) {
@@ -207,7 +236,7 @@
 
     async function removeItem(id) {
       await db.doc(`users/${auth.currentUser.uid}/cart/${id}`).delete();
-      cartData = cartData.filter(i => i.id !== id);
+      cartData = cartData.filter(item => item.id !== id);
       renderCart();
     }
 
@@ -219,35 +248,65 @@
       renderCart();
     }
 
+    async function validatePromoLive() {
+      const code = document.getElementById('promoCode').value.trim();
+      const liveMsg = document.getElementById('promoLiveStatus');
+
+      if (!code) return (liveMsg.textContent = '');
+
+      const query = await db.collection('promos').where('code', '==', code).limit(1).get();
+      if (query.empty) {
+        liveMsg.textContent = "❌ Invalid promo code.";
+        liveMsg.style.color = "red";
+      } else {
+        const promo = query.docs[0].data();
+        liveMsg.textContent = `✅ Valid promo: ₹${promo.discount || 0} off`;
+        liveMsg.style.color = "green";
+      }
+    }
+
     async function applyPromo() {
       const code = document.getElementById('promoCode').value.trim();
       const msg = document.getElementById('promoMessage');
-      if (!code) return;
 
-      try {
-        const doc = await db.collection('promoCodes').doc(code).get();
-        if (!doc.exists) {
-          promoDiscount = 0;
-          msg.textContent = "❌ Invalid promo code.";
-          msg.style.color = 'red';
-        } else {
-          const data = doc.data();
-          promoDiscount = data.discountAmount || 0;
-          msg.textContent = `✅ ₹${promoDiscount} off applied.`;
-          msg.style.color = 'green';
-        }
+      const query = await db.collection('promos').where('code', '==', code).limit(1).get();
+      if (query.empty) {
+        msg.textContent = "❌ Invalid promo code.";
+        msg.style.color = "red";
+        promoDiscount = 0;
         renderCart();
-      } catch (err) {
-        console.error("Promo error:", err);
-        msg.textContent = "⚠️ Error validating promo code.";
-        msg.style.color = 'orange';
+        return;
       }
+
+      const promo = query.docs[0].data();
+
+      // Optional: Check expiry
+      if (promo.expiry && new Date(promo.expiry) < new Date()) {
+        msg.textContent = "❌ Promo expired.";
+        msg.style.color = "red";
+        promoDiscount = 0;
+        renderCart();
+        return;
+      }
+
+      // Optional: Check usage limit
+      if (promo.limit && promo.usedCount >= promo.limit) {
+        msg.textContent = "❌ Promo usage limit reached.";
+        msg.style.color = "red";
+        promoDiscount = 0;
+        renderCart();
+        return;
+      }
+
+      promoDiscount = promo.discount || 0;
+      msg.textContent = `✅ ₹${promoDiscount} off applied.`;
+      msg.style.color = "green";
+      renderCart();
     }
 
     function goToCheckout() {
       window.location.href = 'checkout.html';
     }
   </script>
-
 </body>
 </html>
