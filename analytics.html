@@ -100,6 +100,28 @@ canvas {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
 }
 
+.top-products {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+.top-products h3 {
+  margin-bottom: 1rem;
+  color: var(--primary);
+}
+.top-products ul {
+  list-style: none;
+  padding-left: 0;
+}
+.top-products li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+  font-weight: 500;
+}
+
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -135,7 +157,12 @@ canvas {
     <div class="card"><h3>Total Bookings</h3><h2 id="bookingCount">--</h2></div>
   </div><canvas id="analyticsChart"></canvas> <canvas id="trendChart"></canvas> <canvas id="categoryChart"></canvas>
 
-  <script type="module">
+  <div class="top-products">
+    <h3>🔥 Top Selling Products</h3>
+    <ul id="topProductsList">
+      <li>Loading...</li>
+    </ul>
+  </div>  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getFirestore, collection, getDocs, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
@@ -159,6 +186,7 @@ canvas {
     const productCount = document.getElementById("productCount");
     const serviceCount = document.getElementById("serviceCount");
     const bookingCount = document.getElementById("bookingCount");
+    const topProductsList = document.getElementById("topProductsList");
     const filter = document.getElementById("timeFilter");
 
     const getTimeRange = (type) => {
@@ -185,6 +213,18 @@ canvas {
       const q = dateFilter ? query(ref, where("createdAt", ">=", dateFilter)) : ref;
       const snap = await getDocs(q);
       return snap.size;
+    };
+
+    const fetchTopProducts = async () => {
+      const snap = await getDocs(collection(db, "products"));
+      const productData = snap.docs.map(doc => doc.data());
+      const sorted = productData
+        .filter(p => p.sold)
+        .sort((a, b) => b.sold - a.sold)
+        .slice(0, 5);
+      topProductsList.innerHTML = sorted.length
+        ? sorted.map(p => `<li>${p.name} (${p.sold} sold)</li>`).join("")
+        : '<li>No data available</li>';
     };
 
     const fetchAllAnalytics = async (filterValue = "all") => {
@@ -214,6 +254,7 @@ canvas {
       renderOverviewChart([users, orders, products, services, bookings]);
       renderTrendChart();
       renderCategoryChart();
+      fetchTopProducts();
     };
 
     const renderOverviewChart = (data) => {
