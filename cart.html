@@ -171,142 +171,151 @@
     </div>
   </div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
-      authDomain: "store-471f1.firebaseapp.com",
-      projectId: "store-471f1",
-      storageBucket: "store-471f1.appspot.com",
-      messagingSenderId: "619523242611",
-      appId: "1:619523242611:web:fdfa53044c62f844574806",
-      measurementId: "G-16C8MYT70G"
-    };
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
+    authDomain: "store-471f1.firebaseapp.com",
+    projectId: "store-471f1",
+    storageBucket: "store-471f1.appspot.com",
+    messagingSenderId: "619523242611",
+    appId: "1:619523242611:web:fdfa53044c62f844574806"
+  };
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-    let cartData = [], promoDiscount = 0;
+  let cartData = [], promoDiscount = 0, promoDocRef = null;
 
-    auth.onAuthStateChanged(async user => {
-      if (!user) return alert("Please log in to view your cart.");
-      const snapshot = await db.collection(`users/${user.uid}/cart`).get();
-      cartData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      renderCart();
+  auth.onAuthStateChanged(async user => {
+    if (!user) return alert("Please log in to view your cart.");
+    const snapshot = await db.collection(`users/${user.uid}/cart`).get();
+    cartData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderCart();
+  });
+
+  function renderCart() {
+    const cartItemsEl = document.getElementById('cartItems');
+    let total = 0;
+    cartItemsEl.innerHTML = '';
+
+    cartData.forEach(item => {
+      const itemTotal = item.price * item.quantity;
+      total += itemTotal;
+      const el = document.createElement('div');
+      el.className = 'cart-item';
+      el.innerHTML = `
+        <div class="item-details">
+          <div class="item-name">${item.name}</div>
+          <div class="item-price">₹${item.price} × ${item.quantity} = ₹${itemTotal}</div>
+          <div class="item-controls">
+            <button onclick="changeQty('${item.id}', -1)">-</button>
+            <button onclick="changeQty('${item.id}', 1)">+</button>
+            <button onclick="removeItem('${item.id}')">Remove</button>
+          </div>
+        </div>
+      `;
+      cartItemsEl.appendChild(el);
     });
 
-    function renderCart() {
-      const cartItemsEl = document.getElementById('cartItems');
-      let total = 0;
-      cartItemsEl.innerHTML = '';
+    const subtotal = total;
+    const discounted = Math.max(0, subtotal - promoDiscount);
+    document.getElementById('cartTotal').innerText = discounted.toFixed(2);
+  }
 
-      cartData.forEach(item => {
-        const itemTotal = item.price * item.quantity;
-        total += itemTotal;
-        const el = document.createElement('div');
-        el.className = 'cart-item';
-        el.innerHTML = `
-          <img class="item-image" src="${item.image || 'https://via.placeholder.com/100'}" />
-          <div class="item-details">
-            <div class="item-name">${item.name}</div>
-            <div class="item-price">₹${item.price} × ${item.quantity} = ₹${itemTotal}</div>
-            <div class="item-controls">
-              <button onclick="changeQty('${item.id}', -1)">-</button>
-              <button onclick="changeQty('${item.id}', 1)">+</button>
-              <button onclick="removeItem('${item.id}')">Remove</button>
-            </div>
-          </div>
-        `;
-        cartItemsEl.appendChild(el);
-      });
+  async function changeQty(id, delta) {
+    const item = cartData.find(i => i.id === id);
+    if (!item) return;
+    const newQty = item.quantity + delta;
+    if (newQty < 1) return;
+    await db.doc(`users/${auth.currentUser.uid}/cart/${id}`).update({ quantity: newQty });
+    item.quantity = newQty;
+    renderCart();
+  }
 
-      const discounted = total - promoDiscount;
-      document.getElementById('cartTotal').innerText = discounted.toFixed(2);
+  async function removeItem(id) {
+    await db.doc(`users/${auth.currentUser.uid}/cart/${id}`).delete();
+    cartData = cartData.filter(item => item.id !== id);
+    renderCart();
+  }
+
+  async function clearCart() {
+    for (const item of cartData) {
+      await db.doc(`users/${auth.currentUser.uid}/cart/${item.id}`).delete();
     }
+    cartData = [];
+    renderCart();
+  }
 
-    async function changeQty(id, delta) {
-      const item = cartData.find(i => i.id === id);
-      if (!item) return;
-      const newQty = item.quantity + delta;
-      if (newQty < 1) return;
-      await db.doc(`users/${auth.currentUser.uid}/cart/${id}`).update({ quantity: newQty });
-      item.quantity = newQty;
+  async function applyPromo() {
+    const code = document.getElementById('promoCode').value.trim();
+    const msg = document.getElementById('promoMessage');
+    const user = auth.currentUser;
+    if (!code || !user) return;
+
+    const query = await db.collection('promos').where('code', '==', code).limit(1).get();
+    if (query.empty) {
+      msg.textContent = "❌ Invalid promo code.";
+      msg.style.color = "red";
+      promoDiscount = 0;
       renderCart();
+      return;
     }
 
-    async function removeItem(id) {
-      await db.doc(`users/${auth.currentUser.uid}/cart/${id}`).delete();
-      cartData = cartData.filter(item => item.id !== id);
+    const doc = query.docs[0];
+    const promo = doc.data();
+    promoDocRef = doc.ref;
+
+    // Validate expiry
+    if (promo.expiry && new Date(promo.expiry) < new Date()) {
+      msg.textContent = "❌ Promo expired.";
+      msg.style.color = "red";
+      promoDiscount = 0;
       renderCart();
+      return;
     }
 
-    async function clearCart() {
-      for (const item of cartData) {
-        await db.doc(`users/${auth.currentUser.uid}/cart/${item.id}`).delete();
-      }
-      cartData = [];
+    // Validate usage count
+    if (promo.limit && promo.usedCount >= promo.limit) {
+      msg.textContent = "❌ Promo usage limit reached.";
+      msg.style.color = "red";
+      promoDiscount = 0;
       renderCart();
+      return;
     }
 
-    async function validatePromoLive() {
-      const code = document.getElementById('promoCode').value.trim();
-      const liveMsg = document.getElementById('promoLiveStatus');
-
-      if (!code) return (liveMsg.textContent = '');
-
-      const query = await db.collection('promos').where('code', '==', code).limit(1).get();
-      if (query.empty) {
-        liveMsg.textContent = "❌ Invalid promo code.";
-        liveMsg.style.color = "red";
-      } else {
-        const promo = query.docs[0].data();
-        liveMsg.textContent = `✅ Valid promo: ₹${promo.discount || 0} off`;
-        liveMsg.style.color = "green";
-      }
+    // Validate per-user
+    if (promo.usedBy && promo.usedBy.includes(user.email)) {
+      msg.textContent = "❌ You have already used this code.";
+      msg.style.color = "red";
+      promoDiscount = 0;
+      renderCart();
+      return;
     }
 
-    async function applyPromo() {
-      const code = document.getElementById('promoCode').value.trim();
-      const msg = document.getElementById('promoMessage');
-
-      const query = await db.collection('promos').where('code', '==', code).limit(1).get();
-      if (query.empty) {
-        msg.textContent = "❌ Invalid promo code.";
-        msg.style.color = "red";
-        promoDiscount = 0;
-        renderCart();
-        return;
-      }
-
-      const promo = query.docs[0].data();
-
-      // Optional: Check expiry
-      if (promo.expiry && new Date(promo.expiry) < new Date()) {
-        msg.textContent = "❌ Promo expired.";
-        msg.style.color = "red";
-        promoDiscount = 0;
-        renderCart();
-        return;
-      }
-
-      // Optional: Check usage limit
-      if (promo.limit && promo.usedCount >= promo.limit) {
-        msg.textContent = "❌ Promo usage limit reached.";
-        msg.style.color = "red";
-        promoDiscount = 0;
-        renderCart();
-        return;
-      }
-
+    // Calculate discount
+    const subtotal = cartData.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    if (promo.type === 'percentage') {
+      promoDiscount = (subtotal * promo.discount) / 100;
+    } else {
       promoDiscount = promo.discount || 0;
-      msg.textContent = `✅ ₹${promoDiscount} off applied.`;
-      msg.style.color = "green";
-      renderCart();
     }
 
-    function goToCheckout() {
-      window.location.href = 'checkout.html';
-    }
-  </script>
+    msg.textContent = `✅ Promo applied: ₹${promoDiscount.toFixed(2)} off`;
+    msg.style.color = "green";
+
+    // Update promo usage
+    await promoDocRef.update({
+      usedCount: (promo.usedCount || 0) + 1,
+      usedBy: firebase.firestore.FieldValue.arrayUnion(user.email)
+    });
+
+    renderCart();
+  }
+
+  function goToCheckout() {
+    window.location.href = 'checkout.html';
+  }
+</script>
 </body>
 </html>
