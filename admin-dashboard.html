@@ -1,93 +1,118 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel</title>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: "Segoe UI", sans-serif;
+      display: flex;
+      min-height: 100vh;
+      background-color: #f4f6f8;
+      color: #1f2937;
+    }
+    .sidebar {
+      width: 250px;
+      background-color: #111827;
+      color: white;
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+    .sidebar h2 {
+      margin-bottom: 2rem;
+      font-size: 1.6rem;
+      text-align: center;
+    }
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      margin: 0.5rem 0;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      transition: background 0.3s ease;
+      font-weight: 500;
+    }
+    .sidebar a:hover {
+      background-color: #374151;
+    }
+    .content {
+      flex: 1;
+      padding: 2rem;
+      background: linear-gradient(to right, #f8fafc, #e2e8f0);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    .content h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #1e40af;
+    }
+    .content p {
+      font-size: 1.1rem;
+    }
+    .logout {
+      margin-top: auto;
+      background-color: #ef4444;
+      border: none;
+      color: white;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .logout:hover {
+      background-color: #dc2626;
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100px;
+        padding: 1rem 0.5rem;
+      }
+      .sidebar h2 {
+        display: none;
+      }
+      .sidebar a {
+        font-size: 0.8rem;
+        padding: 0.5rem;
+      }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
-  <!-- Layout -->
-  <div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 bg-blue-900 text-white transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-in-out md:relative shadow-xl">
-      <div class="p-6 text-2xl font-bold">Admin Panel</div>
-      <nav class="flex flex-col gap-2 px-4">
-       <a href="admin-dashboard.html" class="px-4 py-2 rounded hover:bg-blue-800 transition">Dashboard</a>
-        <a href="bookings-dash.html" class="px-4 py-2 rounded hover:bg-blue-800 transition">Bookings </a>
-        <a href="services-dash.html" class="px-4 py-2 rounded hover:bg-blue-800 transition">Services Manager</a>
-        <a href="products-dash.html" class="px-4 py-2 rounded hover:bg-blue-800 transition">Products Manager</a>
-        <a href="users-dash.html" class="px-4 py-2 rounded hover:bg-blue-800 transition">Users Manager </a>
-        <a href="analytics.html" class="px-4 py-2 rounded hover:bg-blue-800 transition">Anaylatics</a>
-        <button id="logoutBtn" class="px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition text-left">Logout</button>
-      </nav>
-    </aside>
-
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col overflow-hidden w-full">
-      <header class="bg-white shadow flex items-center justify-between px-4 py-4 md:px-6">
-        <button id="menuBtn" class="md:hidden text-blue-900">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-        </button>
-        <h1 class="text-xl font-bold text-blue-900">Dashboard</h1>
-        <div class="flex items-center gap-4">
-          <span class="text-sm hidden sm:block">Admin</span>
-          <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">A</div>
-        </div>
-      </header>
-
-      <main class="p-4 md:p-6 overflow-y-auto">
-        <h2 class="text-2xl font-semibold mb-6">Welcome back, Admin 👋</h2>
-
-        <!-- Stat Cards -->
-        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div class="bg-white rounded-xl shadow-md p-4">
-            <h3 class="text-sm text-gray-500">Total Users</h3>
-            <p id="totalUsers" class="text-2xl font-bold text-blue-700 mt-2">0</p>
-          </div>
-          <div class="bg-white rounded-xl shadow-md p-4">
-            <h3 class="text-sm text-gray-500">Total Products</h3>
-            <p id="totalProducts" class="text-2xl font-bold text-purple-700 mt-2">0</p>
-          </div>
-          <div class="bg-white rounded-xl shadow-md p-4">
-            <h3 class="text-sm text-gray-500">Total Services</h3>
-            <p id="totalServices" class="text-2xl font-bold text-green-700 mt-2">0</p>
-          </div>
-          <div class="bg-white rounded-xl shadow-md p-4">
-            <h3 class="text-sm text-gray-500">Total Bookings</h3>
-            <p id="totalBookings" class="text-2xl font-bold text-pink-700 mt-2">0</p>
-          </div>
-        </div>
-
-        <!-- Charts -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="bg-white p-6 rounded-xl shadow-md">
-            <h3 class="text-lg font-semibold mb-4">📈 Bookings Over Time</h3>
-            <canvas id="lineChart" height="300"></canvas>
-          </div>
-          <div class="bg-white p-6 rounded-xl shadow-md">
-            <h3 class="text-lg font-semibold mb-4">🧪 Service Distribution</h3>
-            <canvas id="pieChart" height="300"></canvas>
-          </div>
-        </div>
-      </main>
-    </div>
-  </div>
-
-  <!-- Firebase Integration -->
-  <script type="module">
+<body>
+  <div class="sidebar">
+    <h2>Admin Panel</h2>
+    <a href="users.html">👥 Manage Users</a>
+    <a href="products.html">🛍️ Manage Products</a>
+    <a href="services.html">🧰 Manage Services</a>
+    <a href="bookings.html">📅 Manage Bookings</a>
+    <a href="orders.html">📦 View Orders</a>
+    <a href="promos.html">🏷️ Promo Manager</a>
+    <button class="logout" id="logoutBtn">🚪 Logout</button>
+  </div>  <div class="content">
+    <h1>Welcome, <span id="adminName">Admin</span></h1>
+    <p>Use the sidebar to manage your platform.</p>
+  </div>  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
@@ -100,88 +125,24 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
-    const db = getFirestore();
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    // Sidebar toggle
-    document.getElementById("menuBtn").addEventListener("click", () => {
-      document.getElementById("sidebar").classList.toggle("-translate-x-full");
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return location.href = "/login.html";
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+      if (!docSnap.exists() || docSnap.data().role !== "admin") {
+        alert("Access denied. Admins only.");
+        location.href = "/";
+      } else {
+        document.getElementById("adminName").textContent = docSnap.data().name || "Admin";
+      }
     });
 
-    // Logout
     document.getElementById("logoutBtn").addEventListener("click", async () => {
       await signOut(auth);
-      window.location.href = "index.html";
+      location.href = "/login.html";
     });
-
-    // Admin check and data fetch
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return window.location.href = "index.html";
-
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists() || userSnap.data().role !== "admin") {
-        alert("Access Denied: Admins Only");
-        return window.location.href = "index.html";
-      }
-
-      // Fetch totals
-      const [usersSnap, productsSnap, servicesSnap, bookingsSnap] = await Promise.all([
-        getDocs(collection(db, "users")),
-        getDocs(collection(db, "products")),
-        getDocs(collection(db, "services")),
-        getDocs(collection(db, "bookings")),
-      ]);
-
-      document.getElementById("totalUsers").textContent = usersSnap.size;
-      document.getElementById("totalProducts").textContent = productsSnap.size;
-      document.getElementById("totalServices").textContent = servicesSnap.size;
-      document.getElementById("totalBookings").textContent = bookingsSnap.size;
-
-      // Bookings chart by date
-      const bookingMap = {};
-      bookingsSnap.forEach(doc => {
-        const data = doc.data();
-        const date = new Date(data.date).toLocaleDateString("en-GB");
-        bookingMap[date] = (bookingMap[date] || 0) + 1;
-      });
-
-      const labels = Object.keys(bookingMap);
-      const bookingCounts = Object.values(bookingMap);
-
-      new Chart(document.getElementById("lineChart"), {
-        type: "line",
-        data: {
-          labels: labels,
-          datasets: [{
-            label: "Bookings",
-            data: bookingCounts,
-            backgroundColor: "rgba(59,130,246,0.2)",
-            borderColor: "#3b82f6",
-            tension: 0.3,
-            fill: true
-          }]
-        }
-      });
-
-      // Service category distribution
-      const serviceMap = {};
-      servicesSnap.forEach(doc => {
-        const cat = doc.data().category || "Uncategorized";
-        serviceMap[cat] = (serviceMap[cat] || 0) + 1;
-      });
-
-      new Chart(document.getElementById("pieChart"), {
-        type: "pie",
-        data: {
-          labels: Object.keys(serviceMap),
-          datasets: [{
-            data: Object.values(serviceMap),
-            backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#6366f1"]
-          }]
-        }
-      });
-    });
-  </script>
-</body>
+  </script></body>
 </html>
