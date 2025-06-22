@@ -1,0 +1,306 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Promo Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #fce4ec);
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      color: #0f172a;
+      margin-bottom: 2rem;
+      font-size: 2.5rem;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    }
+    form {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      transform: perspective(1000px) rotateX(1deg);
+      transition: transform 0.3s;
+    }
+    form:hover {
+      transform: perspective(1000px) rotateX(0);
+    }
+    input, select {
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #7c3aed;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: background 0.3s, transform 0.2s;
+      margin: 0.25rem;
+    }
+    button:hover {
+      background-color: #5b21b6;
+      transform: translateY(-2px);
+    }
+    .promo-list {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    .promo-item {
+      border-bottom: 1px solid #eee;
+      padding: 1rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      animation: fadeIn 0.5s ease;
+    }
+    .promo-item:last-child {
+      border-bottom: none;
+    }
+    .promo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(145deg, #a78bfa, #c4b5fd);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    }
+    .promo-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .promo-actions button {
+      background: #facc15;
+      color: black;
+      flex-shrink: 0;
+    }
+    .promo-actions button:last-child {
+      background: #ef4444;
+      color: white;
+    }
+    .status {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.5rem;
+      font-size: 0.8rem;
+      margin-left: 0.5rem;
+    }
+    .active {
+      background: #4ade80;
+      color: #065f46;
+    }
+    .expired {
+      background: #f87171;
+      color: #7f1d1d;
+    }
+    #searchBar {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 1rem auto;
+      display: block;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #10b981;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+      animation: fadeIn 0.3s ease, fadeOut 0.3s ease 2.5s forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateY(20px); }
+    }
+  </style>
+</head>
+<body>
+  <h1>🎁 Promo Manager</h1>
+  <form id="promoForm">
+    <input type="text" id="code" placeholder="Promo Code" required />
+    <input type="number" id="discount" placeholder="Discount % (e.g. 10)" required />
+    <input type="number" id="limit" placeholder="Usage Limit" required />
+    <input type="date" id="expiry" required />
+    <button type="submit">Add Promo</button>
+  </form>  <input type="text" id="searchBar" placeholder="Search promo codes...">  <div class="promo-list" id="promoList">
+    <h2>Promo Codes</h2>
+    <div id="promosContainer">Loading...</div>
+  </div>  <div id="toast" class="toast" style="display:none;"></div>  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js';
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
+      authDomain: "store-471f1.firebaseapp.com",
+      projectId: "store-471f1",
+      storageBucket: "store-471f1.appspot.com",
+      messagingSenderId: "619523242611",
+      appId: "1:619523242611:web:fdfa53044c62f844574806",
+      measurementId: "G-16C8MYT70G"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
+
+    const promoForm = document.getElementById('promoForm');
+    const promoList = document.getElementById('promosContainer');
+    const searchBar = document.getElementById('searchBar');
+
+    let promoData = [];
+
+    const showToast = (msg) => {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 3000);
+    };
+
+    const fetchPromos = async () => {
+      const snap = await getDocs(collection(db, 'promos'));
+      promoData = [];
+      snap.forEach(docSnap => {
+        promoData.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      displayPromos(promoData);
+    };
+
+    const displayPromos = (list) => {
+      promoList.innerHTML = '';
+      const now = new Date();
+      list.forEach(p => {
+        const expires = new Date(p.expiry);
+        const status = expires >= now ? 'active' : 'expired';
+        const div = document.createElement('div');
+        div.className = 'promo-item';
+        div.innerHTML = `
+          <strong>${p.code}</strong>
+          <span class="status ${status}">${status.toUpperCase()}</span><br>
+          ${p.discount}% off | limit: ${p.limit} | used: ${p.usedCount || 0} | expires: ${p.expiry}
+          <div class="promo-actions">
+            <button onclick="editPromo('${p.id}', '${p.code}', ${p.discount}, ${p.limit}, '${p.expiry}')">Edit</button>
+            <button onclick="clonePromo('${p.code}', ${p.discount}, ${p.limit}, '${p.expiry}')">Clone</button>
+            <button onclick="deletePromo('${p.id}')">Delete</button>
+          </div>
+        `;
+        promoList.appendChild(div);
+      });
+    };
+
+    searchBar.addEventListener('input', () => {
+      const filtered = promoData.filter(p => p.code.toLowerCase().includes(searchBar.value.toLowerCase()));
+      displayPromos(filtered);
+    });
+
+    window.editPromo = (id, code, discount, limit, expiry) => {
+      document.getElementById('code').value = code;
+      document.getElementById('discount').value = discount;
+      document.getElementById('limit').value = limit;
+      document.getElementById('expiry').value = expiry;
+      promoForm.onsubmit = async (e) => {
+        e.preventDefault();
+        await updateDoc(doc(db, 'promos', id), {
+          code: code.trim(),
+          discount: parseFloat(discount),
+          limit: parseInt(limit),
+          expiry
+        });
+        promoForm.reset();
+        promoForm.onsubmit = handlePromoSubmit;
+        fetchPromos();
+        showToast('Promo updated');
+      };
+    };
+
+    window.clonePromo = async (code, discount, limit, expiry) => {
+      await addDoc(collection(db, 'promos'), {
+        code: `${code}-copy`,
+        discount,
+        limit,
+        expiry,
+        usedCount: 0,
+        createdAt: serverTimestamp()
+      });
+      fetchPromos();
+      showToast('Promo cloned');
+    };
+
+    const deletePromo = async (id) => {
+      if (confirm('Delete this promo?')) {
+        await deleteDoc(doc(db, 'promos', id));
+        fetchPromos();
+        showToast('Promo deleted');
+      }
+    };
+
+    window.deletePromo = deletePromo;
+
+    const handlePromoSubmit = async (e) => {
+      e.preventDefault();
+      const code = document.getElementById('code').value.trim();
+      const discount = parseFloat(document.getElementById('discount').value);
+      const limit = parseInt(document.getElementById('limit').value);
+      const expiry = document.getElementById('expiry').value;
+      if (!code || isNaN(discount) || isNaN(limit) || !expiry || discount > 100 || limit < 1) return alert("Invalid input");
+      await addDoc(collection(db, 'promos'), {
+        code,
+        discount,
+        limit,
+        expiry,
+        usedCount: 0,
+        createdAt: serverTimestamp()
+      });
+      promoForm.reset();
+      fetchPromos();
+      showToast('Promo added');
+    };
+
+    promoForm.onsubmit = handlePromoSubmit;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return location.href = "/login.html";
+      fetchPromos();
+    });
+  </script></body>
+</html>
