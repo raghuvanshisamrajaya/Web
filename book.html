@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -68,17 +69,28 @@
       <input type="email" id="email" placeholder="Email Address" required />
       <input type="tel" id="phone" placeholder="Phone Number" required />
       <textarea id="location" placeholder="Your Location (Address)" required></textarea>
-      <select id="service" required><option value="">Select Service</option></select>
+      <select id="service" required>
+        <option value="">Select Service</option>
+      </select>
       <div class="price-display" id="priceDisplay"></div>
       <input type="date" id="date" required />
-      <select id="time" required><option value="">Select Time Slot</option></select>
+      <select id="time" required>
+        <option value="">Select Time Slot</option>
+      </select>
       <button type="submit">Book Now</button>
     </form>
     <div id="message"></div>
     <div id="whatsappBtn" style="display:none;">
       <a id="whatsappLink" target="_blank">Confirm via WhatsApp</a>
     </div>
-  </div>  <!-- Firebase SDK -->  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js"></script>  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js"></script>  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js"></script>  <script>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js"></script>
+
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
       authDomain: "store-471f1.firebaseapp.com",
@@ -88,10 +100,13 @@
       appId: "1:619523242611:web:fdfa53044c62f844574806",
       measurementId: "G-16C8MYT70G"
     };
+
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-  </script>  <script>
+  </script>
+
+  <script>
     const serviceDropdown = document.getElementById("service");
     const timeDropdown = document.getElementById("time");
     const priceDisplay = document.getElementById("priceDisplay");
@@ -114,24 +129,35 @@
     }
 
     async function loadServices() {
-      const servicesSnap = await db.collection("services").get();
-      servicesSnap.forEach(doc => {
-        const s = doc.data();
-        const opt = document.createElement("option");
-        opt.value = doc.id;
-        opt.textContent = s.name;
-        serviceDropdown.appendChild(opt);
-      });
+      try {
+        const servicesSnap = await db.collection("services").get();
+        servicesSnap.forEach(doc => {
+          const data = doc.data();
+          if (data.name) {
+            const opt = document.createElement("option");
+            opt.value = doc.id;
+            opt.textContent = data.name;
+            serviceDropdown.appendChild(opt);
+          }
+        });
+      } catch (error) {
+        console.error("Error loading services:", error);
+      }
     }
 
     async function loadTimeSlots() {
       const serviceId = serviceDropdown.value;
       const selectedDate = dateInput.value;
       timeDropdown.innerHTML = `<option value="">Select Time Slot</option>`;
+      priceDisplay.textContent = "";
+
       if (!serviceId || !selectedDate) return;
 
       const serviceDoc = await db.collection("services").doc(serviceId).get();
       const serviceData = serviceDoc.data();
+
+      if (!serviceData) return;
+
       priceDisplay.textContent = `₹${serviceData.price}`;
       const slots = serviceData.slots || [];
 
@@ -139,6 +165,7 @@
         .where("serviceId", "==", serviceId)
         .where("date", "==", selectedDate)
         .get();
+
       const bookedSlots = bookingsSnap.docs.map(doc => doc.data().time);
 
       slots.forEach(slot => {
@@ -169,7 +196,13 @@
       const time = timeDropdown.value;
       const date = dateInput.value;
 
-      const existing = await db.collection("bookings").where("userId", "==", user.uid).where("date", "==", date).get();
+      if (!serviceId || !time || !date) return alert("Fill all required fields");
+
+      const existing = await db.collection("bookings")
+        .where("userId", "==", user.uid)
+        .where("date", "==", date)
+        .get();
+
       if (existing.size >= 3) return alert("Max 3 bookings per day.");
 
       const serviceData = (await db.collection("services").doc(serviceId).get()).data();
@@ -200,11 +233,16 @@
     serviceDropdown.addEventListener("change", loadTimeSlots);
     dateInput.addEventListener("change", loadTimeSlots);
 
+    // Load services on page load
     loadServices();
-  </script>  <!-- Register Service Worker for PWA -->  <script>
+  </script>
+
+  <!-- Register Service Worker -->
+  <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/service-worker.js')
         .then(() => console.log('Service Worker Registered'));
     }
-  </script></body>
+  </script>
+</body>
 </html>
