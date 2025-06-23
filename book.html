@@ -4,245 +4,217 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Book a Service</title>
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#2563eb" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: "Segoe UI", sans-serif;
-      background: #f3f4f6;
-      padding: 20px;
+      font-family: 'Inter', sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
     }
+
     .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
       max-width: 500px;
-      margin: auto;
-      background: #fff;
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      width: 100%;
     }
-    h1 {
+
+    h2 {
+      margin-bottom: 1.5rem;
+      color: #2563eb;
       text-align: center;
     }
-    form {
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
       margin-top: 1rem;
     }
-    select, input, button, textarea {
-      padding: 10px;
-      margin: 8px 0;
+
+    input, select {
       width: 100%;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-family: inherit;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      background: #fff;
+      transition: border 0.3s ease;
     }
+
+    input:focus, select:focus {
+      border-color: #2563eb;
+      outline: none;
+    }
+
     button {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.75rem;
       background: #2563eb;
       color: white;
       border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
+
     button:hover {
       background: #1d4ed8;
     }
-    .price-display {
-      text-align: right;
-      font-weight: bold;
-      color: #111827;
-    }
-    #whatsappBtn {
-      margin-top: 10px;
+
+    .message {
       text-align: center;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: #444;
     }
-    #whatsappBtn a {
-      background: #25D366;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 8px;
-      text-decoration: none;
+
+    .message.success {
+      color: green;
+    }
+
+    .message.error {
+      color: red;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Book a Service</h1>
+    <h2>Book a Service</h2>
     <form id="bookingForm">
-      <input type="text" id="name" placeholder="Your Name" required />
-      <input type="email" id="email" placeholder="Email Address" required />
-      <input type="tel" id="phone" placeholder="Phone Number" required />
-      <textarea id="location" placeholder="Your Location (Address)" required></textarea>
+      <label for="name">Full Name</label>
+      <input type="text" id="name" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" required />
+
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" required pattern="[0-9]{10}" />
+
+      <label for="location">Location</label>
+      <input type="text" id="location" required />
+
+      <label for="service">Select Service</label>
       <select id="service" required>
-        <option value="">Select Service</option>
+        <option disabled selected>Loading services...</option>
       </select>
-      <div class="price-display" id="priceDisplay"></div>
+
+      <label for="date">Booking Date</label>
       <input type="date" id="date" required />
-      <select id="time" required>
-        <option value="">Select Time Slot</option>
-      </select>
+
       <button type="submit">Book Now</button>
+      <div id="message" class="message"></div>
     </form>
-    <div id="message"></div>
-    <div id="whatsappBtn" style="display:none;">
-      <a id="whatsappLink" target="_blank">Confirm via WhatsApp</a>
-    </div>
   </div>
 
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore, collection, getDocs, addDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import {
+      getAuth, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-  <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
-      authDomain: "store-471f1.firebaseapp.com",
-      projectId: "store-471f1",
-      storageBucket: "store-471f1.appspot.com",
-      messagingSenderId: "619523242611",
-      appId: "1:619523242611:web:fdfa53044c62f844574806",
-      measurementId: "G-16C8MYT70G"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
     };
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-  </script>
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-  <script>
-    const serviceDropdown = document.getElementById("service");
-    const timeDropdown = document.getElementById("time");
-    const priceDisplay = document.getElementById("priceDisplay");
-    const bookingForm = document.getElementById("bookingForm");
+    const form = document.getElementById("bookingForm");
+    const serviceSelect = document.getElementById("service");
     const dateInput = document.getElementById("date");
+    const messageDiv = document.getElementById("message");
 
+    // Date range setup
     const today = new Date();
-    const maxDate = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    const minDate = `${yyyy}-${mm}-${dd}`;
+    const maxDate = new Date(today);
     maxDate.setDate(today.getDate() + 30);
-    dateInput.min = today.toISOString().split("T")[0];
-    dateInput.max = maxDate.toISOString().split("T")[0];
+    const maxDateStr = maxDate.toISOString().split("T")[0];
+    dateInput.min = minDate;
+    dateInput.max = maxDateStr;
 
-    function generateInvoiceId() {
-      const now = new Date();
-      const pad = n => n.toString().padStart(2, '0');
-      const date = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`;
-      const time = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-      const rand = Math.floor(1000 + Math.random() * 9000);
-      return `INV-${date}-${time}-${rand}`;
-    }
-
+    // Load services into dropdown
     async function loadServices() {
       try {
-        const servicesSnap = await db.collection("services").get();
-        servicesSnap.forEach(doc => {
+        const snapshot = await getDocs(collection(db, "services"));
+        serviceSelect.innerHTML = '<option disabled selected>Select a service</option>';
+        snapshot.forEach(doc => {
           const data = doc.data();
-          if (data.name) {
-            const opt = document.createElement("option");
-            opt.value = doc.id;
-            opt.textContent = data.name;
-            serviceDropdown.appendChild(opt);
-          }
+          const option = document.createElement("option");
+          option.value = doc.id;
+          option.textContent = data.name || "Unnamed Service";
+          serviceSelect.appendChild(option);
         });
       } catch (error) {
         console.error("Error loading services:", error);
+        serviceSelect.innerHTML = '<option disabled>Error loading services</option>';
       }
     }
 
-    async function loadTimeSlots() {
-      const serviceId = serviceDropdown.value;
-      const selectedDate = dateInput.value;
-      timeDropdown.innerHTML = `<option value="">Select Time Slot</option>`;
-      priceDisplay.textContent = "";
+    // Handle auth state
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        loadServices();
 
-      if (!serviceId || !selectedDate) return;
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          messageDiv.className = "message";
+          messageDiv.textContent = "Submitting...";
 
-      const serviceDoc = await db.collection("services").doc(serviceId).get();
-      const serviceData = serviceDoc.data();
+          const invoiceId = "INV-" + Date.now();
 
-      if (!serviceData) return;
+          const data = {
+            userId: user.uid,
+            name: form.name.value,
+            email: form.email.value,
+            phone: form.phone.value,
+            location: form.location.value,
+            serviceId: form.service.value,
+            date: form.date.value,
+            status: "pending",
+            invoiceId: invoiceId,
+            createdAt: serverTimestamp()
+          };
 
-      priceDisplay.textContent = `₹${serviceData.price}`;
-      const slots = serviceData.slots || [];
-
-      const bookingsSnap = await db.collection("bookings")
-        .where("serviceId", "==", serviceId)
-        .where("date", "==", selectedDate)
-        .get();
-
-      const bookedSlots = bookingsSnap.docs.map(doc => doc.data().time);
-
-      slots.forEach(slot => {
-        if (!bookedSlots.includes(slot)) {
-          const opt = document.createElement("option");
-          opt.value = slot;
-          opt.textContent = slot;
-          timeDropdown.appendChild(opt);
-        }
-      });
-    }
-
-    bookingForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const user = auth.currentUser;
-      if (!user) return alert("Please login");
-
-      const userDoc = await db.collection("users").doc(user.uid).get();
-      if (!userDoc.exists || userDoc.data().role !== "user") {
-        return alert("Only users can book.");
+          try {
+            await addDoc(collection(db, "bookings"), data);
+            messageDiv.className = "message success";
+            messageDiv.innerHTML = `✅ Booking successful!<br>📄 Invoice ID: <strong>${invoiceId}</strong>`;
+            form.reset();
+          } catch (err) {
+            console.error("Booking failed:", err);
+            messageDiv.className = "message error";
+            messageDiv.textContent = "❌ Failed to book. Try again later.";
+          }
+        });
+      } else {
+        messageDiv.className = "message error";
+        messageDiv.textContent = "⚠️ Please log in to book a service.";
+        serviceSelect.disabled = true;
+        form.querySelector("button").disabled = true;
       }
-
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-      const location = document.getElementById("location").value.trim();
-      const serviceId = serviceDropdown.value;
-      const time = timeDropdown.value;
-      const date = dateInput.value;
-
-      if (!serviceId || !time || !date) return alert("Fill all required fields");
-
-      const existing = await db.collection("bookings")
-        .where("userId", "==", user.uid)
-        .where("date", "==", date)
-        .get();
-
-      if (existing.size >= 3) return alert("Max 3 bookings per day.");
-
-      const serviceData = (await db.collection("services").doc(serviceId).get()).data();
-      const invoiceId = generateInvoiceId();
-
-      await db.collection("bookings").add({
-        invoiceId,
-        userId: user.uid,
-        name, email, phone, location,
-        serviceId,
-        serviceName: serviceData.name,
-        price: serviceData.price,
-        date, time,
-        status: "pending",
-        assignedDoctorId: "",
-        confirmedBy: "",
-        createdAt: firebase.firestore.Timestamp.now()
-      });
-
-      bookingForm.reset();
-      priceDisplay.textContent = "";
-      document.getElementById("message").textContent = `Booked! Invoice: ${invoiceId}`;
-      const waText = encodeURIComponent(`Hi, I booked ${serviceData.name} on ${date} at ${time}. Invoice: ${invoiceId}`);
-      document.getElementById("whatsappLink").href = `https://wa.me/91${phone}?text=${waText}`;
-      document.getElementById("whatsappBtn").style.display = "block";
     });
-
-    serviceDropdown.addEventListener("change", loadTimeSlots);
-    dateInput.addEventListener("change", loadTimeSlots);
-
-    // Load services on page load
-    loadServices();
-  </script>
-
-  <!-- Register Service Worker -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js')
-        .then(() => console.log('Service Worker Registered'));
-    }
   </script>
 </body>
 </html>
