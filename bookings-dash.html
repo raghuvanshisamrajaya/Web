@@ -108,7 +108,7 @@ button:hover {
   </div>  <div id="bookingsContainer"></div>  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import {
-      getFirestore, collection, getDocs, updateDoc, doc
+      getFirestore, collection, getDocs, updateDoc, deleteDoc, doc
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
     import {
       getAuth, onAuthStateChanged
@@ -130,6 +130,7 @@ button:hover {
 
     let doctors = [];
     let allBookings = [];
+    let serviceMap = new Map();
 
     async function getUserRole(uid) {
       const usersSnap = await getDocs(collection(db, "users"));
@@ -143,6 +144,13 @@ button:hover {
         .map(doc => ({ id: doc.id, email: doc.data().email }));
     }
 
+    async function loadServices() {
+      const snapshot = await getDocs(collection(db, "services"));
+      snapshot.forEach(doc => {
+        serviceMap.set(doc.id, doc.data().title || "Untitled");
+      });
+    }
+
     function renderBookings(bookings) {
       container.innerHTML = "";
       bookings.forEach(b => {
@@ -154,7 +162,7 @@ button:hover {
           <p><strong>Email:</strong> ${b.email}</p>
           <p><strong>Phone:</strong> ${b.phone}</p>
           <p><strong>Location:</strong> ${b.location}</p>
-          <p><strong>Service ID:</strong> ${b.serviceId}</p>
+          <p><strong>Service:</strong> ${serviceMap.get(b.serviceId) || "Unknown"}</p>
           <p><strong>Date:</strong> ${b.date}</p>
           <p><strong>Status:</strong> <span class="status">${b.status}</span></p>
           <p><strong>Assigned Doctor:</strong> ${b.assignedDoctor || "Not Assigned"}</p>
@@ -175,6 +183,8 @@ button:hover {
             <option value="rejected">Rejected</option>
           </select>
           <button onclick="updateStatus('${b.id}')">Update</button>
+
+          <button onclick="deleteBooking('${b.id}')" style="background:#dc2626; margin-top:1rem;">Delete</button>
         `;
         container.appendChild(div);
       });
@@ -195,6 +205,13 @@ button:hover {
       if (!status) return alert("Select a status.");
       await updateDoc(doc(db, "bookings", id), { status });
       alert("Status updated");
+      loadBookings();
+    };
+
+    window.deleteBooking = async (id) => {
+      if (!confirm("Are you sure you want to delete this booking?")) return;
+      await deleteDoc(doc(db, "bookings", id));
+      alert("Booking deleted");
       loadBookings();
     };
 
@@ -222,6 +239,7 @@ button:hover {
     onAuthStateChanged(auth, async user => {
       if (user && await getUserRole(user.uid) === "admin") {
         doctors = await loadDoctors();
+        await loadServices();
         loadBookings();
       } else {
         alert("Admin access required.");
