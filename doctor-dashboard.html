@@ -1,122 +1,125 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Doctor Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f3f4f6;
+      background: #f9fafb;
       margin: 0;
-      padding: 0;
-    }
+    }header {
+  background: #2563eb;
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    header {
-      background: #2563eb;
-      color: white;
-      padding: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+header h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
 
-    header h1 {
-      font-size: 1.5rem;
-      margin: 0;
-    }
+#logoutBtn {
+  background: #ef4444;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
 
-    #logoutBtn {
-      background: #ef4444;
-      border: none;
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: 0.3s;
-    }
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
 
-    #logoutBtn:hover {
-      background: #b91c1c;
-    }
+.controls input[type="text"] {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+}
 
-    #bookingsContainer {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1rem;
-      padding: 1rem;
-    }
+#bookingsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  padding: 1rem 2rem;
+}
 
-    .booking-card {
-      background: white;
-      border-radius: 1rem;
-      padding: 1rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      transition: 0.3s;
-    }
+.booking-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: 0.3s;
+}
 
-    .booking-card:hover {
-      transform: scale(1.01);
-    }
+.booking-card:hover {
+  transform: scale(1.01);
+}
 
-    .status {
-      padding: 0.4rem 0.8rem;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: bold;
-      display: inline-block;
-      text-transform: capitalize;
-      margin: 0.5rem 0;
-    }
+.status {
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  display: inline-block;
+  text-transform: capitalize;
+  margin: 0.5rem 0;
+}
 
-    .status.pending {
-      background-color: #fde68a;
-      color: #92400e;
-    }
+.status.pending {
+  background-color: #fde68a;
+  color: #92400e;
+}
 
-    .status.confirmed {
-      background-color: #bbf7d0;
-      color: #065f46;
-    }
+.status.confirmed {
+  background-color: #bbf7d0;
+  color: #065f46;
+}
 
-    .status.completed {
-      background-color: #bfdbfe;
-      color: #1e3a8a;
-    }
+.status.completed {
+  background-color: #bfdbfe;
+  color: #1e3a8a;
+}
 
-    .update-btn {
-      background: #2563eb;
-      color: white;
-      padding: 0.4rem 0.8rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: 0.3s;
-    }
+.update-btn {
+  background: #2563eb;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
 
-    .update-btn:hover {
-      background: #1e40af;
-    }
+.update-btn:hover {
+  background: #1e40af;
+}
 
-    @media (max-width: 480px) {
-      header h1 {
-        font-size: 1.2rem;
-      }
-    }
   </style>
 </head>
 <body>
   <header>
     <h1>Doctor Dashboard</h1>
     <button id="logoutBtn">Logout</button>
-  </header>
-
-  <div id="bookingsContainer">Loading...</div>
-
-  <!-- Firebase SDK -->
-  <script type="module">
+  </header>  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Search bookings by name, phone, email..." />
+  </div>  <div id="bookingsContainer">Loading...</div>  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
@@ -129,14 +132,10 @@
       updateDoc
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // ✅ Your Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
       authDomain: "store-471f1.firebaseapp.com",
       projectId: "store-471f1",
-      storageBucket: "store-471f1.appspot.com",
-      messagingSenderId: "399183437333",
-      appId: "1:399183437333:web:fa417bd93f32f35087cbd3"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -144,45 +143,43 @@
     const auth = getAuth(app);
     const bookingsContainer = document.getElementById("bookingsContainer");
     const logoutBtn = document.getElementById("logoutBtn");
+    const searchInput = document.getElementById("searchInput");
 
+    let allBookings = [];
     const statusOrder = ["pending", "confirmed", "completed"];
 
-    // 🔴 Logout Button
     logoutBtn.addEventListener("click", () => {
       signOut(auth).then(() => {
         window.location.href = "/index.html";
-      }).catch((error) => {
-        alert("Logout failed: " + error.message);
       });
     });
 
-    // 🟢 Load Bookings Assigned to Doctor
     onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        bookingsContainer.innerHTML = "<p>Please login to view your dashboard.</p>";
-        return;
-      }
+      if (!user) return bookingsContainer.innerHTML = "<p>Please login.</p>";
 
-      const q = query(
-        collection(db, "bookings"),
-        where("assignedDoctor", "==", user.email)
-      );
+      const q = query(collection(db, "bookings"), where("assignedDoctor", "==", user.email));
       const snapshot = await getDocs(q);
+      allBookings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderBookings(allBookings);
+    });
 
+    searchInput.addEventListener("input", () => {
+      const keyword = searchInput.value.toLowerCase();
+      const filtered = allBookings.filter(b =>
+        b.name.toLowerCase().includes(keyword) ||
+        b.email.toLowerCase().includes(keyword) ||
+        b.phone.toLowerCase().includes(keyword)
+      );
+      renderBookings(filtered);
+    });
+
+    function renderBookings(bookings) {
       bookingsContainer.innerHTML = "";
+      if (bookings.length === 0) return bookingsContainer.innerHTML = "<p>No matching bookings.</p>";
 
-      if (snapshot.empty) {
-        bookingsContainer.innerHTML = "<p>No bookings assigned to you.</p>";
-        return;
-      }
-
-      snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const bookingId = docSnap.id;
-
+      bookings.forEach(data => {
         const card = document.createElement("div");
         card.className = "booking-card";
-
         card.innerHTML = `
           <h3>${data.name}</h3>
           <p><strong>Phone:</strong> ${data.phone}</p>
@@ -191,34 +188,20 @@
           <p><strong>Location:</strong> ${data.location}</p>
           <p><strong>Invoice:</strong> ${data.invoiceId}</p>
           <p><strong>Status:</strong> <span class="status ${data.status.toLowerCase()}">${data.status}</span></p>
-          <button class="update-btn" data-id="${bookingId}" data-status="${data.status}">Update Status</button>
+          <button class="update-btn" onclick="updateStatus('${data.id}', '${data.status}')">Update Status</button>
         `;
-
         bookingsContainer.appendChild(card);
       });
+    }
 
-      // 🔁 Handle Status Updates
-      bookingsContainer.addEventListener("click", async (e) => {
-        if (e.target.classList.contains("update-btn")) {
-          const bookingId = e.target.getAttribute("data-id");
-          const currentStatus = e.target.getAttribute("data-status").toLowerCase();
-          const nextIndex = statusOrder.indexOf(currentStatus) + 1;
-
-          if (nextIndex >= statusOrder.length) {
-            alert("Booking is already completed.");
-            return;
-          }
-
-          const nextStatus = statusOrder[nextIndex];
-          const bookingRef = doc(db, "bookings", bookingId);
-
-          await updateDoc(bookingRef, { status: nextStatus });
-
-          alert(`Status updated to "${nextStatus}"`);
-          location.reload();
-        }
-      });
-    });
-  </script>
-</body>
+    window.updateStatus = async (bookingId, currentStatus) => {
+      const nextIndex = statusOrder.indexOf(currentStatus.toLowerCase()) + 1;
+      if (nextIndex >= statusOrder.length) return alert("Already completed.");
+      const nextStatus = statusOrder[nextIndex];
+      await updateDoc(doc(db, "bookings", bookingId), { status: nextStatus });
+      const item = allBookings.find(b => b.id === bookingId);
+      if (item) item.status = nextStatus;
+      renderBookings(allBookings);
+    };
+  </script></body>
 </html>
