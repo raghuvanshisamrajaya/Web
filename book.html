@@ -124,13 +124,17 @@
       getFirestore, collection, getDocs, addDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
     import {
-      getAuth, onAuthStateChanged
+      getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
+      apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
+      authDomain: "store-471f1.firebaseapp.com",
+      projectId: "store-471f1",
+      storageBucket: "store-471f1.appspot.com",
+      messagingSenderId: "619523242611",
+      appId: "1:619523242611:web:fdfa53044c62f844574806",
+      measurementId: "G-16C8MYT70G"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -142,7 +146,7 @@
     const dateInput = document.getElementById("date");
     const messageDiv = document.getElementById("message");
 
-    // Date range setup
+    // Set booking date limits
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, "0");
@@ -154,7 +158,7 @@
     dateInput.min = minDate;
     dateInput.max = maxDateStr;
 
-    // Load services into dropdown
+    // Load services
     async function loadServices() {
       try {
         const snapshot = await getDocs(collection(db, "services"));
@@ -172,48 +176,52 @@
       }
     }
 
-    // Handle auth state
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        loadServices();
+    // Auth persistence + state check
+    setPersistence(auth, browserLocalPersistence).then(() => {
+      onAuthStateChanged(auth, user => {
+        if (user) {
+          loadServices();
 
-        form.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          messageDiv.className = "message";
-          messageDiv.textContent = "Submitting...";
+          form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            messageDiv.className = "message";
+            messageDiv.textContent = "Submitting...";
 
-          const invoiceId = "INV-" + Date.now();
+            const invoiceId = "INV-" + Date.now();
 
-          const data = {
-            userId: user.uid,
-            name: form.name.value,
-            email: form.email.value,
-            phone: form.phone.value,
-            location: form.location.value,
-            serviceId: form.service.value,
-            date: form.date.value,
-            status: "pending",
-            invoiceId: invoiceId,
-            createdAt: serverTimestamp()
-          };
+            const data = {
+              userId: user.uid,
+              name: form.name.value,
+              email: form.email.value,
+              phone: form.phone.value,
+              location: form.location.value,
+              serviceId: form.service.value,
+              date: form.date.value,
+              status: "pending",
+              invoiceId: invoiceId,
+              createdAt: serverTimestamp()
+            };
 
-          try {
-            await addDoc(collection(db, "bookings"), data);
-            messageDiv.className = "message success";
-            messageDiv.innerHTML = `✅ Booking successful!<br>📄 Invoice ID: <strong>${invoiceId}</strong>`;
-            form.reset();
-          } catch (err) {
-            console.error("Booking failed:", err);
-            messageDiv.className = "message error";
-            messageDiv.textContent = "❌ Failed to book. Try again later.";
-          }
-        });
-      } else {
-        messageDiv.className = "message error";
-        messageDiv.textContent = "⚠️ Please log in to book a service.";
-        serviceSelect.disabled = true;
-        form.querySelector("button").disabled = true;
-      }
+            try {
+              await addDoc(collection(db, "bookings"), data);
+              messageDiv.className = "message success";
+              messageDiv.innerHTML = `✅ Booking successful!<br>📄 Invoice ID: <strong>${invoiceId}</strong>`;
+              form.reset();
+            } catch (err) {
+              console.error("Booking failed:", err);
+              messageDiv.className = "message error";
+              messageDiv.textContent = "❌ Failed to book. Try again later.";
+            }
+          });
+        } else {
+          messageDiv.className = "message error";
+          messageDiv.textContent = "⚠️ Please log in to book a service.";
+          serviceSelect.disabled = true;
+          form.querySelector("button").disabled = true;
+        }
+      });
+    }).catch(err => {
+      console.error("Auth persistence error:", err);
     });
   </script>
 </body>
