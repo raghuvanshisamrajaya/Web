@@ -20,28 +20,18 @@
       text-align: center;
       margin-bottom: 2rem;
     }
-    .summary p {
-      font-weight: 600;
-      color: #1e293b;
-    }
     .controls {
       display: flex;
       justify-content: center;
       gap: 1rem;
-      margin-bottom: 2rem;
       flex-wrap: wrap;
+      margin-bottom: 2rem;
     }
     input, select {
       padding: 0.6rem 1rem;
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 1rem;
-    }
-    .legend {
-      text-align: center;
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
-      color: #4b5563;
     }
     .card {
       background: white;
@@ -58,10 +48,6 @@
     @keyframes fadeIn {
       from {opacity: 0; transform: translateY(10px);}
       to {opacity: 1; transform: translateY(0);}
-    }
-    .card:hover {
-      transform: scale(1.01);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     }
     .card p {
       margin: 0.5rem 0;
@@ -98,14 +84,8 @@
 <body>
   <h1>Doctor Dashboard</h1>
   <div class="summary" id="summaryStats"></div>
-  <div class="legend">
-    <span class="status-badge pending">Pending</span>
-    <span class="status-badge confirmed">Confirmed</span>
-    <span class="status-badge completed">Completed</span>
-    <span class="status-badge rejected">Rejected</span>
-  </div>
   <div class="controls">
-    <input type="text" id="searchInput" placeholder="Search by patient or invoice...">
+    <input type="text" id="searchInput" placeholder="Search by name or invoice...">
     <select id="statusFilter">
       <option value="">All Statuses</option>
       <option value="pending">Pending</option>
@@ -139,20 +119,20 @@
     const container = document.getElementById("bookingsContainer");
     const searchInput = document.getElementById("searchInput");
     const statusFilter = document.getElementById("statusFilter");
-    const summary = document.getElementById("summaryStats");
+    const summaryStats = document.getElementById("summaryStats");
 
     let bookings = [];
     let servicesMap = new Map();
 
-    function renderBookings(list) {
+    function renderBookings(data) {
       container.innerHTML = "";
-      list.forEach(b => {
+      data.forEach(b => {
         const card = document.createElement("div");
         card.className = "card";
         const serviceName = servicesMap.get(b.serviceId) || b.serviceId;
         card.innerHTML = `
           <p><strong>Invoice:</strong> ${b.invoiceId}</p>
-          <p><strong>Patient:</strong> ${b.name}</p>
+          <p><strong>Name:</strong> ${b.name}</p>
           <p><strong>Email:</strong> ${b.email}</p>
           <p><strong>Phone:</strong> ${b.phone}</p>
           <p><strong>Location:</strong> ${b.location}</p>
@@ -166,28 +146,24 @@
             <option value="completed">Completed</option>
             <option value="rejected">Rejected</option>
           </select>
-          <button onclick="updateStatus('${b.id}')">Update</button>
+          <button onclick="window.updateStatus('${b.id}')">Update</button>
         `;
         container.appendChild(card);
       });
     }
 
-    function updateSummary(list) {
-      const total = list.length;
-      const pending = list.filter(b => b.status === "pending").length;
-      const confirmed = list.filter(b => b.status === "confirmed").length;
-      const completed = list.filter(b => b.status === "completed").length;
-      const rejected = list.filter(b => b.status === "rejected").length;
-
-      summary.innerHTML = `
-        <p>Total: ${total} | Pending: ${pending} | Confirmed: ${confirmed} | Completed: ${completed} | Rejected: ${rejected}</p>
-      `;
+    function updateSummary(data) {
+      const pending = data.filter(b => b.status === "pending").length;
+      const confirmed = data.filter(b => b.status === "confirmed").length;
+      const completed = data.filter(b => b.status === "completed").length;
+      const rejected = data.filter(b => b.status === "rejected").length;
+      summaryStats.innerHTML = `Pending: ${pending} | Confirmed: ${confirmed} | Completed: ${completed} | Rejected: ${rejected}`;
     }
 
     window.updateStatus = async (id) => {
-      const status = document.getElementById(`status-${id}`).value;
-      if (!status) return;
-      await updateDoc(doc(db, "bookings", id), { status });
+      const newStatus = document.getElementById(`status-${id}`).value;
+      if (!newStatus) return;
+      await updateDoc(doc(db, "bookings", id), { status: newStatus });
       alert("Status updated");
     };
 
@@ -210,11 +186,11 @@
     async function loadServices() {
       const snap = await getDocs(collection(db, "services"));
       snap.forEach(doc => {
-        servicesMap.set(doc.id, doc.data().title || "Unnamed Service");
+        servicesMap.set(doc.id, doc.data().title || "Untitled Service");
       });
     }
 
-    async function getRole(uid) {
+    async function getUserRole(uid) {
       const snap = await getDocs(collection(db, "users"));
       const docu = snap.docs.find(d => d.id === uid);
       return docu?.data()?.role || null;
@@ -222,19 +198,18 @@
 
     onAuthStateChanged(auth, async user => {
       if (user) {
-        const role = await getRole(user.uid);
-        if (role === "doctor") {
-          await loadServices();
-          onSnapshot(collection(db, "bookings"), snap => {
-            bookings = snap.docs
-              .map(doc => ({ id: doc.id, ...doc.data() }))
-              .filter(b => b.assignedDoctor === user.email);
-            filterBookings();
-          });
-        } else {
-          alert("Access denied. Doctor only.");
-          window.location.href = "index.html";
+        const role = await getUserRole(user.uid);
+        if (role !== "doctor") {
+          alert("Access denied");
+          window.location.href = "/index.html";
+          return;
         }
+        await loadServices();
+        onSnapshot(collection(db, "bookings"), snap => {
+          bookings = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+            .filter(b => b.assignedDoctor?.toLowerCase() === user.email.toLowerCase());
+          filterBookings();
+        });
       }
     });
   </script></body>
