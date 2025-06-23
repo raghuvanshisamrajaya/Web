@@ -1,171 +1,232 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Booking Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Booking Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    .card-hover:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    * {
+      box-sizing: border-box;
     }
-    .transition {
-      transition: all 0.3s ease-in-out;
-    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      margin: 0;
+      padding: 2rem;
+    }h1 {
+  text-align: center;
+  color: #2563eb;
+  margin-bottom: 2rem;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.controls input, .controls select {
+  padding: 0.6rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.card h3 {
+  color: #1d4ed8;
+  margin-top: 0;
+}
+
+.card p {
+  margin: 0.4rem 0;
+}
+
+select, button {
+  padding: 0.6rem;
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+}
+
+select {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-right: 0.5rem;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.status {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.hidden {
+  display: none;
+}
+
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen text-gray-800">
-  <div class="max-w-7xl mx-auto p-4">
-    <h1 class="text-3xl font-bold mb-6">Booking Dashboard</h1>
+<body>
+  <h1>Admin - Bookings Manager</h1>  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Search by name or invoice...">
+    <select id="statusFilter">
+      <option value="">All Statuses</option>
+      <option value="pending">Pending</option>
+      <option value="confirmed">Confirmed</option>
+      <option value="completed">Completed</option>
+      <option value="rejected">Rejected</option>
+    </select>
+  </div>  <div id="bookingsContainer"></div>  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore, collection, getDocs, updateDoc, doc
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import {
+      getAuth, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-    <!-- Top Counters -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-      <div class="bg-white p-4 rounded-2xl shadow-md card-hover transition">
-        <h2 class="text-lg font-semibold">Total</h2>
-        <p class="text-2xl font-bold" id="total-count">0</p>
-      </div>
-      <div class="bg-yellow-100 p-4 rounded-2xl shadow-md card-hover transition">
-        <h2 class="text-lg font-semibold">Pending</h2>
-        <p class="text-2xl font-bold" id="pending-count">0</p>
-      </div>
-      <div class="bg-green-100 p-4 rounded-2xl shadow-md card-hover transition">
-        <h2 class="text-lg font-semibold">Confirmed</h2>
-        <p class="text-2xl font-bold" id="confirmed-count">0</p>
-      </div>
-      <div class="bg-red-100 p-4 rounded-2xl shadow-md card-hover transition">
-        <h2 class="text-lg font-semibold">Rejected</h2>
-        <p class="text-2xl font-bold" id="rejected-count">0</p>
-      </div>
-      <div class="bg-blue-100 p-4 rounded-2xl shadow-md card-hover transition">
-        <h2 class="text-lg font-semibold">Completed</h2>
-        <p class="text-2xl font-bold" id="completed-count">0</p>
-      </div>
-    </div>
-
-    <!-- Search Bar -->
-    <div class="mb-4">
-      <input type="text" id="searchInput" placeholder="Search by name, email, phone, service, invoice..." class="w-full md:w-1/2 px-4 py-2 border rounded-md" />
-    </div>
-
-    <!-- Table -->
-    <div class="bg-white rounded-2xl shadow-md p-4 overflow-x-auto">
-      <table class="w-full table-auto">
-        <thead>
-          <tr class="bg-gray-200 text-sm">
-            <th class="px-4 py-2">Name</th>
-            <th class="px-4 py-2">Email</th>
-            <th class="px-4 py-2">Phone</th>
-            <th class="px-4 py-2">Service</th>
-            <th class="px-4 py-2">Date</th>
-            <th class="px-4 py-2">Time</th>
-            <th class="px-4 py-2">Invoice #</th>
-            <th class="px-4 py-2">Status</th>
-            <th class="px-4 py-2">Doctor</th>
-            <th class="px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="bookingTable" class="text-center text-sm"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <script>
-    // Your Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyAbknkfD6Je1a3wDZRTzn6lC62CNUhhwLc",
       authDomain: "store-471f1.firebaseapp.com",
       projectId: "store-471f1",
       storageBucket: "store-471f1.appspot.com",
       messagingSenderId: "619523242611",
-      appId: "1:619523242611:web:fdfa53044c62f844574806",
-      measurementId: "G-16C8MYT70G"
+      appId: "1:619523242611:web:fdfa53044c62f844574806"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const container = document.getElementById("bookingsContainer");
 
-    const counts = {
-      total: 0,
-      pending: 0,
-      confirmed: 0,
-      rejected: 0,
-      completed: 0
-    };
+    let doctors = [];
+    let allBookings = [];
 
-    const updateCounters = () => {
-      document.getElementById("total-count").textContent = counts.total;
-      document.getElementById("pending-count").textContent = counts.pending;
-      document.getElementById("confirmed-count").textContent = counts.confirmed;
-      document.getElementById("rejected-count").textContent = counts.rejected;
-      document.getElementById("completed-count").textContent = counts.completed;
-    };
+    async function getUserRole(uid) {
+      const usersSnap = await getDocs(collection(db, "users"));
+      const userDoc = usersSnap.docs.find(doc => doc.id === uid);
+      return userDoc?.data()?.role || null;
+    }
 
-    const loadDoctors = async () => {
-      const snapshot = await db.collection("users").where("role", "==", "doctor").get();
-      return snapshot.docs.map(doc => doc.data().email);
-    };
+    async function loadDoctors() {
+      const snapshot = await getDocs(collection(db, "users"));
+      return snapshot.docs.filter(doc => doc.data().role === "doctor")
+        .map(doc => ({ id: doc.id, email: doc.data().email }));
+    }
 
-    const renderTable = async () => {
-      const doctors = await loadDoctors();
-      db.collection("bookings").onSnapshot(snapshot => {
-        const table = document.getElementById("bookingTable");
-        const searchVal = document.getElementById("searchInput").value.toLowerCase();
-        table.innerHTML = "";
+    function renderBookings(bookings) {
+      container.innerHTML = "";
+      bookings.forEach(b => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <h3>Invoice: ${b.invoiceId}</h3>
+          <p><strong>Name:</strong> ${b.name}</p>
+          <p><strong>Email:</strong> ${b.email}</p>
+          <p><strong>Phone:</strong> ${b.phone}</p>
+          <p><strong>Location:</strong> ${b.location}</p>
+          <p><strong>Service ID:</strong> ${b.serviceId}</p>
+          <p><strong>Date:</strong> ${b.date}</p>
+          <p><strong>Status:</strong> <span class="status">${b.status}</span></p>
+          <p><strong>Assigned Doctor:</strong> ${b.assignedDoctor || "Not Assigned"}</p>
 
-        counts.total = counts.pending = counts.confirmed = counts.rejected = counts.completed = 0;
+          <label>Assign Doctor:</label>
+          <select id="doctorSelect-${b.id}">
+            <option disabled selected>Select Doctor</option>
+            ${doctors.map(d => `<option value="${d.email}">${d.email}</option>`).join("")}
+          </select>
+          <button onclick="assignDoctor('${b.id}')">Assign</button>
 
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const match = [data.userName, data.email, data.phone, data.serviceName, data.invoiceNumber]
-            .some(field => field && field.toLowerCase().includes(searchVal));
-          if (!match) return;
-
-          counts.total++;
-          if (counts[data.status] !== undefined) counts[data.status]++;
-
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td class="px-4 py-2">${data.userName}</td>
-            <td class="px-4 py-2">${data.email}</td>
-            <td class="px-4 py-2">${data.phone}</td>
-            <td class="px-4 py-2">${data.serviceName}</td>
-            <td class="px-4 py-2">${data.date}</td>
-            <td class="px-4 py-2">${data.time}</td>
-            <td class="px-4 py-2">${data.invoiceNumber || "-"}</td>
-            <td class="px-4 py-2 capitalize">${data.status}</td>
-            <td class="px-4 py-2">${data.assignedDoctorEmail || "-"}</td>
-            <td class="px-4 py-2">
-              <select onchange="assignDoctor('${doc.id}', this.value)" class="mb-1 text-xs">
-                <option value="">Assign Doctor</option>
-                ${doctors.map(email => `<option value="${email}">${email}</option>`).join("")}
-              </select><br/>
-              <button onclick="updateStatus('${doc.id}', 'confirmed')" class="bg-green-500 text-white text-xs px-2 py-1 rounded">Confirm</button>
-              <button onclick="updateStatus('${doc.id}', 'rejected')" class="bg-red-500 text-white text-xs px-2 py-1 rounded">Reject</button>
-              <button onclick="updateStatus('${doc.id}', 'completed')" class="bg-blue-500 text-white text-xs px-2 py-1 rounded">Complete</button>
-            </td>
-          `;
-          table.appendChild(row);
-        });
-
-        updateCounters();
+          <label>Update Status:</label>
+          <select id="statusSelect-${b.id}">
+            <option disabled selected>Select Status</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="completed">Completed</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <button onclick="updateStatus('${b.id}')">Update</button>
+        `;
+        container.appendChild(div);
       });
+    }
+
+    window.assignDoctor = async (id) => {
+      const select = document.getElementById(`doctorSelect-${id}`);
+      const email = select.value;
+      if (!email) return alert("Select a doctor.");
+      await updateDoc(doc(db, "bookings", id), { assignedDoctor: email });
+      alert("Doctor assigned");
+      loadBookings();
     };
 
-    const updateStatus = (id, status) => {
-      db.collection("bookings").doc(id).update({ status });
+    window.updateStatus = async (id) => {
+      const select = document.getElementById(`statusSelect-${id}`);
+      const status = select.value;
+      if (!status) return alert("Select a status.");
+      await updateDoc(doc(db, "bookings", id), { status });
+      alert("Status updated");
+      loadBookings();
     };
 
-    const assignDoctor = (id, email) => {
-      if (!email) return;
-      db.collection("bookings").doc(id).update({ assignedDoctorEmail: email });
-    };
+    document.getElementById("searchInput").addEventListener("input", e => {
+      const keyword = e.target.value.toLowerCase();
+      const filtered = allBookings.filter(b =>
+        b.name.toLowerCase().includes(keyword) ||
+        b.invoiceId.toLowerCase().includes(keyword)
+      );
+      renderBookings(filtered);
+    });
 
-    document.getElementById("searchInput").addEventListener("input", renderTable);
-    renderTable();
-  </script>
-</body>
+    document.getElementById("statusFilter").addEventListener("change", e => {
+      const status = e.target.value;
+      const filtered = status ? allBookings.filter(b => b.status === status) : allBookings;
+      renderBookings(filtered);
+    });
+
+    async function loadBookings() {
+      const snapshot = await getDocs(collection(db, "bookings"));
+      allBookings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderBookings(allBookings);
+    }
+
+    onAuthStateChanged(auth, async user => {
+      if (user && await getUserRole(user.uid) === "admin") {
+        doctors = await loadDoctors();
+        loadBookings();
+      } else {
+        alert("Admin access required.");
+        location.href = "index.html";
+      }
+    });
+  </script></body>
 </html>
