@@ -118,10 +118,10 @@
   </div>
 
   <!-- Firebase SDK -->
-  <script type="module">
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
   import {
-    getFirestore, collection, getDocs, addDoc, serverTimestamp
+    getFirestore, collection, getDocs, addDoc, query, where, getCountFromServer, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
   import {
     getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence
@@ -145,10 +145,9 @@
   const serviceSelect = document.getElementById("service");
   const dateInput = document.getElementById("date");
   const messageDiv = document.getElementById("message");
+  const serviceMap = new Map();
 
-  const serviceMap = new Map(); // serviceId => title
-
-  // Set booking date limits
+  // Set date range (today to 30 days ahead)
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, "0");
@@ -160,7 +159,7 @@
   dateInput.min = minDate;
   dateInput.max = maxDateStr;
 
-  // Load services from Firestore and populate dropdown
+  // Load services
   async function loadServices() {
     try {
       const snapshot = await getDocs(collection(db, "services"));
@@ -179,7 +178,22 @@
     }
   }
 
-  // Auth persistence + state check
+  // Count bookings for today
+  async function getTodayBookingCount(userId) {
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+    const todayStr = todayDate.toISOString().split("T")[0];
+
+    const q = query(
+      collection(db, "bookings"),
+      where("userId", "==", userId),
+      where("date", "==", todayStr)
+    );
+    const snapshot = await getCountFromServer(q);
+    return snapshot.data().count;
+  }
+
+  // Auth setup
   setPersistence(auth, browserLocalPersistence).then(() => {
     onAuthStateChanged(auth, user => {
       if (user) {
@@ -188,17 +202,25 @@
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
           messageDiv.className = "message";
-          messageDiv.textContent = "Submitting...";
+          messageDiv.textContent = "Checking booking limit...";
+
+          const todayBookingCount = await getTodayBookingCount(user.uid);
+          if (todayBookingCount >= 3) {
+            messageDiv.className = "message error";
+            messageDiv.textContent = "❌ You can only make 3 bookings per day.";
+            return;
+          }
 
           const invoiceId = "INV-" + Date.now();
           const selectedServiceId = form.service.value;
           const serviceTitle = serviceMap.get(selectedServiceId);
+          const phone = form.phone.value;
 
           const data = {
             userId: user.uid,
             name: form.name.value,
             email: form.email.value,
-            phone: form.phone.value,
+            phone: phone,
             location: form.location.value,
             serviceId: selectedServiceId,
             date: form.date.value,
@@ -209,18 +231,27 @@
 
           try {
             await addDoc(collection(db, "bookings"), data);
+            const waMessage = encodeURIComponent(
+              `Hi, I booked the service "${serviceTitle}". My Invoice ID is ${invoiceId}.`
+            );
 
-            const waMessage = encodeURIComponent(`Hi, I booked the service "${serviceTitle}". My Invoice ID is ${invoiceId}.`);
+            // Optional: Store booking details in localStorage if needed
+            localStorage.setItem("bookingSuccess", `true`);
+            localStorage.setItem("invoiceId", invoiceId);
 
+            // ✅ Redirect to profile page after 2s with WhatsApp message
             messageDiv.className = "message success";
             messageDiv.innerHTML = `
               ✅ Booking successful!<br>
               📄 Invoice ID: <strong>${invoiceId}</strong><br><br>
-              <a href="https://wa.me/916367225694${form.phone.value}?text=${waMessage}" target="_blank">
+              <a href="https://wa.me/916367225694?text=${waMessage}" target="_blank">
                 <button type="button" style="background:#25D366;margin-top:1rem;">Confirm via WhatsApp</button>
               </a>
+              <br><br>Redirecting to profile page...
             `;
-            form.reset();
+            setTimeout(() => {
+              window.location.href = "profile.html?msg=You can see your bookings and orders there.";
+            }, 4000);
           } catch (err) {
             console.error("Booking failed:", err);
             messageDiv.className = "message error";
@@ -237,6 +268,6 @@
   }).catch(err => {
     console.error("Auth persistence error:", err);
   });
-  </script>
+</script>
 </body>
 </html>
